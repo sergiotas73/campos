@@ -2,9 +2,8 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <title>Gestión de Parcelas y SIGPAC v14 - Tactical Pro + Proximidad</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -550,9 +549,6 @@
     }
     .toast.show { opacity: 1; }
 
-    /* ============================================
-       ALERTA DE PROXIMIDAD
-       ============================================ */
     .proximity-alert-bar {
       background: var(--alert-bg);
       border: 2px solid var(--alert-border);
@@ -658,21 +654,21 @@
 <body data-theme="tactical">
 
   <div class="header-bar">
-    <div class="header-title">馃尵 SIGPAC TACTICAL v14</div>
+    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v14</div>
     <div class="header-actions">
-      <button class="btn-header primary" onclick="activarSensoresGpsYBrujula()">馃摗 GPS</button>
-      <button class="btn-header" onclick="toggleConfig()">鈿欙笍 Config</button>
+      <button class="btn-header primary" onclick="activarSensoresGpsYBrujula()">&#x1F4E1; GPS</button>
+      <button class="btn-header" onclick="toggleConfig()">&#x2699;&#xFE0F; Config</button>
     </div>
   </div>
 
   <div id="panelConfig" class="panel-config hidden">
-    <h3>鈿欙笍 Configuraci贸n Avanzada</h3>
+    <h3>&#x2699;&#xFE0F; Configuración Avanzada</h3>
     
-    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">馃帹 Tema Visual</h4>
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F3A8; Tema Visual</h4>
     <div class="theme-selector">
       <div class="theme-option" onclick="cambiarTema('classic')">
         <div class="theme-preview preview-classic"></div>
-        <div class="theme-name">Cl谩sico</div>
+        <div class="theme-name">Clásico</div>
       </div>
       <div class="theme-option active" onclick="cambiarTema('tactical')">
         <div class="theme-preview preview-tactical"></div>
@@ -684,30 +680,30 @@
       </div>
     </div>
 
-    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">馃摗 Alertas de Proximidad</h4>
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4E1; Alertas de Proximidad</h4>
     <div class="config-row">
-      <label>馃敂 Distancia de alerta (metros):</label>
+      <label>&#x1F514; Distancia de alerta (metros):</label>
       <input type="number" id="cfgDistAlerta" value="100" min="10" max="5000" step="10" onchange="guardarConfigProximidad()">
     </div>
     <div class="config-row">
-      <label>馃攰 Sonido de alerta:</label>
+      <label>&#x1F50A; Sonido de alerta:</label>
       <select id="cfgSonidoAlerta" onchange="guardarConfigProximidad()">
-        <option value="vibrar">Solo Vibraci贸n</option>
-        <option value="sonido" selected>Vibraci贸n + Sonido</option>
+        <option value="vibrar">Solo Vibración</option>
+        <option value="sonido" selected>Vibración + Sonido</option>
         <option value="silencio">Silencio (solo visual)</option>
       </select>
     </div>
     <div class="config-row">
-      <label>鈴憋笍 Intervalo de escaneo (seg):</label>
+      <label>&#x23F1;&#xFE0F; Intervalo de escaneo (seg):</label>
       <select id="cfgIntervalo" onchange="guardarConfigProximidad()">
-        <option value="2000">2 segundos (m谩x precisi贸n)</option>
+        <option value="2000">2 segundos (máx precisión)</option>
         <option value="5000" selected>5 segundos (recomendado)</option>
-        <option value="10000">10 segundos (ahorro bater铆a)</option>
-        <option value="30000">30 segundos (m铆n consumo)</option>
+        <option value="10000">10 segundos (ahorro batería)</option>
+        <option value="30000">30 segundos (mín consumo)</option>
       </select>
     </div>
 
-    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">馃敜 Tama帽o de Letra</h4>
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F524; Tamaño de Letra</h4>
     <select id="cfgTamLetra" onchange="aplicarAjustesConfig()">
       <option value="0.85em">Compacto</option>
       <option value="1em" selected>Normal</option>
@@ -716,66 +712,65 @@
     </select>
   </div>
 
-  <!-- BARRA DE ALERTA DE PROXIMIDAD -->
   <div id="proximityAlertBar" class="proximity-alert-bar">
-    <span style="font-size:1.5em;">馃搷</span>
+    <span style="font-size:1.5em;">&#x1F4CD;</span>
     <span id="proximityAlertText">--</span>
   </div>
 
   <div class="nav-bar">
-    <button id="navBtn-sec-kml" class="nav-btn active" onclick="cambiarVista('sec-kml')">馃搧 KML</button>
-    <button id="navBtn-sec-edicion" class="nav-btn" onclick="cambiarVista('sec-edicion')">馃搷 GPS</button>
-    <button id="navBtn-sec-resumen" class="nav-btn" onclick="cambiarVista('sec-resumen')">馃搵 Lista</button>
-    <button id="navBtn-sec-exportar" class="nav-btn" onclick="cambiarVista('sec-exportar')">馃捑 Export</button>
-    <button id="navBtn-sec-consultas" class="nav-btn" onclick="cambiarVista('sec-consultas')">馃攳 Busca</button>
+    <button id="navBtn-sec-kml" class="nav-btn active" onclick="cambiarVista('sec-kml')">&#x1F4C1; KML</button>
+    <button id="navBtn-sec-edicion" class="nav-btn" onclick="cambiarVista('sec-edicion')">&#x1F4CD; GPS</button>
+    <button id="navBtn-sec-resumen" class="nav-btn" onclick="cambiarVista('sec-resumen')">&#x1F4CB; Lista</button>
+    <button id="navBtn-sec-exportar" class="nav-btn" onclick="cambiarVista('sec-exportar')">&#x1F4BE; Export</button>
+    <button id="navBtn-sec-consultas" class="nav-btn" onclick="cambiarVista('sec-consultas')">&#x1F50D; Busca</button>
   </div>
 
   <div id="sec-kml" class="card">
-    <h2>馃搧 Cargar KML</h2>
+    <h2>&#x1F4C1; Cargar KML</h2>
     <div class="kml-box-dual">
       <div class="kml-upload-card">
-        <h3>馃搷 Puntos</h3>
+        <h3>&#x1F4CD; Puntos</h3>
         <input type="file" id="inputKmlPuntos" accept=".kml">
         <p style="font-size:0.9em; margin-top:8px;">Cargados: <strong id="totalPuntos">0</strong></p>
       </div>
       <div class="kml-upload-card">
-        <h3>馃椇锔?Contornos</h3>
+        <h3>&#x1F5FA;&#xFE0F; Contornos</h3>
         <input type="file" id="inputKmlContornos" accept=".kml">
         <p style="font-size:0.9em; margin-top:8px;">Recintos: <strong id="totalContornos">0</strong></p>
       </div>
     </div>
     <div id="secCamposKml" class="kml-upload-card hidden">
-      <h3>馃搶 Campo Identificador</h3>
+      <h3>&#x1F4CC; Campo Identificador</h3>
       <select id="selectCampoNombre" onchange="aplicarCampoIdentificador()"></select>
     </div>
     <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
-      <button class="btn btn-danger" onclick="vibrate(100); mostrarConfirmacionLimpieza()">馃棏锔?Limpiar Todo</button>
+      <button class="btn btn-danger" onclick="vibrate(100); mostrarConfirmacionLimpieza()">&#x1F5D1;&#xFE0F; Limpiar Todo</button>
     </div>
   </div>
 
   <div id="sec-edicion" class="card relative hidden">
-    <h2>馃搷 Ficha de Campo</h2>
+    <h2>&#x1F4CD; Ficha de Campo</h2>
     <div class="grid-2">
       <div>
         <p style="margin:6px 0; font-size: 1.1em;"><strong>ID:</strong> <span id="editId">-</span></p>
         <p style="margin:6px 0; font-size: 1.4em; font-weight: 800; color: var(--accent-primary);">Ref: <span id="editNombre">-</span></p>
         <p style="margin:6px 0;"><strong>Coords:</strong> <span id="editCoords">-</span></p>
         <div style="display:flex; gap:10px; margin:14px 0; flex-wrap:wrap;">
-          <a id="btnGmaps" class="btn btn-maps" href="#" target="_blank" rel="noopener" onclick="vibrate(30)">馃椇锔?Maps</a>
-          <button id="btnEstadoCompletada" class="btn btn-completar" onclick="vibrate(30); toggleEstadoCompletada()">鉁?OK</button>
-          <button class="btn btn-gps" onclick="vibrate(30); centrarEnMiUbicacion()">馃搷 GPS</button>
+          <a id="btnGmaps" class="btn btn-maps" href="#" target="_blank" rel="noopener" onclick="vibrate(30)">&#x1F5FA;&#xFE0F; Maps</a>
+          <button id="btnEstadoCompletada" class="btn btn-completar" onclick="vibrate(30); toggleEstadoCompletada()">&#x2714;&#xFE0F; OK</button>
+          <button class="btn btn-gps" onclick="vibrate(30); centrarEnMiUbicacion()">&#x1F4CD; GPS</button>
         </div>
-        <label for="inputObservaciones"><strong>馃摑 Notas:</strong></label>
+        <label for="inputObservaciones"><strong>&#x1F4DD; Notas:</strong></label>
         <textarea id="inputObservaciones" rows="4" oninput="guardarObservaciones()"></textarea>
       </div>
       <div>
         <div class="relative">
-          <h3>馃攷 Buscador</h3>
+          <h3>&#x1F50E; Buscador</h3>
           <input type="text" id="inputBuscador" oninput="filtrarGlobal()">
           <div id="searchResults" class="search-results"></div>
         </div>
         <details class="collapsible-module">
-          <summary>馃搵 Consultas R谩pidas</summary>
+          <summary>&#x1F4CB; Consultas Rápidas</summary>
           <div style="padding:10px;">
             <div class="consult-box">
               <select id="selectUsoSigpac" onchange="vibrate(30); agregarAObservaciones(this, 'USO')"></select>
@@ -792,11 +787,11 @@
         </details>
       </div>
     </div>
-    <h3>馃Л Navegaci贸n GPS</h3>
+    <h3>&#x1F9ED; Navegación GPS</h3>
     <div class="field-gis-container">
       <div class="compass-box">
-        <div id="gpsStatusBadge" class="status-badge">GPS: Esperando se帽al...</div>
-        <div id="compassStatusBadge" class="status-badge">Br煤jula: Inactiva</div>
+        <div id="gpsStatusBadge" class="status-badge">GPS: Esperando señal...</div>
+        <div id="compassStatusBadge" class="status-badge">Brújula: Inactiva</div>
         <div class="compass-dial">
           <div class="compass-cardinal card-n">N</div>
           <div class="compass-cardinal card-s">S</div>
@@ -808,10 +803,10 @@
           </div>
           <div id="bearingNeedle" style="position: absolute; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 50px solid #22c55e; top: 30px; left: 73px; transform-origin: 7px 50px; filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8)); z-index: 10;"></div>
         </div>
-        <div style="font-size:1.15em; font-weight:800;" id="txtRumbo">--掳</div>
+        <div style="font-size:1.15em; font-weight:800;" id="txtRumbo">--°</div>
         <div style="margin-top:12px; font-size:0.9em; color:var(--text-secondary); text-align:left; width:100%; padding:0 10px; border-top:1px solid var(--border-color); padding-top:8px;">
-          <div>馃搹 Distancia: <strong id="txtDistancia" style="color:var(--text-primary);">--</strong></div>
-          <div>馃Л Rumbo destino: <strong id="txtRumboDestino" style="color:var(--btn-success);">--</strong></div>
+          <div>&#x1F4CF; Distancia: <strong id="txtDistancia" style="color:var(--text-primary);">--</strong></div>
+          <div>&#x1F9ED; Rumbo destino: <strong id="txtRumboDestino" style="color:var(--btn-success);">--</strong></div>
         </div>
       </div>
       <div>
@@ -825,8 +820,8 @@
   </div>
 
   <div id="sec-resumen" class="card hidden">
-    <h2>馃搵 Lista de Parcelas (ordenada por distancia)</h2>
-    <p style="font-size:0.85em; color:var(--text-secondary);"><em>La lista se reordena autom谩ticamente seg煤n tu posici贸n GPS. Haz clic en una fila para ver en mapa.</em></p>
+    <h2>&#x1F4CB; Lista de Parcelas (ordenada por distancia)</h2>
+    <p style="font-size:0.85em; color:var(--text-secondary);"><em>La lista se reordena automáticamente según tu posición GPS. Haz clic en una fila para ver en mapa.</em></p>
     <table>
       <thead>
         <tr>
@@ -844,38 +839,38 @@
   </div>
 
   <div id="sec-exportar" class="card hidden">
-    <h2>馃捑 Exportar Informaci贸n</h2>
-    <p style="font-size:0.88em;">Descarga la informaci贸n catalogada y notas registradas en campo.</p>
+    <h2>&#x1F4BE; Exportar Información</h2>
+    <p style="font-size:0.88em;">Descarga la información catalogada y notas registradas en campo.</p>
     <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
-      <button class="btn btn-export" onclick="exportarCSV()">馃搳 Exportar CSV</button>
-      <button class="btn btn-export-json" onclick="exportarJSON()">馃捑 Backup JSON</button>
+      <button class="btn btn-export" onclick="exportarCSV()">&#x1F4CA; Exportar CSV</button>
+      <button class="btn btn-export-json" onclick="exportarJSON()">&#x1F4BE; Backup JSON</button>
     </div>
   </div>
 
   <div id="sec-consultas" class="card hidden">
-    <h2>馃攳 Consultas y Diccionario</h2>
+    <h2>&#x1F50D; Consultas y Diccionario</h2>
     <p style="font-size:0.88em; color:var(--text-secondary);">Filtra con texto simple o <strong>Expresiones Regulares (REGEX)</strong>.</p>
     <div style="background: var(--bg-tertiary); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-      <label for="inputRegexConsultas"><strong>馃攳 Acotar cat谩logo por REGEX o Texto:</strong></label>
+      <label for="inputRegexConsultas"><strong>&#x1F50D; Acotar catálogo por REGEX o Texto:</strong></label>
       <div style="display: flex; gap: 10px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
-        <input type="text" id="inputRegexConsultas" placeholder="Ej: ^(1|2)\d, C铆tri.*, TA|CS, ^10$" oninput="filtrarConsultasRegex()" style="flex: 1; min-width: 250px;">
+        <input type="text" id="inputRegexConsultas" placeholder="Ej: ^(1|2)\d, Cítri.*, TA|CS, ^10$" oninput="filtrarConsultasRegex()" style="flex: 1; min-width: 250px;">
         <label style="font-size: 0.85em; font-weight: 600; cursor: pointer; white-space: nowrap;">
-          <input type="checkbox" id="chkCaseSensitive" onchange="filtrarConsultasRegex()"> May煤sculas
+          <input type="checkbox" id="chkCaseSensitive" onchange="filtrarConsultasRegex()"> Mayúsculas
         </label>
       </div>
       <div id="regexStatus" style="font-size: 0.8em; margin-top: 4px; color: var(--text-secondary);"></div>
     </div>
     <div class="grid-2">
       <div class="consult-box">
-        <h3>馃尡 Usos SIGPAC (<span id="countUsos">0</span>)</h3>
+        <h3>&#x1F331; Usos SIGPAC (<span id="countUsos">0</span>)</h3>
         <div id="listUsosRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div>
       </div>
       <div class="consult-box">
-        <h3>馃殰 Productos PAC (<span id="countProductos">0</span>)</h3>
+        <h3>&#x1F69C; Productos PAC (<span id="countProductos">0</span>)</h3>
         <div id="listProductosRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div>
       </div>
       <div class="consult-box" style="grid-column: 1 / -1;">
-        <h3>鈿狅笍 Incidencias SIGPAC (<span id="countIncidencias">0</span>)</h3>
+        <h3>&#x26A0;&#xFE0F; Incidencias SIGPAC (<span id="countIncidencias">0</span>)</h3>
         <div id="listIncidenciasRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div>
       </div>
     </div>
@@ -883,11 +878,11 @@
 
   <div id="modalConfirm" class="modal-overlay hidden">
     <div class="modal-content">
-      <h3>鈿狅笍 Confirmar Limpieza</h3>
-      <p>驴Deseas borrar todos los datos guardados y comenzar de nuevo?</p>
+      <h3>&#x26A0;&#xFE0F; Confirmar Limpieza</h3>
+      <p>¿Deseas borrar todos los datos guardados y comenzar de nuevo?</p>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
         <button class="btn btn-completar" onclick="cerrarModalConfirm()">Cancelar</button>
-        <button class="btn btn-danger" onclick="limpiarLocalStorage()">S铆, Borrar Todo</button>
+        <button class="btn btn-danger" onclick="limpiarLocalStorage()">Sí, Borrar Todo</button>
       </div>
     </div>
   </div>
@@ -895,9 +890,6 @@
   <div id="toastContainer"></div>
 
   <script>
-    /* ============================================
-       VARIABLES GLOBALES
-       ============================================ */
     let parcelas = [];
     let contornosGeom = [];
     let parcelaActualIndex = -1;
@@ -911,8 +903,6 @@
     let currentHeading = 0;
     let kmlFieldsList = new Set();
     let sensorSampleCount = 0;
-
-    // Proximidad
     let monitorProximidadInterval = null;
     let distAlerta = 100;
     let sonidoAlerta = 'sonido';
@@ -920,16 +910,13 @@
     let parcelasAlertadas = new Set();
     let audioCtx = null;
 
-    /* ============================================
-       BASES DE DATOS
-       ============================================ */
     const USOS_SIGPAC_DB = [
       { codigo: "TA", descripcion: "Tierras Arables" },
       { codigo: "TH", descripcion: "Huerta" },
       { codigo: "CS", descripcion: "Cítricos" },
       { codigo: "FY", descripcion: "Frutales" },
       { codigo: "OV", descripcion: "Olivar" },
-      { codigo: "VI", descripcion: "Vi?edo" },
+      { codigo: "VI", descripcion: "Viñedo" },
       { codigo: "FL", descripcion: "Frutos Secos" },
       { codigo: "FS", descripcion: "Frutos Secos y Olivar" },
       { codigo: "CI", descripcion: "Cítricos e Invernaderos" },
@@ -951,24 +938,24 @@
   { codigo:1, descripcion:"TRIGO BLANDO" },
   { codigo:2, descripcion:"ESPELTA" },
   { codigo:3, descripcion:"TRIGO DURO" },
-  { codigo:4, descripcion:"MAíZ" },
+  { codigo:4, descripcion:"MA  Z" },
   { codigo:5, descripcion:"CEBADA" },
   { codigo:6, descripcion:"CENTENO" },
   { codigo:7, descripcion:"SORGO" },
   { codigo:8, descripcion:"AVENA" },
-  { codigo:9, descripcion:"ALFORFóN" },
+  { codigo:9, descripcion:"ALFORF  N" },
   { codigo:10, descripcion:"MIJO" },
   { codigo:11, descripcion:"ALPISTE" },
-  { codigo:12, descripcion:"TRANQUILLóN" },
+  { codigo:12, descripcion:"TRANQUILL  N" },
   { codigo:13, descripcion:"TRITICALE" },
   { codigo:14, descripcion:"TRITORDEUM" },
   { codigo:19, descripcion:"TEFF" },
   { codigo:20, descripcion:"BARBECHO TRADICIONAL" },
   { codigo:21, descripcion:"BARBECHO MEDIOAMBIENTAL ABANDONO 5 A?OS" },
   { codigo:23, descripcion:"BARBECHO MEDIOAMBIENTAL" },
-  { codigo:24, descripcion:"BARBECHO SIN PRODUCCIóN" },
+  { codigo:24, descripcion:"BARBECHO SIN PRODUCCI  N" },
   { codigo:25, descripcion:"ABANDONO 20 a?os" },
-  { codigo:28, descripcion:"RETIRADA FORESTACIóN" },
+  { codigo:28, descripcion:"RETIRADA FORESTACI  N" },
   { codigo:33, descripcion:"GIRASOL" },
   { codigo:34, descripcion:"SOJA" },
   { codigo:35, descripcion:"COLZA" },
@@ -983,11 +970,11 @@
   { codigo:53, descripcion:"YEROS" },
   { codigo:60, descripcion:"ALFALFA" },
   { codigo:61, descripcion:"ALHOLVA" },
-  { codigo:62, descripcion:"PASTOS PERMANENTES DE 5 O MáS A?OS" },
+  { codigo:62, descripcion:"PASTOS PERMANENTES DE 5 O M  S A?OS" },
   { codigo:63, descripcion:"PASTOS DE MENOS DE 5 A?OS" },
-  { codigo:64, descripcion:"PASTIZAL DE 5 O MáS A?OS" },
-  { codigo:65, descripcion:"PASTO ARBUSTIVO DE 5 O MáS A?OS" },
-  { codigo:66, descripcion:"PASTO ARBOLADO DE 5 O MáS A?OS" },
+  { codigo:64, descripcion:"PASTIZAL DE 5 O M  S A?OS" },
+  { codigo:65, descripcion:"PASTO ARBUSTIVO DE 5 O M  S A?OS" },
+  { codigo:66, descripcion:"PASTO ARBOLADO DE 5 O M  S A?OS" },
   { codigo:67, descripcion:"ESPARCETA" },
   { codigo:68, descripcion:"FESTUCA" },
   { codigo:69, descripcion:"RAYGRASS PERENNE" },
@@ -997,25 +984,25 @@
   { codigo:73, descripcion:"FLEO" },
   { codigo:74, descripcion:"POA" },
   { codigo:76, descripcion:"ZULLA" },
-  { codigo:77, descripcion:"TRéBOL" },
+  { codigo:77, descripcion:"TR  BOL" },
   { codigo:78, descripcion:"RAYGRASS ANUAL " },
   { codigo:80, descripcion:"ARROZ" },
-  { codigo:81, descripcion:"ALGODóN" },
+  { codigo:81, descripcion:"ALGOD  N" },
   { codigo:82, descripcion:"REMOLACHA" },
   { codigo:83, descripcion:"TABACO" },
-  { codigo:84, descripcion:"LúPULO" },
+  { codigo:84, descripcion:"L  PULO" },
   { codigo:85, descripcion:"LINO" },
-  { codigo:86, descripcion:"Cá?AMO" },
+  { codigo:86, descripcion:"C  ?AMO" },
   { codigo:87, descripcion:"CACAHUETE" },
-  { codigo:88, descripcion:"CáRTAMO" },
+  { codigo:88, descripcion:"C  RTAMO" },
   { codigo:89, descripcion:"CHUFA" },
   { codigo:90, descripcion:"REGALIZ" },
   { codigo:91, descripcion:"FLORES" },
   { codigo:92, descripcion:"ROMANESCU" },
   { codigo:93, descripcion:"LINO NO TEXTIL" },
-  { codigo:96, descripcion:"ESPECIES AROMáTICAS HERBáCEAS" },
+  { codigo:96, descripcion:"ESPECIES AROM  TICAS HERB  CEAS" },
   { codigo:97, descripcion:"SETAS" },
-  { codigo:98, descripcion:"PIMIENTO PARA PIMENTóN" },
+  { codigo:98, descripcion:"PIMIENTO PARA PIMENT  N" },
   { codigo:99, descripcion:"PATATA" },
   { codigo:101, descripcion:"OLIVO" },
   { codigo:102, descripcion:"VI?A" },
@@ -1034,14 +1021,14 @@
   { codigo:115, descripcion:"OTRAS SUPERFICIES FORESTALES" },
   { codigo:116, descripcion:"CHOPO" },
   { codigo:117, descripcion:"CASTA?O" },
-  { codigo:118, descripcion:"ESPECIES AROMáTICAS LE?OSAS" },
+  { codigo:118, descripcion:"ESPECIES AROM  TICAS LE?OSAS" },
   { codigo:119, descripcion:"VIVERO - PRODUCTOR MVR" },
   { codigo:120, descripcion:"VI?A - OLIVAR" },
   { codigo:121, descripcion:"BONIATO" },
   { codigo:122, descripcion:"ALGARROBO" },
   { codigo:123, descripcion:"AVELLANO" },
   { codigo:124, descripcion:"PISTACHO" },
-  { codigo:125, descripcion:"FRUTOS DE CáSCARA" },
+  { codigo:125, descripcion:"FRUTOS DE C  SCARA" },
   { codigo:138, descripcion:"ADORMIDERA" },
   { codigo:139, descripcion:"HIERBA CINTA " },
   { codigo:140, descripcion:"ABACA ALIAS MANILA " },
@@ -1057,16 +1044,16 @@
   { codigo:150, descripcion:"Otras utilizaciones no agrarias ni forestales" },
   { codigo:151, descripcion:"PUERRO" },
   { codigo:152, descripcion:"PIMIENTO" },
-  { codigo:153, descripcion:"MELóN" },
-  { codigo:154, descripcion:"BRóCOLI" },
+  { codigo:153, descripcion:"MEL  N" },
+  { codigo:154, descripcion:"BR  COLI" },
   { codigo:155, descripcion:"LECHUGA" },
-  { codigo:156, descripcion:"SANDíA" },
+  { codigo:156, descripcion:"SAND  A" },
   { codigo:157, descripcion:"CEBOLLA" },
   { codigo:158, descripcion:"APIO" },
-  { codigo:159, descripcion:"COLIRRáBANO" },
+  { codigo:159, descripcion:"COLIRR  BANO" },
   { codigo:160, descripcion:"COLIFLOR" },
   { codigo:162, descripcion:"BERENJENA" },
-  { codigo:163, descripcion:"CALABACíN" },
+  { codigo:163, descripcion:"CALABAC  N" },
   { codigo:164, descripcion:"ALCACHOFA" },
   { codigo:165, descripcion:"PEPINO" },
   { codigo:166, descripcion:"ACELGA" },
@@ -1074,16 +1061,16 @@
   { codigo:168, descripcion:"CHALOTA" },
   { codigo:169, descripcion:"AJO" },
   { codigo:170, descripcion:"COL" },
-  { codigo:171, descripcion:"CHIRIVíA" },
+  { codigo:171, descripcion:"CHIRIV  A" },
   { codigo:172, descripcion:"REPOLLO" },
   { codigo:173, descripcion:"COL ROJA O LOMBARDA" },
-  { codigo:174, descripcion:"COL MILáN O SAVOY" },
+  { codigo:174, descripcion:"COL MIL  N O SAVOY" },
   { codigo:175, descripcion:"BERZA" },
   { codigo:176, descripcion:"COL DE BRUSELAS" },
   { codigo:177, descripcion:"ENDIVIA" },
   { codigo:178, descripcion:"ZANAHORIA" },
   { codigo:179, descripcion:"NABO" },
-  { codigo:180, descripcion:"JUDíA" },
+  { codigo:180, descripcion:"JUD  A" },
   { codigo:181, descripcion:"ACHICORIA" },
   { codigo:182, descripcion:"GUINDILLA" },
   { codigo:183, descripcion:"ESPINACA" },
@@ -1093,35 +1080,35 @@
   { codigo:187, descripcion:"BORRAJA" },
   { codigo:188, descripcion:"PEPINILLOS" },
   { codigo:189, descripcion:"ESCAROLA" },
-  { codigo:190, descripcion:"RáBANO" },
+  { codigo:190, descripcion:"R  BANO" },
   { codigo:191, descripcion:"BERRO DE AGUA" },
   { codigo:192, descripcion:"FRAMBUESA" },
   { codigo:193, descripcion:"HUERTA" },
-  { codigo:194, descripcion:"CHAMPI?óN" },
+  { codigo:194, descripcion:"CHAMPI?  N" },
   { codigo:197, descripcion:"TOMATE" },
-  { codigo:198, descripcion:"TOMATE PARA TRANSFORMACIóN" },
+  { codigo:198, descripcion:"TOMATE PARA TRANSFORMACI  N" },
   { codigo:199, descripcion:"PINOS" },
   { codigo:200, descripcion:"PAULONIA" },
   { codigo:201, descripcion:"PLATERINA" },
   { codigo:202, descripcion:"PARAGUAYO" },
-  { codigo:203, descripcion:"ENDRINO o ARA?óN" },
+  { codigo:203, descripcion:"ENDRINO o ARA?  N" },
   { codigo:204, descripcion:"CLEMENTINA" },
   { codigo:205, descripcion:"SATSUMA" },
   { codigo:206, descripcion:"NARANJO" },
   { codigo:207, descripcion:"LIMONERO" },
   { codigo:208, descripcion:"POMELO" },
   { codigo:209, descripcion:"MANDARINO" },
-  { codigo:210, descripcion:"MANDARINO HíBRIDO" },
+  { codigo:210, descripcion:"MANDARINO H  BRIDO" },
   { codigo:211, descripcion:"MEMBRILLO" },
   { codigo:212, descripcion:"KIWI" },
   { codigo:213, descripcion:"CAQUI o PALOSANTO" },
-  { codigo:214, descripcion:"NíSPERO" },
+  { codigo:214, descripcion:"N  SPERO" },
   { codigo:215, descripcion:"GROSELLERO" },
-  { codigo:216, descripcion:"ARáNDANO" },
+  { codigo:216, descripcion:"AR  NDANO" },
   { codigo:217, descripcion:"GRANADO" },
   { codigo:218, descripcion:"HIGUERA" },
   { codigo:219, descripcion:"FRESA" },
-  { codigo:220, descripcion:"CA?A DE AZúCAR" },
+  { codigo:220, descripcion:"CA?A DE AZ  CAR" },
   { codigo:221, descripcion:"UVA PASA" },
   { codigo:222, descripcion:"QUINOA" },
   { codigo:223, descripcion:"MISCANTHUS" },
@@ -1137,8 +1124,8 @@
   { codigo:233, descripcion:"FITOLACA" },
   { codigo:234, descripcion:"CASTA?O (FORESTAL)" },
   { codigo:235, descripcion:"JATROPHA" },
-  { codigo:236, descripcion:"CA?A COMúN " },
-  { codigo:237, descripcion:"SUPERFICIES FORESTALES DE ROTACIóN CORTA" },
+  { codigo:236, descripcion:"CA?A COM  N " },
+  { codigo:237, descripcion:"SUPERFICIES FORESTALES DE ROTACI  N CORTA" },
   { codigo:238, descripcion:"ALTRAMUZ AMARILLO" },
   { codigo:239, descripcion:"ALMORTA" },
   { codigo:240, descripcion:"TITARROS" },
@@ -1151,10 +1138,10 @@
   { codigo:247, descripcion:"CULTIVOS MIXTOS DE ESPECIES PRATENSES" },
   { codigo:248, descripcion:"ALGARROBA" },
   { codigo:249, descripcion:"ALVERJA" },
-  { codigo:250, descripcion:"ALBERJóN" },
+  { codigo:250, descripcion:"ALBERJ  N" },
   { codigo:251, descripcion:"AJEDREA" },
   { codigo:252, descripcion:"CILANTRO" },
-  { codigo:253, descripcion:"ANíS DULCE" },
+  { codigo:253, descripcion:"AN  S DULCE" },
   { codigo:254, descripcion:"ENELDO" },
   { codigo:255, descripcion:"MANZANILLA" },
   { codigo:256, descripcion:"VALERIANA" },
@@ -1163,27 +1150,27 @@
   { codigo:259, descripcion:"HISOPO" },
   { codigo:260, descripcion:"HINOJO" },
   { codigo:261, descripcion:"PEREJIL" },
-  { codigo:262, descripcion:"AZAFRáN" },
+  { codigo:262, descripcion:"AZAFR  N" },
   { codigo:263, descripcion:"TOMILLO" },
   { codigo:264, descripcion:"ALBAHACA" },
   { codigo:265, descripcion:"MELISA O TORONJIL" },
   { codigo:266, descripcion:"MENTA" },
-  { codigo:267, descripcion:"ORéGANO" },
+  { codigo:267, descripcion:"OR  GANO" },
   { codigo:268, descripcion:"SALVIA" },
   { codigo:269, descripcion:"PERIFOLLO" },
-  { codigo:270, descripcion:"ESTRAGóN" },
+  { codigo:270, descripcion:"ESTRAG  N" },
   { codigo:271, descripcion:"MEJORANA" },
-  { codigo:272, descripcion:"CALéNDULA" },
+  { codigo:272, descripcion:"CAL  NDULA" },
   { codigo:273, descripcion:"COMINO" },
   { codigo:274, descripcion:"ESTEVIA" },
-  { codigo:275, descripcion:"HIPéRICO" },
+  { codigo:275, descripcion:"HIP  RICO" },
   { codigo:276, descripcion:"HIERBABUENA" },
   { codigo:277, descripcion:"VERBENA" },
   { codigo:278, descripcion:"FRUTOS DEL BOSQUE" },
-  { codigo:279, descripcion:"ESPáRRAGO" },
+  { codigo:279, descripcion:"ESP  RRAGO" },
   { codigo:280, descripcion:"TRUFA" },
   { codigo:281, descripcion:"LAVANDA" },
-  { codigo:282, descripcion:"LAVANDíN" },
+  { codigo:282, descripcion:"LAVAND  N" },
   { codigo:283, descripcion:"ALCAPARRA" },
   { codigo:284, descripcion:"AJENJO" },
   { codigo:285, descripcion:"ESPLIEGO" },
@@ -1192,7 +1179,7 @@
   { codigo:288, descripcion:"ROMERO" },
   { codigo:289, descripcion:"SANTOLINA" },
   { codigo:290, descripcion:"ALOE VERA" },
-  { codigo:291, descripcion:"CAFé" },
+  { codigo:291, descripcion:"CAF  " },
   { codigo:292, descripcion:"GROSELLA NEGRA" },
   { codigo:293, descripcion:"ROBLE" },
   { codigo:294, descripcion:"HAYA" },
@@ -1203,7 +1190,7 @@
   { codigo:299, descripcion:"MEZCLA AVENA-GUISANTE" },
   { codigo:300, descripcion:"SABINA" },
   { codigo:301, descripcion:"PINSAPO" },
-  { codigo:302, descripcion:"MEZCLA EN MáRGENES MULTIFUNCIONALES" },
+  { codigo:302, descripcion:"MEZCLA EN M  RGENES MULTIFUNCIONALES" },
   { codigo:303, descripcion:"MEZCLA DE RESERVORIOS" },
   { codigo:304, descripcion:"COL CHINA" },
   { codigo:305, descripcion:"MEZCLA AVENA-TRIGO" },
@@ -1211,30 +1198,30 @@
   { codigo:307, descripcion:"MEZCLA AVENA-TRITICALE" },
   { codigo:308, descripcion:"AGRIMONIA" },
   { codigo:309, descripcion:"BARDANA" },
-  { codigo:310, descripcion:"DIENTE DE LEóN" },
+  { codigo:310, descripcion:"DIENTE DE LE  N" },
   { codigo:311, descripcion:"ENULA" },
   { codigo:312, descripcion:"EQUINACEA" },
   { codigo:313, descripcion:"GINSENG" },
-  { codigo:315, descripcion:"LLANTéN" },
+  { codigo:315, descripcion:"LLANT  N" },
   { codigo:316, descripcion:"MALVAVISCO" },
   { codigo:317, descripcion:"MANZANILLA AMARGA" },
   { codigo:318, descripcion:"MANZANILLA DULCE" },
   { codigo:319, descripcion:"MILENRAMA" },
   { codigo:320, descripcion:"POLEO" },
-  { codigo:321, descripcion:"RáBANO NEGRO" },
+  { codigo:321, descripcion:"R  BANO NEGRO" },
   { codigo:322, descripcion:"ROMPEPIEDRA" },
   { codigo:323, descripcion:"TRAVALERA" },
   { codigo:324, descripcion:"VARA DE ORO" },
   { codigo:325, descripcion:"TRIGO KHORASAN" },
-  { codigo:326, descripcion:"MAíZ DULCE" },
+  { codigo:326, descripcion:"MA  Z DULCE" },
   { codigo:327, descripcion:"REMOLACHA DE MESA" },
-  { codigo:328, descripcion:"PASTO DEL SUDáN" },
+  { codigo:328, descripcion:"PASTO DEL SUD  N" },
   { codigo:329, descripcion:"AMARANTO" },
   { codigo:330, descripcion:"ELEMENTO DEL PAISAJE" },
   { codigo:331, descripcion:"MORINGA" },
   { codigo:332, descripcion:"MOSTAZA" },
   { codigo:333, descripcion:"PORTAINJERTOS DE VID" },
-  { codigo:334, descripcion:"BARBECHO DE BIODIVERSIDAD (INCLUYE MELíFERAS)" },
+  { codigo:334, descripcion:"BARBECHO DE BIODIVERSIDAD (INCLUYE MEL  FERAS)" },
   { codigo:335, descripcion:"CABECERA Y CONTORNOS DE CULTIVO PERMANENTE" },
   { codigo:336, descripcion:"MEZCLA ALGARROBA-AVENA" },
   { codigo:337, descripcion:"MEZCLA ALGARROBA-CEBADA" },
@@ -1251,31 +1238,31 @@
   { codigo:348, descripcion:"VI?A - FRUTAL" },
   { codigo:349, descripcion:"OLIVAR - FRUTAL" },
   { codigo:350, descripcion:"RASTROJERAS" },
-  { codigo:351, descripcion:"CíTRICOS HíBRIDOS-CAQUI" },
+  { codigo:351, descripcion:"C  TRICOS H  BRIDOS-CAQUI" },
   { codigo:352, descripcion:"NARANJO-AGUACATE" },
   { codigo:353, descripcion:"CEREZO-OLIVAR" },
   { codigo:354, descripcion:"CEREZO-ALGARROBO" },
   { codigo:355, descripcion:"RICINO" },
   { codigo:356, descripcion:"NARANJO AMARGO" },
-  { codigo:357, descripcion:"Cá?AMO NO TEXTIL" },
+  { codigo:357, descripcion:"C  ?AMO NO TEXTIL" },
   { codigo:358, descripcion:"MEZCLA DE FORESTALES" },
   { codigo:359, descripcion:"HIERBA DE GUINEA" },
   { codigo:360, descripcion:"ABEDUL" },
   { codigo:361, descripcion:"ABETO DE DOUGLAS" },
   { codigo:362, descripcion:"ACEBO" },
   { codigo:363, descripcion:"ACEBUCHE" },
-  { codigo:364, descripcion:"áLAMO" },
+  { codigo:364, descripcion:"  LAMO" },
   { codigo:365, descripcion:"ALANTICO o LANTISCO" },
   { codigo:366, descripcion:"ALERCE" },
   { codigo:367, descripcion:"ALISO" },
-  { codigo:368, descripcion:"ALMáCIGO DE CANARIAS" },
+  { codigo:368, descripcion:"ALM  CIGO DE CANARIAS" },
   { codigo:369, descripcion:"ALMEZ" },
   { codigo:370, descripcion:"ARCE" },
   { codigo:371, descripcion:"CARPE " },
   { codigo:372, descripcion:"CEDRO" },
   { codigo:373, descripcion:"CHAPARRO" },
-  { codigo:374, descripcion:"CHíA" },
-  { codigo:375, descripcion:"CIPRéS" },
+  { codigo:374, descripcion:"CH  A" },
+  { codigo:375, descripcion:"CIPR  S" },
   { codigo:376, descripcion:"FRESNO" },
   { codigo:377, descripcion:"MADRO?O " },
   { codigo:378, descripcion:"OLMO" },
@@ -1292,29 +1279,29 @@
   { codigo:389, descripcion:"PINO" },
   { codigo:390, descripcion:"HABONCILLO" },
   { codigo:391, descripcion:"CEREZO DE MAHOMA" },
-  { codigo:392, descripcion:"MEZCLA ALUBIA-MAíZ" },
+  { codigo:392, descripcion:"MEZCLA ALUBIA-MA  Z" },
   { codigo:393, descripcion:"ESCANDA" },
   { codigo:394, descripcion:"ESCA?A" },
   { codigo:395, descripcion:"PANIZO" },
-  { codigo:397, descripcion:"JUDíA ESCARLATA" },
+  { codigo:397, descripcion:"JUD  A ESCARLATA" },
   { codigo:398, descripcion:"RAMIO" },
-  { codigo:399, descripcion:"SéSAMO" },
+  { codigo:399, descripcion:"S  SAMO" },
   { codigo:400, descripcion:"FORESTACIONES VINCULADAS AL REGLAMENTO 2080/1992" },
   { codigo:401, descripcion:"CEBOLLINO" },
   { codigo:402, descripcion:"ACEDERILLA" },
-  { codigo:403, descripcion:"ANíS ESTRELLADO" },
-  { codigo:404, descripcion:"BOTóN DE ORO" },
+  { codigo:403, descripcion:"AN  S ESTRELLADO" },
+  { codigo:404, descripcion:"BOT  N DE ORO" },
   { codigo:405, descripcion:"AJOWAN" },
   { codigo:406, descripcion:"CHUPAMIELES" },
   { codigo:409, descripcion:"DEDALERA O DIGITAL" },
   { codigo:410, descripcion:"CICUTA" },
   { codigo:411, descripcion:"JABONERA" },
-  { codigo:412, descripcion:"MALVA COMúN" },
+  { codigo:412, descripcion:"MALVA COM  N" },
   { codigo:413, descripcion:"PULMONARIA" },
   { codigo:414, descripcion:"CARDO DE FULLER" },
-  { codigo:415, descripcion:"TáRTAGO" },
+  { codigo:415, descripcion:"T  RTAGO" },
   { codigo:416, descripcion:"PATACA" },
-  { codigo:417, descripcion:"CANóNIGO" },
+  { codigo:417, descripcion:"CAN  NIGO" },
   { codigo:418, descripcion:"ACEDERA" },
   { codigo:419, descripcion:"BERRO HORTELANO" },
   { codigo:420, descripcion:"RUIBARBO" },
@@ -1324,56 +1311,56 @@
   { codigo:424, descripcion:"ALCACHOFA CHINA" },
   { codigo:425, descripcion:"GALANGA MENOR" },
   { codigo:426, descripcion:"PEREJIL TUBEROSO" },
-  { codigo:427, descripcion:"RáBANO PICANTE" },
-  { codigo:428, descripcion:"JUDíA DE LIMA" },
+  { codigo:427, descripcion:"R  BANO PICANTE" },
+  { codigo:428, descripcion:"JUD  A DE LIMA" },
   { codigo:429, descripcion:"COLLEJA" },
   { codigo:430, descripcion:"BERGAMOTO" },
   { codigo:431, descripcion:"CIDRO" },
-  { codigo:432, descripcion:"LIMóN MANDARINA" },
+  { codigo:432, descripcion:"LIM  N MANDARINA" },
   { codigo:433, descripcion:"LIMERO DULCE" },
-  { codigo:434, descripcion:"LIMóN DULCE DEL MEDITERRáNEO" },
+  { codigo:434, descripcion:"LIM  N DULCE DEL MEDITERR  NEO" },
   { codigo:435, descripcion:"NARANJO MORUNO" },
   { codigo:436, descripcion:"ACEROLO" },
   { codigo:437, descripcion:"GUINDO" },
   { codigo:438, descripcion:"SAUCO" },
   { codigo:439, descripcion:"ESPINO AMARILLO" },
   { codigo:440, descripcion:"PITA" },
-  { codigo:441, descripcion:"Té" },
+  { codigo:441, descripcion:"T  " },
   { codigo:442, descripcion:"MIMBRERA" },
-  { codigo:443, descripcion:"BAMBú" },
+  { codigo:443, descripcion:"BAMB  " },
   { codigo:444, descripcion:"ZUMAQUE" },
   { codigo:445, descripcion:"COL CRESPA" },
   { codigo:446, descripcion:"SERRADELLA" },
   { codigo:447, descripcion:"MEZCLA CEREAL-RAYGRASS" },
-  { codigo:448, descripcion:"MEZCLA AVENA-MAíZ" },
+  { codigo:448, descripcion:"MEZCLA AVENA-MA  Z" },
   { codigo:449, descripcion:"MEZCLA HABA-VEZA" },
   { codigo:450, descripcion:"MEZCLA CEBADA-TRIGO" },
   { codigo:451, descripcion:"MEZCLA CENTENO-TRIGO" },
-  { codigo:452, descripcion:"MEZCLA AVENA-MAíZ-VEZA" },
-  { codigo:453, descripcion:"MEZCLA CEBADA-MAíZ-VEZA" },
+  { codigo:452, descripcion:"MEZCLA AVENA-MA  Z-VEZA" },
+  { codigo:453, descripcion:"MEZCLA CEBADA-MA  Z-VEZA" },
   { codigo:454, descripcion:"MEZCLA ALTRAMUZ-AVENA" },
   { codigo:455, descripcion:"MEZCLA AVENA-CENTENO" },
-  { codigo:456, descripcion:"MEZCLA CENTENO-MAíZ" },
-  { codigo:457, descripcion:"MEZCLA MAíZ-SORGO" },
+  { codigo:456, descripcion:"MEZCLA CENTENO-MA  Z" },
+  { codigo:457, descripcion:"MEZCLA MA  Z-SORGO" },
   { codigo:458, descripcion:"MARALFALFA" },
   { codigo:459, descripcion:"TEDERA" },
-  { codigo:460, descripcion:"CAUPí" },
+  { codigo:460, descripcion:"CAUP  " },
   { codigo:461, descripcion:"MELILOTO AMARILLO " },
   { codigo:462, descripcion:"OJO DE BUEY" },
   { codigo:463, descripcion:"CHOISUM" },
-  { codigo:464, descripcion:"BRóCOLI CHINO" },
-  { codigo:465, descripcion:"BATATA ACUáTICA" },
+  { codigo:464, descripcion:"BR  COLI CHINO" },
+  { codigo:465, descripcion:"BATATA ACU  TICA" },
   { codigo:466, descripcion:"CEBOLLINO CHINO" },
   { codigo:467, descripcion:"LEMONGRASS" },
   { codigo:468, descripcion:"ESPINACA DE MALABAR" },
   { codigo:469, descripcion:"LUFFA" },
-  { codigo:470, descripcion:"JUDíA DE EGIPTO" },
+  { codigo:470, descripcion:"JUD  A DE EGIPTO" },
   { codigo:471, descripcion:"CALABAZA AMARGA" },
   { codigo:472, descripcion:"PEPINO CULEBRA" },
   { codigo:473, descripcion:"CALABAZA CHINA" },
   { codigo:474, descripcion:"AROS EGIPCIOS" },
-  { codigo:475, descripcion:"RáBANO SILVESTRE" },
-  { codigo:477, descripcion:"SALSIFí" },
+  { codigo:475, descripcion:"R  BANO SILVESTRE" },
+  { codigo:477, descripcion:"SALSIF  " },
   { codigo:478, descripcion:"COLINABO" },
   { codigo:479, descripcion:"ESCORZONERA" },
   { codigo:480, descripcion:"BARBAREA" },
@@ -1382,16 +1369,16 @@
   { codigo:483, descripcion:"VEZA VELLOSA" },
   { codigo:484, descripcion:"GRELOS" },
   { codigo:485, descripcion:"BAYAS DE GOJI" },
-  { codigo:486, descripcion:"ALVERJA HúNGARA" },
+  { codigo:486, descripcion:"ALVERJA H  NGARA" },
   { codigo:487, descripcion:"CALIFORNIA BLUEBELL" },
   { codigo:488, descripcion:"BISERRULA" },
-  { codigo:489, descripcion:"GRAMA COMúN" },
+  { codigo:489, descripcion:"GRAMA COM  N" },
   { codigo:490, descripcion:"MEDICAGO" },
   { codigo:491, descripcion:"ESPIGUILLA DE BURRO" },
   { codigo:492, descripcion:"A?IL" },
-  { codigo:493, descripcion:"íNDIGO CHINO" },
+  { codigo:493, descripcion:"  NDIGO CHINO" },
   { codigo:496, descripcion:"MEZCLA RAYGRASS-TREBOL" },
-  { codigo:497, descripcion:"APIO-RáBANO" },
+  { codigo:497, descripcion:"APIO-R  BANO" },
   { codigo:498, descripcion:"BROCCOLINI" },
   { codigo:500, descripcion:"FORESTACIONES VINCULADAS AL REGLAMENTO No 1257/1999" },
   { codigo:501, descripcion:"NOGAL PECANO" },
@@ -1399,9 +1386,9 @@
   { codigo:503, descripcion:"NABO SILVESTRE" },
   { codigo:504, descripcion:"ALCARAVEA" },
   { codigo:505, descripcion:"PORTAINJERTOS DE CALABAZA" },
-  { codigo:506, descripcion:"CIRUELO JAPONéS" },
-  { codigo:507, descripcion:"ACHICORIA DE CAFé" },
-  { codigo:508, descripcion:"RáBANO OLEíFERO" },
+  { codigo:506, descripcion:"CIRUELO JAPON  S" },
+  { codigo:507, descripcion:"ACHICORIA DE CAF  " },
+  { codigo:508, descripcion:"R  BANO OLE  FERO" },
   { codigo:509, descripcion:"COL TRONCHUDA" },
   { codigo:510, descripcion:"TRISETUM FLAVESCENS" },
   { codigo:511, descripcion:"AGROSTIS CANINA" },
@@ -1419,8 +1406,8 @@
   { codigo:523, descripcion:"GALEGA DE ORIENTE" },
   { codigo:524, descripcion:"RAYGRASS ITALIANO" },
   { codigo:525, descripcion:"RAYGRASS WESTERNWORLD" },
-  { codigo:526, descripcion:"RAYGRASS HíBRIDO" },
-  { codigo:527, descripcion:"CARRETóN" },
+  { codigo:526, descripcion:"RAYGRASS H  BRIDO" },
+  { codigo:527, descripcion:"CARRET  N" },
   { codigo:528, descripcion:"ALFALFA ITALIANA" },
   { codigo:529, descripcion:"ALFALFA LITORAL" },
   { codigo:530, descripcion:"LUPULINA" },
@@ -1434,119 +1421,119 @@
   { codigo:538, descripcion:"FACELIA FORRAJERA" },
   { codigo:539, descripcion:"ALPISTE BULBOSO" },
   { codigo:540, descripcion:"FLEO BULBOSO" },
-  { codigo:541, descripcion:"LLANTéN MENOR" },
+  { codigo:541, descripcion:"LLANT  N MENOR" },
   { codigo:542, descripcion:"POA ANNUA" },
   { codigo:543, descripcion:"POA DE LOS BOSQUES" },
   { codigo:544, descripcion:"POA DE LOS PANTANOS" },
   { codigo:545, descripcion:"POA DE LOS PRADOS" },
-  { codigo:546, descripcion:"POA COMúN" },
-  { codigo:547, descripcion:"TRéBOL DE ALEJANDRíA" },
-  { codigo:548, descripcion:"TRéBOL FRESERO" },
-  { codigo:549, descripcion:"TRéBOL GLANDULAR" },
-  { codigo:550, descripcion:"TRéBOL VELLOSO" },
-  { codigo:551, descripcion:"TRéBOL HíBRIDO" },
-  { codigo:552, descripcion:"TRéBOL ENCARNADO" },
-  { codigo:553, descripcion:"TRéBOL DE FRUTO ANGOSTO" },
-  { codigo:554, descripcion:"TRéBOL BALANSA" },
-  { codigo:555, descripcion:"TRéBOL VIOLETA" },
-  { codigo:556, descripcion:"TRéBOL BLANCO" },
-  { codigo:557, descripcion:"TRéBOL PERSA" },
-  { codigo:558, descripcion:"TRéBOL SQUARROSO" },
-  { codigo:559, descripcion:"TRéBOL SUBTERRANEO" },
-  { codigo:560, descripcion:"TRéBOL VESICULOSO" },
+  { codigo:546, descripcion:"POA COM  N" },
+  { codigo:547, descripcion:"TR  BOL DE ALEJANDR  A" },
+  { codigo:548, descripcion:"TR  BOL FRESERO" },
+  { codigo:549, descripcion:"TR  BOL GLANDULAR" },
+  { codigo:550, descripcion:"TR  BOL VELLOSO" },
+  { codigo:551, descripcion:"TR  BOL H  BRIDO" },
+  { codigo:552, descripcion:"TR  BOL ENCARNADO" },
+  { codigo:553, descripcion:"TR  BOL DE FRUTO ANGOSTO" },
+  { codigo:554, descripcion:"TR  BOL BALANSA" },
+  { codigo:555, descripcion:"TR  BOL VIOLETA" },
+  { codigo:556, descripcion:"TR  BOL BLANCO" },
+  { codigo:557, descripcion:"TR  BOL PERSA" },
+  { codigo:558, descripcion:"TR  BOL SQUARROSO" },
+  { codigo:559, descripcion:"TR  BOL SUBTERRANEO" },
+  { codigo:560, descripcion:"TR  BOL VESICULOSO" },
   { codigo:561, descripcion:"CA?UELA" },
   { codigo:562, descripcion:"ARVEJA ROJA" },
-  { codigo:563, descripcion:"BERENJENA ETíOPE" },
-  { codigo:564, descripcion:"HíBRIDOS DE SOLANUM LYCOPERSICUM Y CHESMANIAE" },
-  { codigo:565, descripcion:"HíBRIDOS DE SOLANUM LYCOPERSICUM Y PERUVIANUM" },
-  { codigo:566, descripcion:"HíBRIDOS DE SOLANUM LYCOPERSICUM Y PIMPINELLIFOILUM" },
-  { codigo:567, descripcion:"HíBRIDOS DE SOLANUM LYCOPERSICUM Y HABROCHAITES" },
+  { codigo:563, descripcion:"BERENJENA ET  OPE" },
+  { codigo:564, descripcion:"H  BRIDOS DE SOLANUM LYCOPERSICUM Y CHESMANIAE" },
+  { codigo:565, descripcion:"H  BRIDOS DE SOLANUM LYCOPERSICUM Y PERUVIANUM" },
+  { codigo:566, descripcion:"H  BRIDOS DE SOLANUM LYCOPERSICUM Y PIMPINELLIFOILUM" },
+  { codigo:567, descripcion:"H  BRIDOS DE SOLANUM LYCOPERSICUM Y HABROCHAITES" },
   { codigo:568, descripcion:"BERENJENA CIMARRONA" },
-  { codigo:569, descripcion:"HíBRIDOS DE SOLANUM MELONGENA Y TORVUM" },
-  { codigo:570, descripcion:"HíBRIDOS DE SOLANUM MELONGENA Y AETHIOPICUM" },
-  { codigo:571, descripcion:"TOMATE DE GALáPAGOS" },
-  { codigo:572, descripcion:"TOMATE CIMARRóN" },
+  { codigo:569, descripcion:"H  BRIDOS DE SOLANUM MELONGENA Y TORVUM" },
+  { codigo:570, descripcion:"H  BRIDOS DE SOLANUM MELONGENA Y AETHIOPICUM" },
+  { codigo:571, descripcion:"TOMATE DE GAL  PAGOS" },
+  { codigo:572, descripcion:"TOMATE CIMARR  N" },
   { codigo:573, descripcion:"TOMATE PELUDO" },
   { codigo:574, descripcion:"TOMATE SILVESTRE" },
-  { codigo:575, descripcion:"TRéBOL GLOMERADO" },
+  { codigo:575, descripcion:"TR  BOL GLOMERADO" },
   { codigo:576, descripcion:"CEBADILLA" },
   { codigo:577, descripcion:"FROMENTAL" },
   { codigo:578, descripcion:"AVENA DESNUDA" },
   { codigo:579, descripcion:"AVENA NEGRA" },
   { codigo:580, descripcion:"MOSTAZA NEGRA" },
   { codigo:581, descripcion:"COL DE JERSEY" },
-  { codigo:582, descripcion:"HíBRIDOS DE CUCUMIS MELO" },
-  { codigo:583, descripcion:"CALABAZA DE CABELLO DE áNGEL" },
+  { codigo:582, descripcion:"H  BRIDOS DE CUCUMIS MELO" },
+  { codigo:583, descripcion:"CALABAZA DE CABELLO DE   NGEL" },
   { codigo:584, descripcion:"RABANITO" },
-  { codigo:585, descripcion:"MAíZ PALOMITERO" },
+  { codigo:585, descripcion:"MA  Z PALOMITERO" },
   { codigo:586, descripcion:"GROSELLERO ROJO" },
   { codigo:587, descripcion:"BRACHYPODIUM" },
   { codigo:588, descripcion:"PHACELIA" },
   { codigo:589, descripcion:"REMOLACHA FORRAJERA" },
   { codigo:590, descripcion:"REMOLACHA AZUCARERA" },
   { codigo:591, descripcion:"RABO DE GATO" },
-  { codigo:592, descripcion:"TRéBOL áSPERO" },
+  { codigo:592, descripcion:"TR  BOL   SPERO" },
   { codigo:593, descripcion:"SETA DE CHOPO" },
   { codigo:594, descripcion:"SHIITAKE" },
   { codigo:595, descripcion:"SETA DE PIE AZUL" },
   { codigo:596, descripcion:"SETA DE CARDO" },
   { codigo:597, descripcion:"SETA DE OSTRA" },
-  { codigo:598, descripcion:"HONGO PULMóN" },
-  { codigo:599, descripcion:"ALGODóN AMERICANO" },
+  { codigo:598, descripcion:"HONGO PULM  N" },
+  { codigo:599, descripcion:"ALGOD  N AMERICANO" },
   { codigo:600, descripcion:"FORESTACIONES VINCULADAS AL REGLAMENTO No 1698/2005" },
-  { codigo:601, descripcion:"ALGODóN EGIPCIO" },
-  { codigo:602, descripcion:"HíBRIDOS DE GOSSYPIUM HIRSUTUM Y BARBADENSE" },
+  { codigo:601, descripcion:"ALGOD  N EGIPCIO" },
+  { codigo:602, descripcion:"H  BRIDOS DE GOSSYPIUM HIRSUTUM Y BARBADENSE" },
   { codigo:603, descripcion:"KIWI?O" },
   { codigo:604, descripcion:"KIWI AMARILLO" },
   { codigo:605, descripcion:"ACTINIDIA" },
   { codigo:606, descripcion:"KIWI ENANO" },
   { codigo:607, descripcion:"ACTINIDIA VALVATA" },
-  { codigo:608, descripcion:"HíBRIDOS DE ACTINIDIA CHINENSIS Y ARGUTA" },
+  { codigo:608, descripcion:"H  BRIDOS DE ACTINIDIA CHINENSIS Y ARGUTA" },
   { codigo:609, descripcion:"CASTANEA" },
-  { codigo:610, descripcion:"HíBRIDOS DE CASTANEA CRENATA Y SATIVA" },
+  { codigo:610, descripcion:"H  BRIDOS DE CASTANEA CRENATA Y SATIVA" },
   { codigo:611, descripcion:"CASTA?O JAPONES" },
-  { codigo:612, descripcion:"HíBRIDOS DE FRAGARIA IINUMAE Y VESCA" },
-  { codigo:613, descripcion:"HíBRIDOS DE JUGLANS MAYOR Y REGIA" },
+  { codigo:612, descripcion:"H  BRIDOS DE FRAGARIA IINUMAE Y VESCA" },
+  { codigo:613, descripcion:"H  BRIDOS DE JUGLANS MAYOR Y REGIA" },
   { codigo:614, descripcion:"ACELGA BRAVA" },
-  { codigo:615, descripcion:"EUCALIPTO COMúN" },
+  { codigo:615, descripcion:"EUCALIPTO COM  N" },
   { codigo:616, descripcion:"EUCALIPTO BRILLANTE" },
   { codigo:617, descripcion:"TRUFA DEL DESIERTO" },
   { codigo:618, descripcion:"ROBLE ALBAR" },
   { codigo:619, descripcion:"ROBLE PUBESCENTE" },
   { codigo:620, descripcion:"ROBLE AMERICANO" },
-  { codigo:621, descripcion:"áLAMO BLANCO" },
-  { codigo:622, descripcion:"áLAMO TEMBLóN" },
+  { codigo:621, descripcion:"  LAMO BLANCO" },
+  { codigo:622, descripcion:"  LAMO TEMBL  N" },
   { codigo:623, descripcion:"MOSTAZA SILVESTRE" },
-  { codigo:624, descripcion:"OLMO COMúN" },
+  { codigo:624, descripcion:"OLMO COM  N" },
   { codigo:625, descripcion:"OLMO DE MONTA?A" },
-  { codigo:626, descripcion:"JUDíA ESPáRRAGO" },
+  { codigo:626, descripcion:"JUD  A ESP  RRAGO" },
   { codigo:627, descripcion:"ALERCE AFRICANO" },
   { codigo:628, descripcion:"ALERCE EUROPEO" },
-  { codigo:629, descripcion:"ALERCE DEL JAPóN" },
+  { codigo:629, descripcion:"ALERCE DEL JAP  N" },
   { codigo:630, descripcion:"ALERCE DE DUNKLED" },
   { codigo:631, descripcion:"ARCE BLANCO" },
   { codigo:632, descripcion:"ARCE REAL" },
-  { codigo:633, descripcion:"ARCE COMúN" },
+  { codigo:633, descripcion:"ARCE COM  N" },
   { codigo:634, descripcion:"PINO PI?ONERO" },
   { codigo:635, descripcion:"PINO CANARIO" },
   { codigo:636, descripcion:"PINO CARRASCO" },
   { codigo:637, descripcion:"PINO INSIGNE" },
   { codigo:638, descripcion:"PINO NEGRAL" },
   { codigo:639, descripcion:"PINO NEGRO" },
-  { codigo:640, descripcion:"PINO MARíTIMO" },
+  { codigo:640, descripcion:"PINO MAR  TIMO" },
   { codigo:641, descripcion:"PINO SILVESTRE" },
   { codigo:642, descripcion:"MADRO?O CANARIO" },
   { codigo:643, descripcion:"CEDRO DEL ATLAS" },
-  { codigo:644, descripcion:"CEDRO DEL LíBANO" },
-  { codigo:645, descripcion:"CIPRéS COMúN" },
-  { codigo:646, descripcion:"CIPRéS DE ARIZONA" },
+  { codigo:644, descripcion:"CEDRO DEL L  BANO" },
+  { codigo:645, descripcion:"CIPR  S COM  N" },
+  { codigo:646, descripcion:"CIPR  S DE ARIZONA" },
   { codigo:647, descripcion:"FRESNO DE HOJA ESTRECHA" },
-  { codigo:648, descripcion:"FRESNO COMúN" },
+  { codigo:648, descripcion:"FRESNO COM  N" },
   { codigo:649, descripcion:"SERBAL BLANCO" },
   { codigo:650, descripcion:"SERBAL DE LOS CAZADORES" },
-  { codigo:651, descripcion:"SERBAL COMúN" },
+  { codigo:651, descripcion:"SERBAL COM  N" },
   { codigo:652, descripcion:"BLEDO VERDE" },
-  { codigo:653, descripcion:"BLEDO COMúN" },
+  { codigo:653, descripcion:"BLEDO COM  N" },
   { codigo:654, descripcion:"MOCO DE PAVO" },
   { codigo:655, descripcion:"AMARANTO ROJO" },
   { codigo:656, descripcion:"SABINA NEGRA" },
@@ -1566,7 +1553,7 @@
   { codigo:670, descripcion:"SOLIDASTER" },
   { codigo:671, descripcion:"SOLIDAGO" },
   { codigo:672, descripcion:"SIEMPREVIVA AZUL" },
-  { codigo:673, descripcion:"AVE DEL PARAíSO" },
+  { codigo:673, descripcion:"AVE DEL PARA  SO" },
   { codigo:674, descripcion:"CLAVEL CHINO" },
   { codigo:675, descripcion:"CLAVEL DEL POETA" },
   { codigo:676, descripcion:"ADENANTHOS" },
@@ -1617,7 +1604,7 @@
   { codigo:718, descripcion:"CINERARIA" }, 
   { codigo:719, descripcion:"CLIVIA" }, 
   { codigo:720, descripcion:"CODIAEUM" }, 
-  { codigo:721, descripcion:"CóLEO" }, 
+  { codigo:721, descripcion:"C  LEO" }, 
   { codigo:722, descripcion:"CONVOLVULUS" }, 
   { codigo:723, descripcion:"COPROSMA" }, 
   { codigo:724, descripcion:"CORDYLINE" }, 
@@ -1633,7 +1620,7 @@
   { codigo:734, descripcion:"DIOSMA" }, 
   { codigo:735, descripcion:"DODONAEA" }, 
   { codigo:736, descripcion:"DRACAENA" }, 
-  { codigo:737, descripcion:"BOCA DE DRAGóN" }, 
+  { codigo:737, descripcion:"BOCA DE DRAG  N" }, 
   { codigo:738, descripcion:"DURANTA" }, 
   { codigo:739, descripcion:"ECHIUM" }, 
   { codigo:740, descripcion:"EPIPREMNUM" }, 
@@ -1665,7 +1652,7 @@
   { codigo:766, descripcion:"LEPTOSPERMUM" }, 
   { codigo:767, descripcion:"LEWISIA" }, 
   { codigo:768, descripcion:"LIMONIASTRUM" }, 
-  { codigo:769, descripcion:"FALSO JAZMíN" }, 
+  { codigo:769, descripcion:"FALSO JAZM  N" }, 
   { codigo:770, descripcion:"LOBELIA" }, 
   { codigo:771, descripcion:"LOBULARIA" }, 
   { codigo:772, descripcion:"MAGNOLIA" }, 
@@ -1691,10 +1678,10 @@
   { codigo:792, descripcion:"RHAPHIOLEPIS" }, 
   { codigo:793, descripcion:"PLUMBAGO" }, 
   { codigo:794, descripcion:"PLUMERIA" }, 
-  { codigo:795, descripcion:"POLíGALA" }, 
+  { codigo:795, descripcion:"POL  GALA" }, 
   { codigo:796, descripcion:"PORTULACA" }, 
   { codigo:797, descripcion:"PHORMIUM" }, 
-  { codigo:798, descripcion:"PRíMULA" }, 
+  { codigo:798, descripcion:"PR  MULA" }, 
   { codigo:799, descripcion:"SIDA FALLAX" }, 
   { codigo:800, descripcion:"FORESTACIONES VINCULADAS AL REGLAMENTO No 1305/2013" }, 
   { codigo:801, descripcion:"QUISQUALIS" }, 
@@ -1720,8 +1707,8 @@
   { codigo:821, descripcion:"METROSIDEROS" }, 
   { codigo:822, descripcion:"TSUGA" }, 
   { codigo:823, descripcion:"EPHEDRA" }, 
-  { codigo:824, descripcion:"áRBOL DEL AMOR" }, 
-  { codigo:825, descripcion:"ACACIA DEL JAPóN" }, 
+  { codigo:824, descripcion:"  RBOL DEL AMOR" }, 
+  { codigo:825, descripcion:"ACACIA DEL JAP  N" }, 
   { codigo:826, descripcion:"TIPUANA" }, 
   { codigo:827, descripcion:"OSTRIA" }, 
   { codigo:828, descripcion:"PLATANUS" }, 
@@ -1729,21 +1716,21 @@
   { codigo:830, descripcion:"LAUREL" }, 
   { codigo:831, descripcion:"GINKGO" }, 
   { codigo:832, descripcion:"BRAQUIQUITO" }, 
-  { codigo:833, descripcion:"áRBOL DE LA LLAMA" }, 
+  { codigo:833, descripcion:"  RBOL DE LA LLAMA" }, 
   { codigo:834, descripcion:"GREVILLEA" }, 
-  { codigo:835, descripcion:"CATALPA COMúN" }, 
-  { codigo:836, descripcion:"áRBOL PICA-PICA" }, 
-  { codigo:837, descripcion:"OMBú" }, 
+  { codigo:835, descripcion:"CATALPA COM  N" }, 
+  { codigo:836, descripcion:"  RBOL PICA-PICA" }, 
+  { codigo:837, descripcion:"OMB  " }, 
   { codigo:838, descripcion:"CHAENOMELES" }, 
   { codigo:839, descripcion:"PYRACANTHA" }, 
   { codigo:840, descripcion:"COTONEASTER" }, 
   { codigo:841, descripcion:"AMELANCHIER" }, 
   { codigo:842, descripcion:"ESPINO ALBAR" }, 
-  { codigo:843, descripcion:"NíSPERO EUROPEO" }, 
-  { codigo:844, descripcion:"áRBOL DEL PARAíSO" }, 
+  { codigo:843, descripcion:"N  SPERO EUROPEO" }, 
+  { codigo:844, descripcion:"  RBOL DEL PARA  SO" }, 
   { codigo:845, descripcion:"LIGUSTRUM" }, 
   { codigo:846, descripcion:"LILO" }, 
-  { codigo:847, descripcion:"LABIéRNAGO" }, 
+  { codigo:847, descripcion:"LABI  RNAGO" }, 
   { codigo:848, descripcion:"JASMINUM" }, 
   { codigo:849, descripcion:"CINAMOMO" }, 
   { codigo:850, descripcion:"OTRAS SUPERFICIES FORESTALES-VUELO" }, 
@@ -1751,7 +1738,7 @@
   { codigo:852, descripcion:"RHAMNUS" }, 
   { codigo:853, descripcion:"HEDERA" }, 
   { codigo:854, descripcion:"CORNICABRA" }, 
-  { codigo:855, descripcion:"áRBOL DE LAS PELUCAS" }, 
+  { codigo:855, descripcion:"  RBOL DE LAS PELUCAS" }, 
   { codigo:856, descripcion:"FALSO PIMENTERO" }, 
   { codigo:857, descripcion:"BUXUS" }, 
   { codigo:858, descripcion:"BOUGAINVILLEA" }, 
@@ -1762,13 +1749,13 @@
   { codigo:863, descripcion:"PARTHENOCISSUS" }, 
   { codigo:864, descripcion:"CISSUS" }, 
   { codigo:865, descripcion:"AGAVE" }, 
-  { codigo:866, descripcion:"GUANáBANO" }, 
-  { codigo:867, descripcion:"áRBOL DE LA NUEZ DE MACADAMIA" }, 
-  { codigo:868, descripcion:"HIERBA LIMóN" }, 
+  { codigo:866, descripcion:"GUAN  BANO" }, 
+  { codigo:867, descripcion:"  RBOL DE LA NUEZ DE MACADAMIA" }, 
+  { codigo:868, descripcion:"HIERBA LIM  N" }, 
   { codigo:869, descripcion:"CHAYOTE" }, 
-  { codigo:870, descripcion:"ANGéLICA" }, 
+  { codigo:870, descripcion:"ANG  LICA" }, 
   { codigo:871, descripcion:"RUDA" }, 
-  { codigo:872, descripcion:"LEVíSTICO" }, 
+  { codigo:872, descripcion:"LEV  STICO" }, 
   { codigo:873, descripcion:"HELICHRYSUM" }, 
   { codigo:874, descripcion:"CYCLAMEN" }, 
   { codigo:875, descripcion:"GLADIOLUS" }, 
@@ -1787,8 +1774,8 @@
   { codigo:888, descripcion:"FICUS RABUDO" }, 
   { codigo:889, descripcion:"FICUS BENJAMINA" }, 
   { codigo:890, descripcion:"HIGUERA CAUCHERA" }, 
-  { codigo:891, descripcion:"FICUS DE HOJA DE VIOLíN" }, 
-  { codigo:892, descripcion:"HIGUERA DE BAHíA MORETóN" }, 
+  { codigo:891, descripcion:"FICUS DE HOJA DE VIOL  N" }, 
+  { codigo:892, descripcion:"HIGUERA DE BAH  A MORET  N" }, 
   { codigo:893, descripcion:"LAUREL DE INDIAS" }, 
   { codigo:894, descripcion:"HIGUERA HERRUMBROSA" }, 
   { codigo:895, descripcion:"CAMELIA JAPONESA" }, 
@@ -1810,21 +1797,21 @@
   { codigo:911, descripcion:"KUMQUAT" }, 
   { codigo:912, descripcion:"LIMEQUAT" }, 
   { codigo:913, descripcion:"MANO DE BUDA" }, 
-  { codigo:914, descripcion:"CAVIAR CíTRICO/ FINGER LIME" }, 
+  { codigo:914, descripcion:"CAVIAR C  TRICO/ FINGER LIME" }, 
   { codigo:915, descripcion:"LIMA" }, 
   { codigo:916, descripcion:"KALE" }, 
-  { codigo:918, descripcion:"ARGáN" }, 
+  { codigo:918, descripcion:"ARG  N" }, 
   { codigo:919, descripcion:"PITAYA" }, 
   { codigo:920, descripcion:"LONGAN" }, 
-  { codigo:921, descripcion:"MANGOSTáN" }, 
-  { codigo:922, descripcion:"RAMBUTáN" }, 
+  { codigo:921, descripcion:"MANGOST  N" }, 
+  { codigo:922, descripcion:"RAMBUT  N" }, 
   { codigo:923, descripcion:"GUAYABO" }, 
   { codigo:924, descripcion:"ZAPOTE" }, 
   { codigo:925, descripcion:"ALFICOZ" }, 
   { codigo:926, descripcion:"BATATA" }, 
   { codigo:927, descripcion:"OKRA" }, 
   { codigo:928, descripcion:"PHYSALIS" }, 
-  { codigo:929, descripcion:"RúCULA" }, 
+  { codigo:929, descripcion:"R  CULA" }, 
   { codigo:930, descripcion:"SALICORNIA" }, 
   { codigo:931, descripcion:"ESQUEJES" }, 
   { codigo:932, descripcion:"PLANTAS ORNAMENTALES" }, 
@@ -1833,201 +1820,195 @@
   { codigo:935, descripcion:"OTRAS FORRAJERAS" }, 
   { codigo:936, descripcion:"TAGASASTE" }, 
   { codigo:937, descripcion:"CUERNECILLO " }, 
-  { codigo:938, descripcion:"FRESóN" }, 
+  { codigo:938, descripcion:"FRES  N" }, 
   { codigo:939, descripcion:"ALMENDRO-OLIVAR" }, 
   { codigo:940, descripcion:"NARANJO.CAQUI" }, 
   { codigo:941, descripcion:"NARANJO-MANDARINO" }, 
-  { codigo:942, descripcion:"NíSPERO-CAQUI" }, 
+  { codigo:942, descripcion:"N  SPERO-CAQUI" }, 
   { codigo:943, descripcion:"PALMERA DATILERA" }, 
-  { codigo:944, descripcion:"MARACUYá o FRUTO DE LA PASIóN" }, 
+  { codigo:944, descripcion:"MARACUY   o FRUTO DE LA PASI  N" }, 
   { codigo:945, descripcion:"MEZCLA AVENA-HABA" }, 
   { codigo:946, descripcion:"MEZCLA AVENA-CEBADA-VEZA" }, 
   { codigo:947, descripcion:"JOJOBA" }, 
   { codigo:948, descripcion:"CLEMENTINA-CAQUI" }, 
   { codigo:949, descripcion:"SATSUMA-CAQUI" }, 
-  { codigo:950, descripcion:"Cúrcuma" }, 
+  { codigo:950, descripcion:"C  rcuma" }, 
   { codigo:951, descripcion:"Jengibre" }, 
   { codigo:952, descripcion:"Col Picuda" }, 
   { codigo:953, descripcion:"MEZCLA PRATENSES CON PREDOMINANCIA CULTIVOS FIJADORES NITROGENO" }, 
-  { codigo:954, descripcion:"MEZCLA VEZA-GUISANTE-TRéBOL" }, 
+  { codigo:954, descripcion:"MEZCLA VEZA-GUISANTE-TR  BOL" }, 
   { codigo:955, descripcion:"YUZU" }, 
   { codigo:956, descripcion:"MEZCLA TRITICALE-GUISANTE" }, 
-  { codigo:957, descripcion:"JUDíA MUNGO" }, 
+  { codigo:957, descripcion:"JUD  A MUNGO" }, 
   { codigo:958, descripcion:"MEZCLA TRITICALE-CEBADA" }, 
   { codigo:959, descripcion:"MEZCLA RAYGRASS" }, 
-  { codigo:960, descripcion:"JAZMíN DEL CABO" }, 
+  { codigo:960, descripcion:"JAZM  N DEL CABO" }, 
   { codigo:961, descripcion:"AJO PUERRO" }, 
   { codigo:962, descripcion:"HERNIARIA" }, 
   { codigo:963, descripcion:"CALABAZA SERPIENTE" }, 
   { codigo:964, descripcion:"GUAYULE" }, 
-  { codigo:965, descripcion:"CEREZO JAPONéS" }, 
-  { codigo:966, descripcion:"CIRUELO MIROBáLANO" }, 
+  { codigo:965, descripcion:"CEREZO JAPON  S" }, 
+  { codigo:966, descripcion:"CIRUELO MIROB  LANO" }, 
   { codigo:967, descripcion:"ALMENDRO DE FLOR" }, 
   { codigo:968, descripcion:"CEREZO RASTRERO" }, 
   { codigo:969, descripcion:"CEREZO ALISO" }, 
   { codigo:970, descripcion:"LAUREL CEREZO" }, 
   { codigo:971, descripcion:"LAUREL DE PORTUGAL" }, 
-  { codigo:972, descripcion:"MANZANO SILVESTRE JAPONéS" }, 
+  { codigo:972, descripcion:"MANZANO SILVESTRE JAPON  S" }, 
   { codigo:973, descripcion:"MANZANO ROJO" }, 
   { codigo:974, descripcion:"MANZANO SILVESTRE AMERICANO" }, 
   { codigo:975, descripcion:"MANZANO SILVESTRE CHINO" }, 
   { codigo:976, descripcion:"MANZANO DE ADORNO" }, 
   { codigo:977, descripcion:"MANZANO SILVESTRE" }, 
   { codigo:978, descripcion:"PERAL SILVESTRE" }, 
-  { codigo:979, descripcion:"PIRUéTANO" }, 
+  { codigo:979, descripcion:"PIRU  TANO" }, 
   { codigo:980, descripcion:"PERAL DE CALLERY" }, 
   { codigo:981, descripcion:"PERAL DE HOJAS DE SAUCE" }, 
   { codigo:982, descripcion:"PERAL DE REGEL" }, 
   { codigo:983, descripcion:"FALSA ACACIA" }, 
-  { codigo:984, descripcion:"JACARANDá AZUL" }, 
+  { codigo:984, descripcion:"JACARAND   AZUL" }, 
   { codigo:985, descripcion:"HIERBA SALADA" }, 
   { codigo:986, descripcion:"VARA DE ORO EUROPEA" }, 
   { codigo:987, descripcion:"ESPONJA VEGETAL" }
 ]; 
 
     const INCIDENCIAS_SIGPAC_DB = [
-  { "codigo": "7", "descripcion": "Uso asignado por la información de Catastro" },
-  { "codigo": "11", "descripcion": "árboles dispersos" },
+  { "codigo": "7", "descripcion": "Uso asignado por la informaci  n de Catastro" },
+  { "codigo": "11", "descripcion": "  rboles dispersos" },
   { "codigo": "12", "descripcion": "Contiene otros usos sin subdividir" },
   { "codigo": "13", "descripcion": "Se observa en la ortofoto uso de cultivo" },
   { "codigo": "14", "descripcion": "Superficie de cultivo que se prolonga en red viaria o fluvial" },
-  { "codigo": "15", "descripcion": "Recinto perteneciente a parcela incluida en información gráfica de un Certificado de Forestación" },
-  { "codigo": "17", "descripcion": "Recinto perteneciente a parcela incluida en información alfanumérica del Registro Vitícola identificada como arranque de vi?a" },
-  { "codigo": "19", "descripcion": "Cítricos según SIG Citrícola" },
-  { "codigo": "20", "descripcion": "Vi?a según SIG Vitícola" },
+  { "codigo": "15", "descripcion": "Recinto perteneciente a parcela incluida en informaci  n gr  fica de un Certificado de Forestaci  n" },
+  { "codigo": "17", "descripcion": "Recinto perteneciente a parcela incluida en informaci  n alfanum  rica del Registro Vit  cola identificada como arranque de vi?a" },
+  { "codigo": "19", "descripcion": "C  tricos seg  n SIG Citr  cola" },
+  { "codigo": "20", "descripcion": "Vi?a seg  n SIG Vit  cola" },
   { "codigo": "21", "descripcion": "Catastrado de arroz" },
-  { "codigo": "37", "descripcion": "Recinto perteneciente a parcela incluida en información alfanumérica de un Certificado de Forestación" },
-  { "codigo": "39", "descripcion": "La superficie de cítricos no ocupa la totalidad del recinto por asociación con otros frutales" },
+  { "codigo": "37", "descripcion": "Recinto perteneciente a parcela incluida en informaci  n alfanum  rica de un Certificado de Forestaci  n" },
+  { "codigo": "39", "descripcion": "La superficie de c  tricos no ocupa la totalidad del recinto por asociaci  n con otros frutales" },
   { "codigo": "46", "descripcion": "Recinto de uso no arable perteneciente a parcela incluido en fichero de parcelas declaradas" },
   { "codigo": "47", "descripcion": "Se observa en la ortofoto superficie arada" },
   { "codigo": "49", "descripcion": "Arboles aislados o a marco en cultivo combinado con el uso arable" },
-  { "codigo": "58", "descripcion": "Vi?a según Registro Vitícola en parte del Recinto SIGPAC" },
+  { "codigo": "58", "descripcion": "Vi?a seg  n Registro Vit  cola en parte del Recinto SIGPAC" },
   { "codigo": "62", "descripcion": "Uso pastos en parcela incluida en base de datos de pasto permanente" },
   { "codigo": "63", "descripcion": "Uso diferente a pastos en parcela incluida en base de datos de pasto permanente" },
-  { "codigo": "74", "descripcion": "Información de uso SIGPAC aportada por la Comunidad Autónoma" },
-  { "codigo": "75", "descripcion": "Información del sistema de explotación aportada por la Comunidad Autónoma" },
-  { "codigo": "80", "descripcion": "Dato con origen en información procedente de la Comunidad Autónoma" },
-  { "codigo": "81", "descripcion": "Instalaciones energéticas" },
+  { "codigo": "74", "descripcion": "Informaci  n de uso SIGPAC aportada por la Comunidad Aut  noma" },
+  { "codigo": "75", "descripcion": "Informaci  n del sistema de explotaci  n aportada por la Comunidad Aut  noma" },
+  { "codigo": "80", "descripcion": "Dato con origen en informaci  n procedente de la Comunidad Aut  noma" },
+  { "codigo": "81", "descripcion": "Instalaciones energ  ticas" },
   { "codigo": "83", "descripcion": "Tomate en invernadero" },
-  { "codigo": "96", "descripcion": "Uso SIGPAC validado por fotointerpretación Control Teledetección 2017" },
-  { "codigo": "97", "descripcion": "Uso SIGPAC estudiado por Control Teledetección 2017" },
-  { "codigo": "98", "descripcion": "Uso SIGPAC validado por fotointerpretación Control Teledetección 2018" },
-  { "codigo": "99", "descripcion": "Uso SIGPAC estudiado por Control Teledetección 2018" },
-  { "codigo": "100", "descripcion": "Uso SIGPAC validado por fotointerpretación Control Teledetección 2019" },
-  { "codigo": "111", "descripcion": "Asociación vi?a-hortalizas" },
+  { "codigo": "96", "descripcion": "Uso SIGPAC validado por fotointerpretaci  n Control Teledetecci  n 2017" },
+  { "codigo": "97", "descripcion": "Uso SIGPAC estudiado por Control Teledetecci  n 2017" },
+  { "codigo": "98", "descripcion": "Uso SIGPAC validado por fotointerpretaci  n Control Teledetecci  n 2018" },
+  { "codigo": "99", "descripcion": "Uso SIGPAC estudiado por Control Teledetecci  n 2018" },
+  { "codigo": "100", "descripcion": "Uso SIGPAC validado por fotointerpretaci  n Control Teledetecci  n 2019" },
+  { "codigo": "111", "descripcion": "Asociaci  n vi?a-hortalizas" },
   { "codigo": "112", "descripcion": "Plataneras" },
   { "codigo": "116", "descripcion": "Contiene elementos del paisaje" },
   { "codigo": "117", "descripcion": "No subvencionable: Cultivo abandonado" },
   { "codigo": "119", "descripcion": "Catastrado de urbano" },
   { "codigo": "120", "descripcion": "Zona esteparia medida" },
-  { "codigo": "124", "descripcion": "Superficies forestales de rotación corta." },
-  { "codigo": "127", "descripcion": "Regadío comprobado. No consta existencia de concesión." },
+  { "codigo": "124", "descripcion": "Superficies forestales de rotaci  n corta." },
+  { "codigo": "127", "descripcion": "Regad  o comprobado. No consta existencia de concesi  n." },
   { "codigo": "128", "descripcion": "Recintos sin cultivar con valores ambientales o por medidas agroambientales" },
-  { "codigo": "129", "descripcion": "Plantación trufera o encinas micorrizadas" },
+  { "codigo": "129", "descripcion": "Plantaci  n trufera o encinas micorrizadas" },
   { "codigo": "130", "descripcion": "Plantaciones forestales regulares" },
-  { "codigo": "132", "descripcion": "Roquedo según cobertura SIOSE" },
+  { "codigo": "132", "descripcion": "Roquedo seg  n cobertura SIOSE" },
   { "codigo": "133", "descripcion": "Todo el recinto es un elemento del paisaje sin definir" },
-  { "codigo": "134", "descripcion": "Elemento del paisaje árboles en hilera" },
-  { "codigo": "135", "descripcion": "Elemento del paisaje árboles en grupo hasta 0,3 ha" },
+  { "codigo": "134", "descripcion": "Elemento del paisaje   rboles en hilera" },
+  { "codigo": "135", "descripcion": "Elemento del paisaje   rboles en grupo hasta 0,3 ha" },
   { "codigo": "136", "descripcion": "Elemento del paisaje linde hasta 10 m de anchura" },
   { "codigo": "137", "descripcion": "Elemento del paisaje charcas, lagunas, peque?os humedales, etc. hasta 0,1ha" },
-  { "codigo": "138", "descripcion": "Elemento del paisaje islas de vegetación natural o roca hasta 0,1ha" },
+  { "codigo": "138", "descripcion": "Elemento del paisaje islas de vegetaci  n natural o roca hasta 0,1ha" },
   { "codigo": "139", "descripcion": "Elemento del paisaje terraza hasta 10 m de anchura" },
-  { "codigo": "140", "descripcion": "Información del coeficiente de subvencionabilidad aportada por la Comunidad Autónoma" },
+  { "codigo": "140", "descripcion": "Informaci  n del coeficiente de subvencionabilidad aportada por la Comunidad Aut  noma" },
   { "codigo": "142", "descripcion": "Cultivo de esparrago" },
   { "codigo": "143", "descripcion": "Monte-bajo matorral" },
   { "codigo": "144", "descripcion": "Erial" },
-  { "codigo": "145", "descripcion": "Plantas aromáticas le?osas" },
-  { "codigo": "146", "descripcion": "Asignación CAP manual recintos peque?os" },
+  { "codigo": "145", "descripcion": "Plantas arom  ticas le?osas" },
+  { "codigo": "146", "descripcion": "Asignaci  n CAP manual recintos peque?os" },
   { "codigo": "148", "descripcion": "Recinto perteneciente a un Tancat" },
   { "codigo": "149", "descripcion": "Recinto de pasto sensible transformado" },
   { "codigo": "150", "descripcion": "recinto con mezcla de platanera y otros frutales tropicales" },
-  { "codigo": "151", "descripcion": "Frutales bajo plástico" },
-  { "codigo": "152", "descripcion": "Improductivo según cobertura MFE" },
-  { "codigo": "153", "descripcion": "Actualización CAP manual con coeficiente 2016" },
+  { "codigo": "151", "descripcion": "Frutales bajo pl  stico" },
+  { "codigo": "152", "descripcion": "Improductivo seg  n cobertura MFE" },
+  { "codigo": "153", "descripcion": "Actualizaci  n CAP manual con coeficiente 2016" },
   { "codigo": "154", "descripcion": "Visto en campo 2017" },
-  { "codigo": "155", "descripcion": "Frutos secos que no cumplen la densidad mínima, según control de campo o administrativo" },
-  { "codigo": "156", "descripcion": "Control de pastos de más de 10 a?os" },
-  { "codigo": "157", "descripcion": "El cambio de uso SIGPAC, procedente de un uso forestal o pastos, no acredita autorización administrativa de la Consejería con competencia en medio ambiente" },
+  { "codigo": "155", "descripcion": "Frutos secos que no cumplen la densidad m  nima, seg  n control de campo o administrativo" },
+  { "codigo": "156", "descripcion": "Control de pastos de m  s de 10 a?os" },
+  { "codigo": "157", "descripcion": "El cambio de uso SIGPAC, procedente de un uso forestal o pastos, no acredita autorizaci  n administrativa de la Consejer  a con competencia en medio ambiente" },
   { "codigo": "158", "descripcion": "Barbecho de 5 a?os consecutivos" },
   { "codigo": "159", "descripcion": "Subvencionabilidad del recinto condicionada por incendio" },
   { "codigo": "160", "descripcion": "Contiene Balates" },
-  { "codigo": "161", "descripcion": "Frutos secos que no cumplen la densidad mínima, según el no de árboles registrado" },
+  { "codigo": "161", "descripcion": "Frutos secos que no cumplen la densidad m  nima, seg  n el no de   rboles registrado" },
   { "codigo": "162", "descripcion": "Visto en campo 2018" },
-  { "codigo": "163", "descripcion": "El cambio de uso reflejado en SIGPAC ha sido informado por parte de la Consejería con competencia en medio ambiente como exento de la necesidad de autorización" },
-  { "codigo": "164", "descripcion": "El cambio de uso reflejado en SIGPAC ha sido informado por parte de la Consejería con competencia en medio ambiente como autorizado" },
-  { "codigo": "165", "descripcion": "El cambio de uso SIGPAC a le?oso, procedente de tierras de cultivo en zona LIC o ZEPA, no acredita autorización administrativa de la Consejería con competencia en medio ambiente" },
-  { "codigo": "166", "descripcion": "El cambio de uso reflejado en SIGPAC ha sido informado por parte de la Consejería con competencia en medio ambiente como no autorizado" },
-  { "codigo": "167", "descripcion": "Pino inoculado con níscalo" },
-  { "codigo": "168", "descripcion": "Pastos le?osos sin mayoría herbácea" },
-  { "codigo": "169", "descripcion": "Pino para producción de pi?ones" },
+  { "codigo": "163", "descripcion": "El cambio de uso reflejado en SIGPAC ha sido informado por parte de la Consejer  a con competencia en medio ambiente como exento de la necesidad de autorizaci  n" },
+  { "codigo": "164", "descripcion": "El cambio de uso reflejado en SIGPAC ha sido informado por parte de la Consejer  a con competencia en medio ambiente como autorizado" },
+  { "codigo": "165", "descripcion": "El cambio de uso SIGPAC a le?oso, procedente de tierras de cultivo en zona LIC o ZEPA, no acredita autorizaci  n administrativa de la Consejer  a con competencia en medio ambiente" },
+  { "codigo": "166", "descripcion": "El cambio de uso reflejado en SIGPAC ha sido informado por parte de la Consejer  a con competencia en medio ambiente como no autorizado" },
+  { "codigo": "167", "descripcion": "Pino inoculado con n  scalo" },
+  { "codigo": "168", "descripcion": "Pastos le?osos sin mayor  a herb  cea" },
+  { "codigo": "169", "descripcion": "Pino para producci  n de pi?ones" },
   { "codigo": "170", "descripcion": "Visto en campo 2019" },
-  { "codigo": "171", "descripcion": "Uso SIGPAC estudiado por Control Teledetección 2019" },
+  { "codigo": "171", "descripcion": "Uso SIGPAC estudiado por Control Teledetecci  n 2019" },
   { "codigo": "173", "descripcion": "Actividad agraria comprobada 2016" },
   { "codigo": "174", "descripcion": "Actividad agraria comprobada 2017" },
   { "codigo": "175", "descripcion": "Actividad agraria comprobada 2018" },
   { "codigo": "176", "descripcion": "Actividad agraria comprobada 2019" },
   { "codigo": "177", "descripcion": "Cultivos Permanentes con actividad de mantenimiento 5 a?os consecutivos" },
-  { "codigo": "178", "descripcion": "Monitorización 2019: Pendiente confirmar por renovación Ortofoto" },
-  { "codigo": "179", "descripcion": "Recinto con derecho de cultivo en dominio público" },
-  { "codigo": "180", "descripcion": "Uso SIGPAC validado por fotointerpretación Control Teledetección 2020" },
-  { "codigo": "181", "descripcion": "Uso SIGPAC estudiado por Control Teledetección 2020" },
+  { "codigo": "178", "descripcion": "Monitorizaci  n 2019: Pendiente confirmar por renovaci  n Ortofoto" },
+  { "codigo": "179", "descripcion": "Recinto con derecho de cultivo en dominio p  blico" },
+  { "codigo": "180", "descripcion": "Uso SIGPAC validado por fotointerpretaci  n Control Teledetecci  n 2020" },
+  { "codigo": "181", "descripcion": "Uso SIGPAC estudiado por Control Teledetecci  n 2020" },
   { "codigo": "182", "descripcion": "Visto en campo 2020" },
-  { "codigo": "183", "descripcion": "Monitorización 2020: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "183", "descripcion": "Monitorizaci  n 2020: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "184", "descripcion": "cultivo sin suelo" },
   { "codigo": "185", "descripcion": "Actividad agraria comprobada en 2020" },
   { "codigo": "186", "descripcion": "Pasto Permanente con actividad de mantenimiento 5 a?os consecutivos" },
   { "codigo": "187", "descripcion": "Pendiente control por covid-19" },
-  { "codigo": "188", "descripcion": "Uso SIGPAC validado por fotointerpretación Control Teledetección 2021" },
-  { "codigo": "189", "descripcion": "Uso SIGPAC estudiado por Control Teledetección 2021" },
+  { "codigo": "188", "descripcion": "Uso SIGPAC validado por fotointerpretaci  n Control Teledetecci  n 2021" },
+  { "codigo": "189", "descripcion": "Uso SIGPAC estudiado por Control Teledetecci  n 2021" },
   { "codigo": "190", "descripcion": "Visto en campo 2021" },
-  { "codigo": "191", "descripcion": "Monitorización 2021: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "191", "descripcion": "Monitorizaci  n 2021: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "192", "descripcion": "Actividad agraria comprobada en 2021" },
-  { "codigo": "193", "descripcion": "Dominio público según catastro" },
+  { "codigo": "193", "descripcion": "Dominio p  blico seg  n catastro" },
   { "codigo": "196", "descripcion": "Visto en campo 2022" },
-  { "codigo": "197", "descripcion": "Monitorización 2022: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "197", "descripcion": "Monitorizaci  n 2022: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "198", "descripcion": "Actividad agraria comprobada en 2022" },
   { "codigo": "199", "descripcion": "Recinto inactivo" },
-  { "codigo": "202", "descripcion": "Información de Región en Concentración Parcelaria aportada por la Comunidad Autónoma" },
-  { "codigo": "204", "descripcion": "Información Vía Pecuaria aportada por la Comunidad Autónoma" },
+  { "codigo": "202", "descripcion": "Informaci  n de Regi  n en Concentraci  n Parcelaria aportada por la Comunidad Aut  noma" },
+  { "codigo": "204", "descripcion": "Informaci  n V  a Pecuaria aportada por la Comunidad Aut  noma" },
   { "codigo": "208", "descripcion": "CSP externo pendiente cambio raster" },
-  { "codigo": "209", "descripcion": "Revisado por fotointerpretación por la Comunidad Autónoma" },
-  { "codigo": "210", "descripcion": "Recinto afectado por catástrofe natural" },
+  { "codigo": "209", "descripcion": "Revisado por fotointerpretaci  n por la Comunidad Aut  noma" },
+  { "codigo": "210", "descripcion": "Recinto afectado por cat  strofe natural" },
   { "codigo": "211", "descripcion": "Pasto sin actividad agraria." },
   { "codigo": "213", "descripcion": "Prado susceptible de siega con altitud <= 300 m" },
   { "codigo": "214", "descripcion": "Prado susceptible de siega con altitud > 300 m" },
   { "codigo": "215", "descripcion": "Elemento del paisaje construcciones tradicionales" },
   { "codigo": "216", "descripcion": "Elemento del paisaje seto hasta 10 m de anchura" },
-  { "codigo": "217", "descripcion": "Elemento del paisaje árboles aislados" },
+  { "codigo": "217", "descripcion": "Elemento del paisaje   rboles aislados" },
   { "codigo": "218", "descripcion": "Visto en campo 2023" },
-  { "codigo": "219", "descripcion": "Monitorización 2023: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "219", "descripcion": "Monitorizaci  n 2023: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "220", "descripcion": "Actividad agraria comprobada en 2023" },
-  { "codigo": "221", "descripcion": "Tierra de cultivo explotada de regadío en alguno de los últimos 3 a?os" },
+  { "codigo": "221", "descripcion": "Tierra de cultivo explotada de regad  o en alguno de los   ltimos 3 a?os" },
   { "codigo": "222", "descripcion": "Elemento del paisaje muro de piedra" },
   { "codigo": "223", "descripcion": "Cabecera de cultivo permanente" },
   { "codigo": "224", "descripcion": "Cultivo le?oso con bancales" },
   { "codigo": "225", "descripcion": "Recinto con CSP bloqueado tras incendio" },
-  { "codigo": "226", "descripcion": "Cultivo de setas o champi?ón" },
+  { "codigo": "226", "descripcion": "Cultivo de setas o champi?  n" },
   { "codigo": "227", "descripcion": "Prado susceptible de siega" },
   { "codigo": "228", "descripcion": "Visto en campo 2024" },
-  { "codigo": "229", "descripcion": "Monitorización 2024: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "229", "descripcion": "Monitorizaci  n 2024: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "230", "descripcion": "Actividad agraria comprobada en 2024" },
   { "codigo": "231", "descripcion": "Disponibilidad No acreditada" },
   { "codigo": "233", "descripcion": "Visto en campo 2025" },
-  { "codigo": "234", "descripcion": "Monitorización 2025: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "234", "descripcion": "Monitorizaci  n 2025: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "235", "descripcion": "Actividad agraria comprobada en 2025" },
   { "codigo": "236", "descripcion": "Recinto LDG estable" },
   { "codigo": "237", "descripcion": "Visto en campo 2026" },
-  { "codigo": "238", "descripcion": "Monitorización 2026: Pendiente confirmar por renovación Ortofoto" },
+  { "codigo": "238", "descripcion": "Monitorizaci  n 2026: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "239", "descripcion": "Actividad agraria comprobada en 2026" }
 ]; 
-
-    /* ============================================
-       UTILIDADES
-       ============================================ */
-    function vibrate(ms) {
-      if ("vibrate" in navigator) navigator.vibrate(ms);
-    }
+    function vibrate(ms) { if ("vibrate" in navigator) navigator.vibrate(ms); }
 
     function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
@@ -2055,9 +2036,6 @@
       return m > 1000 ? (m/1000).toFixed(2) + ' km' : Math.round(m) + ' m';
     }
 
-    /* ============================================
-       SISTEMA DE ALERTAS DE PROXIMIDAD
-       ============================================ */
     function solicitarPermisoNotificaciones() {
       if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
@@ -2077,15 +2055,14 @@
         osc.start();
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
         osc.stop(audioCtx.currentTime + 0.5);
-      } catch(e) { /* silenciar error */ }
+      } catch(e) {}
     }
 
     function lanzarAlertaProximidad(parcela, distancia, rumbo) {
       const card = rumboACardinal(rumbo);
       const distTxt = formatearDistancia(distancia);
-      const msg = `La parcela ${parcela.nombre} est谩 a ${distTxt} en el rumbo ${Math.round(rumbo)}掳 (${card})`;
+      const msg = `La parcela ${parcela.nombre} está a ${distTxt} en el rumbo ${Math.round(rumbo)}° (${card})`;
 
-      // 1. Barra visual en la app
       const bar = document.getElementById('proximityAlertBar');
       const txt = document.getElementById('proximityAlertText');
       if (bar && txt) {
@@ -2093,30 +2070,25 @@
         bar.classList.add('visible');
       }
 
-      // 2. Vibraci贸n
       if (sonidoAlerta !== 'silencio') {
         vibrate([300, 100, 300, 100, 300]);
       }
 
-      // 3. Sonido
       if (sonidoAlerta === 'sonido') {
         reproducirSonidoAlerta();
       }
 
-      // 4. Notificaci贸n del navegador
       if ('Notification' in window && Notification.permission === 'granted') {
         try {
-          new Notification('馃搷 Parcela Cercana', {
+          new Notification('&#x1F4CD; Parcela Cercana', {
             body: msg,
-            icon: '馃尵',
             tag: 'prox-' + parcela.id,
             requireInteraction: false
           });
-        } catch(e) { /* fallback silencioso */ }
+        } catch(e) {}
       }
 
-      // 5. Toast dentro de la app
-      mostrarNotificacion('馃搷 ' + msg);
+      mostrarNotificacion('&#x1F4CD; ' + msg);
     }
 
     function iniciarMonitorProximidad() {
@@ -2125,7 +2097,6 @@
       monitorProximidadInterval = setInterval(() => {
         if (!userCoords || parcelas.length === 0) return;
 
-        // Calcular distancias a todas las parcelas
         let masCercana = null;
         let distMinima = Infinity;
 
@@ -2139,25 +2110,22 @@
             masCercana = { parcela: p, idx: idx, dist: d, rumbo: p._rumbo };
           }
 
-          // Alerta si est谩 dentro del radio
           if (d <= distAlerta && !parcelasAlertadas.has(p.id)) {
             parcelasAlertadas.add(p.id);
             lanzarAlertaProximidad(p, d, p._rumbo);
           }
 
-          // Resetear alerta si se aleja
           if (d > distAlerta * 1.5) {
             parcelasAlertadas.delete(p.id);
           }
         });
 
-        // Actualizar barra con la m谩s cercana
         if (masCercana && masCercana.dist <= distAlerta * 2) {
           const bar = document.getElementById('proximityAlertBar');
           const txt = document.getElementById('proximityAlertText');
           if (bar && txt) {
             const card = rumboACardinal(masCercana.rumbo);
-            txt.textContent = `M谩s cercana: ${masCercana.parcela.nombre} 鈫?${formatearDistancia(masCercana.dist)} al ${Math.round(masCercana.rumbo)}掳 (${card})`;
+            txt.textContent = `Más cercana: ${masCercana.parcela.nombre} → ${formatearDistancia(masCercana.dist)} al ${Math.round(masCercana.rumbo)}° (${card})`;
             bar.classList.add('visible');
           }
         } else {
@@ -2165,7 +2133,6 @@
           if (bar) bar.classList.remove('visible');
         }
 
-        // Reordenar tabla si est谩 visible
         renderTablaResumen();
 
       }, intervaloEscaneo);
@@ -2184,9 +2151,6 @@
       mostrarNotificacion(`Alerta configurada: ${distAlerta}m cada ${intervaloEscaneo/1000}s`);
     }
 
-    /* ============================================
-       GPS Y BR脷JULA
-       ============================================ */
     function initMap() {
       if (leafletMap) return;
       leafletMap = L.map('mapaField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
@@ -2194,7 +2158,7 @@
       const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
       const ignPnoa = L.tileLayer.wms('https://www.ign.es/wms-inspire/pnoa-ma', { layers: 'OI.OrtoimageCoverage', format: 'image/png', transparent: true, maxZoom: 20 });
       esriSat.addTo(leafletMap);
-      L.control.layers({ 'Sat茅lite (Esri)': esriSat, 'Ortofoto (PNOA/IGN)': ignPnoa, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(leafletMap);
+      L.control.layers({ 'Satélite (Esri)': esriSat, 'Ortofoto (PNOA/IGN)': ignPnoa, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(leafletMap);
     }
 
     function activarSensoresGpsYBrujula() {
@@ -2216,7 +2180,7 @@
         actualizarBadgeGps("GPS no soportado");
         return;
       }
-      actualizarBadgeGps("GPS: Conectando sat茅lites...");
+      actualizarBadgeGps("GPS: Conectando satélites...");
       navigator.geolocation.getCurrentPosition(
         (pos) => { procesarPosicionGps(pos); iniciarWatchGps(); },
         (err) => { actualizarBadgeGps("GPS: Reintentando modo Red..."); iniciarWatchGps(); },
@@ -2240,11 +2204,11 @@
 
     function procesarPosicionGps(pos) {
       userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy || 10 };
-      actualizarBadgeGps(`GPS: OK (卤${Math.round(userCoords.accuracy)}m)`);
+      actualizarBadgeGps(`GPS: OK (±${Math.round(userCoords.accuracy)}m)`);
       actualizarMapaUbicacion(userCoords.lat, userCoords.lng, userCoords.accuracy);
       actualizarCalculosNav();
       if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
-        actualizarRumboUI(pos.coords.heading, "GPS Sat茅lite");
+        actualizarRumboUI(pos.coords.heading, "GPS Satélite");
       }
     }
 
@@ -2254,7 +2218,7 @@
       const userIcon = L.divIcon({ className: 'custom-user-icon', html: `<div class="user-location-marker"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
       if (!userMarker) {
         userMarker = L.marker(latLng, { icon: userIcon, zIndexOffset: 1000 }).addTo(leafletMap);
-        userMarker.bindPopup(`<b>Tu Ubicaci贸n</b><br>卤${Math.round(accuracy)}m`);
+        userMarker.bindPopup(`<b>Tu Ubicación</b><br>±${Math.round(accuracy)}m`);
       } else {
         userMarker.setLatLng(latLng);
       }
@@ -2278,10 +2242,10 @@
       if (userCoords && leafletMap) {
         leafletMap.setView([userCoords.lat, userCoords.lng], 18);
         if (userMarker) userMarker.openPopup();
-        mostrarNotificacion("Mapa centrado en tu posici贸n.");
+        mostrarNotificacion("Mapa centrado en tu posición.");
       } else {
         activarSensoresGpsYBrujula();
-        mostrarNotificacion("Buscando se帽al GPS...");
+        mostrarNotificacion("Buscando señal GPS...");
       }
     }
 
@@ -2311,7 +2275,7 @@
         if (ch < 0) ch += 360;
         const sa = (screen.orientation && screen.orientation.angle) ? screen.orientation.angle : (window.orientation || 0);
         heading = (ch + sa) % 360;
-        fuente = e.absolute ? "Magnet贸metro" : "Giroscopio";
+        fuente = e.absolute ? "Magnetómetro" : "Giroscopio";
       }
       if (heading !== null && !isNaN(heading)) actualizarRumboUI(heading, fuente);
     }
@@ -2327,7 +2291,7 @@
         if (bNeedle) bNeedle.style.transform = `rotate(${bearing - heading}deg)`;
       }
       const txt = document.getElementById('txtRumbo');
-      if (txt) txt.textContent = `${Math.round(heading)}掳 ${rumboACardinal(heading)}`;
+      if (txt) txt.textContent = `${Math.round(heading)}° ${rumboACardinal(heading)}`;
       actualizarBadgeBrujula(`${fuente} (${sensorSampleCount})`);
       actualizarCalculosNav();
     }
@@ -2340,15 +2304,12 @@
       const td = document.getElementById('txtDistancia');
       if (td) td.textContent = formatearDistancia(dist);
       const tr = document.getElementById('txtRumboDestino');
-      if (tr) tr.textContent = `${Math.round(rumbo)}掳 ${rumboACardinal(rumbo)}`;
+      if (tr) tr.textContent = `${Math.round(rumbo)}° ${rumboACardinal(rumbo)}`;
     }
 
     function actualizarBadgeGps(t) { const e = document.getElementById('gpsStatusBadge'); if (e) e.textContent = t; }
     function actualizarBadgeBrujula(t) { const e = document.getElementById('compassStatusBadge'); if (e) e.textContent = t; }
 
-    /* ============================================
-       KML PARSING
-       ============================================ */
     function setupKMLListeners() {
       document.getElementById('inputKmlPuntos').addEventListener('change', (e) => {
         const f = e.target.files[0]; if (!f) return;
@@ -2429,9 +2390,6 @@
       if (notificar) mostrarNotificacion(`Campo cambiado a: "${field}"`);
     }
 
-    /* ============================================
-       EDICI脫N DE PARCELA
-       ============================================ */
     function cargarParcelaEnEdicion(idx) {
       if (idx < 0 || idx >= parcelas.length) return;
       parcelaActualIndex = idx;
@@ -2442,7 +2400,7 @@
       document.getElementById('inputObservaciones').value = p.observaciones || '';
       document.getElementById('btnGmaps').href = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
       const bc = document.getElementById('btnEstadoCompletada');
-      if (p.completada) { bc.classList.add('activa'); bc.textContent = '鉁?Completada'; } else { bc.classList.remove('activa'); bc.textContent = '鉁?Completar'; }
+      if (p.completada) { bc.classList.add('activa'); bc.textContent = '✔ Completada'; } else { bc.classList.remove('activa'); bc.textContent = '✔ Completar'; }
       const kc = document.getElementById('kmlDataContent');
       if (kc) {
         let html = "";
@@ -2453,7 +2411,7 @@
       }
       if (leafletMap) {
         if (parcelMarker) leafletMap.removeLayer(parcelMarker);
-        parcelMarker = L.marker([p.lat, p.lng]).addTo(leafletMap).bindPopup(`<b style="font-size:1.1em; color:#0284c7;">馃搷 ${p.nombre}</b>`);
+        parcelMarker = L.marker([p.lat, p.lng]).addTo(leafletMap).bindPopup(`<b style="font-size:1.1em; color:#0284c7;">&#x1F4CD; ${p.nombre}</b>`);
         if (parcelPolygon) leafletMap.removeLayer(parcelPolygon);
         if (contornosGeom[idx]) { parcelPolygon = L.polygon(contornosGeom[idx], { color: '#38bdf8', weight: 3, fillOpacity: 0.3 }).addTo(leafletMap); leafletMap.fitBounds(parcelPolygon.getBounds(), { padding: [30, 30] }); }
         else leafletMap.setView([p.lat, p.lng], 17);
@@ -2476,18 +2434,13 @@
       }
     }
 
-    /* ============================================
-       TABLA ORDENADA POR DISTANCIA
-       ============================================ */
     function renderTablaResumen() {
       const tbody = document.getElementById('tablaResumen');
       if (!tbody) return;
       if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos cargados</td></tr>'; return; }
 
-      // Crear array con 铆ndices para ordenar
       let indices = parcelas.map((p, i) => i);
       
-      // Si hay coordenadas GPS, ordenar por distancia
       if (userCoords) {
         indices.sort((a, b) => {
           const da = parcelas[a]._distancia !== null ? parcelas[a]._distancia : calcularDistanciaMetros(userCoords.lat, userCoords.lng, parcelas[a].lat, parcelas[a].lng);
@@ -2515,9 +2468,6 @@
       }).join('');
     }
 
-    /* ============================================
-       LOCALSTORAGE
-       ============================================ */
     function guardarEnLocalStorage() {
       try {
         localStorage.setItem('sigpac_parcelas_data', JSON.stringify(parcelas));
@@ -2538,7 +2488,6 @@
         if (sc) { contornosGeom = JSON.parse(sc); document.getElementById('totalContornos').textContent = contornosGeom.length; }
         if (sf) { kmlFieldsList = new Set(JSON.parse(sf)); poblarSelectCampoIdentificador(ss); }
         
-        // Cargar config de proximidad
         const da = localStorage.getItem('sigpac_dist_alerta');
         const sa = localStorage.getItem('sigpac_sonido_alerta');
         const iv = localStorage.getItem('sigpac_intervalo');
@@ -2566,15 +2515,12 @@
       renderTablaResumen(); cerrarModalConfirm(); mostrarNotificacion("Memoria limpiada.");
     }
 
-    /* ============================================
-       B脷SQUEDA Y CONSULTAS
-       ============================================ */
     function agregarAObservaciones(sel, tipo) {
       if (!sel.value) return;
       const o = document.getElementById('inputObservaciones');
       if (!o) return;
       o.value = o.value ? `${o.value}\n[${tipo}] ${sel.value}` : `[${tipo}] ${sel.value}`;
-      sel.value = ''; guardarObservaciones(); mostrarNotificacion("A帽adido a observaciones.");
+      sel.value = ''; guardarObservaciones(); mostrarNotificacion("Añadido a observaciones.");
     }
 
     function filtrarGlobal() {
@@ -2619,15 +2565,12 @@
       };
       if (!val) { status.textContent = "Mostrando todos."; status.style.color = "var(--text-secondary)"; renderList(USOS_SIGPAC_DB,'listUsosRegex','countUsos',null); renderList(PRODUCTOS_DB,'listProductosRegex','countProductos',null); renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',null); return; }
       let regex;
-      try { regex = new RegExp(val, chk && chk.checked ? '' : 'i'); status.textContent = "鉁?Filtro activo"; status.style.color = "var(--btn-success)"; } catch(e) { status.textContent = "鈿狅笍 Error: " + e.message; status.style.color = "var(--btn-danger)"; renderList(USOS_SIGPAC_DB,'listUsosRegex','countUsos',null); renderList(PRODUCTOS_DB,'listProductosRegex','countProductos',null); renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',null); return; }
+      try { regex = new RegExp(val, chk && chk.checked ? '' : 'i'); status.textContent = "✅ Filtro activo"; status.style.color = "var(--btn-success)"; } catch(e) { status.textContent = "⚠️ Error: " + e.message; status.style.color = "var(--btn-danger)"; renderList(USOS_SIGPAC_DB,'listUsosRegex','countUsos',null); renderList(PRODUCTOS_DB,'listProductosRegex','countProductos',null); renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',null); return; }
       renderList(USOS_SIGPAC_DB,'listUsosRegex','countUsos',regex);
       renderList(PRODUCTOS_DB,'listProductosRegex','countProductos',regex);
       renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',regex);
     }
 
-    /* ============================================
-       CONFIG Y UI
-       ============================================ */
     function toggleConfig() { document.getElementById('panelConfig').classList.toggle('hidden'); }
     function cambiarTema(tema, guardar = true) {
       document.body.setAttribute('data-theme', tema);
@@ -2660,15 +2603,12 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
     }
 
-    /* ============================================
-       EXPORTAR
-       ============================================ */
     function exportarCSV() {
       if (!parcelas.length) return mostrarNotificacion("No hay datos.");
       let csv = "ID;Nombre;Latitud;Longitud;Estado;Observaciones\n";
       parcelas.forEach(p => { const o = (p.observaciones||'').replace(/;/g,',').replace(/\n/g,' '); csv += `${p.id};"${p.nombre}";${p.lat};${p.lng};${p.completada?'Completada':'Pendiente'};"${o}"\n`; });
       descargarArchivo(csv, "catalogo_sigpac.csv", "text/csv;charset=utf-8;");
-      mostrarNotificacion("鉁?CSV exportado.");
+      mostrarNotificacion("✅ CSV exportado.");
     }
     function exportarJSON() {
       if (!parcelas.length) return mostrarNotificacion("No hay datos.");
@@ -2676,9 +2616,6 @@
     }
     function descargarArchivo(c, n, t) { const b = new Blob(["\ufeff"+c], {type:t}); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = n; l.click(); }
 
-    /* ============================================
-       INICIO
-       ============================================ */
     window.onload = function() {
       poblardesplegables();
       initMap();
