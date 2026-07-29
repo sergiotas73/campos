@@ -4,269 +4,80 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gestión de Parcelas y SIGPAC v14 - Tactical Pro + Proximidad</title>
+  <title>Gestión de Parcelas y SIGPAC v17 - Tactical Pro</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     [data-theme="classic"] {
-      --bg-primary: #f8fafc;
-      --bg-secondary: #ffffff;
-      --bg-tertiary: #f1f5f9;
-      --text-primary: #1e293b;
-      --text-secondary: #64748b;
-      --accent-primary: #0284c7;
-      --accent-secondary: #0369a1;
-      --border-color: #cbd5e1;
-      --shadow: 0 1px 3px rgba(0,0,0,0.05);
-      --nav-bg: #1e293b;
-      --nav-text: #94a3b8;
-      --nav-active: #ffffff;
-      --card-bg: #ffffff;
-      --input-bg: #f8fafc;
-      --badge-bg: #1e293b;
-      --badge-text: #38bdf8;
-      --compass-bg: #0f172a;
-      --compass-border: #38bdf8;
-      --btn-primary: #1e293b;
-      --btn-success: #16a34a;
-      --btn-danger: #dc2626;
-      --btn-info: #2563eb;
-      --btn-secondary: #64748b;
-      --btn-purple: #9333ea;
+      --bg-primary: #f8fafc; --bg-secondary: #ffffff; --bg-tertiary: #f1f5f9;
+      --text-primary: #1e293b; --text-secondary: #64748b;
+      --accent-primary: #0284c7; --accent-secondary: #0369a1;
+      --border-color: #cbd5e1; --shadow: 0 1px 3px rgba(0,0,0,0.05);
+      --nav-bg: #1e293b; --nav-text: #94a3b8; --nav-active: #ffffff;
+      --card-bg: #ffffff; --input-bg: #f8fafc;
+      --badge-bg: #1e293b; --badge-text: #38bdf8;
+      --compass-bg: #0f172a; --compass-border: #38bdf8;
+      --btn-primary: #1e293b; --btn-success: #16a34a; --btn-danger: #dc2626;
+      --btn-info: #2563eb; --btn-secondary: #64748b; --btn-purple: #9333ea;
+      --btn-photo: #d97706; --btn-map: #7c3aed;
       --header-gradient: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
-      --alert-bg: #fef3c7;
-      --alert-border: #f59e0b;
-      --alert-text: #92400e;
-      --proximity-near: #ef4444;
-      --proximity-mid: #f59e0b;
-      --proximity-far: #10b981;
+      --alert-bg: #fef3c7; --alert-border: #f59e0b; --alert-text: #92400e;
+      --proximity-near: #ef4444; --proximity-mid: #f59e0b; --proximity-far: #10b981;
     }
-
     [data-theme="tactical"] {
-      --bg-primary: #0a0d13;
-      --bg-secondary: #1a1d23;
-      --bg-tertiary: #2a2f3a;
-      --text-primary: #e2e8f0;
-      --text-secondary: #94a3b8;
-      --accent-primary: #00a8ff;
-      --accent-secondary: #0077cc;
-      --border-color: #3a4050;
-      --shadow: 0 2px 8px rgba(0,0,0,0.5);
-      --nav-bg: #1a1d23;
-      --nav-text: #64748b;
-      --nav-active: #00a8ff;
-      --card-bg: #1a1d23;
-      --input-bg: #2a2f3a;
-      --badge-bg: #2a2f3a;
-      --badge-text: #00a8ff;
-      --compass-bg: #0a0d13;
-      --compass-border: #00a8ff;
-      --btn-primary: #2a2f3a;
-      --btn-success: #10b981;
-      --btn-danger: #ef4444;
-      --btn-info: #00a8ff;
-      --btn-secondary: #64748b;
-      --btn-purple: #8b5cf6;
+      --bg-primary: #0a0d13; --bg-secondary: #1a1d23; --bg-tertiary: #2a2f3a;
+      --text-primary: #e2e8f0; --text-secondary: #94a3b8;
+      --accent-primary: #00a8ff; --accent-secondary: #0077cc;
+      --border-color: #3a4050; --shadow: 0 2px 8px rgba(0,0,0,0.5);
+      --nav-bg: #1a1d23; --nav-text: #64748b; --nav-active: #00a8ff;
+      --card-bg: #1a1d23; --input-bg: #2a2f3a;
+      --badge-bg: #2a2f3a; --badge-text: #00a8ff;
+      --compass-bg: #0a0d13; --compass-border: #00a8ff;
+      --btn-primary: #2a2f3a; --btn-success: #10b981; --btn-danger: #ef4444;
+      --btn-info: #00a8ff; --btn-secondary: #64748b; --btn-purple: #8b5cf6;
+      --btn-photo: #f59e0b; --btn-map: #a78bfa;
       --header-gradient: linear-gradient(135deg, #1a1d23 0%, #2a2f3a 100%);
-      --alert-bg: #422006;
-      --alert-border: #f59e0b;
-      --alert-text: #fbbf24;
-      --proximity-near: #ef4444;
-      --proximity-mid: #f59e0b;
-      --proximity-far: #10b981;
+      --alert-bg: #422006; --alert-border: #f59e0b; --alert-text: #fbbf24;
+      --proximity-near: #ef4444; --proximity-mid: #f59e0b; --proximity-far: #10b981;
     }
-
     [data-theme="highcontrast"] {
-      --bg-primary: #000000;
-      --bg-secondary: #1a1a1a;
-      --bg-tertiary: #2a2a2a;
-      --text-primary: #ffffff;
-      --text-secondary: #cccccc;
-      --accent-primary: #ffff00;
-      --accent-secondary: #ffcc00;
-      --border-color: #ffffff;
-      --shadow: 0 2px 10px rgba(255,255,255,0.1);
-      --nav-bg: #1a1a1a;
-      --nav-text: #999999;
-      --nav-active: #ffff00;
-      --card-bg: #1a1a1a;
-      --input-bg: #2a2a2a;
-      --badge-bg: #2a2a2a;
-      --badge-text: #ffff00;
-      --compass-bg: #000000;
-      --compass-border: #ffff00;
-      --btn-primary: #2a2a2a;
-      --btn-success: #00ff00;
-      --btn-danger: #ff0000;
-      --btn-info: #00ffff;
-      --btn-secondary: #666666;
-      --btn-purple: #ff00ff;
+      --bg-primary: #000000; --bg-secondary: #1a1a1a; --bg-tertiary: #2a2a2a;
+      --text-primary: #ffffff; --text-secondary: #cccccc;
+      --accent-primary: #ffff00; --accent-secondary: #ffcc00;
+      --border-color: #ffffff; --shadow: 0 2px 10px rgba(255,255,255,0.1);
+      --nav-bg: #1a1a1a; --nav-text: #999999; --nav-active: #ffff00;
+      --card-bg: #1a1a1a; --input-bg: #2a2a2a;
+      --badge-bg: #2a2a2a; --badge-text: #ffff00;
+      --compass-bg: #000000; --compass-border: #ffff00;
+      --btn-primary: #2a2a2a; --btn-success: #00ff00; --btn-danger: #ff0000;
+      --btn-info: #00ffff; --btn-secondary: #666666; --btn-purple: #ff00ff;
+      --btn-photo: #ffff00; --btn-map: #ff00ff;
       --header-gradient: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
-      --alert-bg: #333300;
-      --alert-border: #ffff00;
-      --alert-text: #ffff00;
-      --proximity-near: #ff0000;
-      --proximity-mid: #ffff00;
-      --proximity-far: #00ff00;
+      --alert-bg: #333300; --alert-border: #ffff00; --alert-text: #ffff00;
+      --proximity-near: #ff0000; --proximity-mid: #ffff00; --proximity-far: #00ff00;
     }
 
     * { box-sizing: border-box; }
-
-    body { 
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; 
-      margin: 0; 
-      padding: 8px; 
-      background-color: var(--bg-primary); 
-      color: var(--text-primary); 
-      transition: background-color 0.3s, color 0.3s;
-      font-size: 1em;
-    }
-    
-    .header-bar { 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      margin-bottom: 8px; 
-      flex-wrap: wrap;
-      gap: 8px;
-      background: var(--header-gradient);
-      padding: 12px 16px;
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
-    }
-    
-    .header-title { 
-      font-size: 1.1em; 
-      font-weight: 700; 
-      color: var(--accent-primary); 
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      letter-spacing: 0.5px;
-    }
-    
-    .header-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-header {
-      background: var(--btn-primary);
-      color: var(--text-primary);
-      border: 1px solid var(--border-color);
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9em;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-header:hover { 
-      background: var(--accent-primary);
-      color: white;
-    }
-    .btn-header.primary {
-      background: var(--accent-primary);
-      color: white;
-      border-color: var(--accent-secondary);
-    }
-    .btn-header.primary:hover {
-      background: var(--accent-secondary);
-    }
-
-    .nav-bar { 
-      display: flex; 
-      background: var(--nav-bg); 
-      border-radius: 12px; 
-      margin-bottom: 10px; 
-      overflow: hidden; 
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border-color);
-    }
-    
-    .nav-btn { 
-      flex: 1;
-      padding: 14px 8px; 
-      color: var(--nav-text); 
-      background: none; 
-      border: none; 
-      font-weight: 600; 
-      cursor: pointer; 
-      text-align: center; 
-      font-size: 0.85em; 
-      transition: all 0.2s;
-      border-bottom: 3px solid transparent;
-    }
-    .nav-btn:hover { 
-      color: var(--nav-active);
-      background: rgba(255,255,255,0.05);
-    }
-    .nav-btn.active { 
-      color: var(--nav-active);
-      border-bottom-color: var(--accent-primary);
-      background: rgba(0,168,255,0.1);
-    }
-
-    .card { 
-      background: var(--card-bg); 
-      padding: 16px; 
-      border-radius: 12px; 
-      box-shadow: var(--shadow); 
-      margin-bottom: 12px;
-      border: 1px solid var(--border-color);
-    }
-    
-    h2, h3 { 
-      margin-top: 0; 
-      color: var(--accent-primary); 
-      font-size: 1.15em;
-      font-weight: 700;
-    }
-    
-    input[type="file"], input[type="text"], input[type="number"], select, textarea { 
-      width: 100%; 
-      padding: 12px; 
-      margin: 6px 0; 
-      border: 2px solid var(--border-color); 
-      border-radius: 8px; 
-      font-size: 1em;
-      background: var(--input-bg);
-      color: var(--text-primary);
-      transition: all 0.2s;
-    }
-    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent-primary);
-      background: var(--bg-secondary);
-      box-shadow: 0 0 0 3px rgba(0,168,255,0.1);
-    }
-
-    .btn { 
-      background-color: var(--btn-primary); 
-      color: white; 
-      border: none; 
-      padding: 12px 18px; 
-      border-radius: 8px; 
-      cursor: pointer; 
-      display: inline-flex; 
-      align-items: center; 
-      gap: 8px; 
-      font-size: 0.95em; 
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-    }
-    .btn:hover { 
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
+    body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; margin: 0; padding: 8px; background-color: var(--bg-primary); color: var(--text-primary); transition: background-color 0.3s, color 0.3s; font-size: 1em; overflow-x: hidden; }
+    .header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; background: var(--header-gradient); padding: 12px 16px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border-color); }
+    .header-title { font-size: 1.1em; font-weight: 700; color: var(--accent-primary); display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-header { background: var(--btn-primary); color: var(--text-primary); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .btn-header:hover { background: var(--accent-primary); color: white; }
+    .btn-header.primary { background: var(--accent-primary); color: white; border-color: var(--accent-secondary); }
+    .btn-header.primary:hover { background: var(--accent-secondary); }
+    .nav-bar { display: flex; background: var(--nav-bg); border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border-color); flex-wrap: wrap; }
+    .nav-btn { flex: 1; min-width: 60px; padding: 14px 8px; color: var(--nav-text); background: none; border: none; font-weight: 600; cursor: pointer; text-align: center; font-size: 0.85em; transition: all 0.2s; border-bottom: 3px solid transparent; }
+    .nav-btn:hover { color: var(--nav-active); background: rgba(255,255,255,0.05); }
+    .nav-btn.active { color: var(--nav-active); border-bottom-color: var(--accent-primary); background: rgba(0,168,255,0.1); }
+    .card { background: var(--card-bg); padding: 16px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border-color); }
+    h2, h3 { margin-top: 0; color: var(--accent-primary); font-size: 1.15em; font-weight: 700; }
+    input[type="file"], input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 12px; margin: 6px 0; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1em; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s; }
+    input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-primary); background: var(--bg-secondary); box-shadow: 0 0 0 3px rgba(0,168,255,0.1); }
+    .btn { background-color: var(--btn-primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95em; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     .btn:active { transform: translateY(0); }
     .btn-export { background-color: var(--btn-success); }
     .btn-export-json { background-color: var(--btn-purple); }
@@ -275,372 +86,77 @@
     .btn-completar { background-color: var(--btn-secondary); }
     .btn-completar.activa { background-color: var(--btn-success); }
     .btn-gps { background-color: var(--accent-primary); }
-
-    .kml-box-dual {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .kml-upload-card {
-      background: var(--bg-tertiary);
-      border: 2px dashed var(--border-color);
-      padding: 16px;
-      border-radius: 10px;
-      transition: all 0.2s;
-    }
-    .kml-upload-card:hover {
-      border-color: var(--accent-primary);
-    }
-
-    .field-gis-container {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      gap: 14px;
-      margin-top: 12px;
-    }
-    
-    .compass-box {
-      background: var(--compass-bg);
-      color: var(--text-primary);
-      border-radius: 16px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.8), var(--shadow);
-      border: 2px solid var(--border-color);
-    }
-    
-    .compass-dial {
-      width: 160px;
-      height: 160px;
-      border: 4px solid var(--compass-border);
-      border-radius: 50%;
-      position: relative;
-      margin: 12px 0;
-      background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--compass-bg) 100%);
-      box-shadow: 0 0 20px rgba(0,168,255,0.3), inset 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    .compass-cardinal {
-      position: absolute;
-      font-size: 1em;
-      font-weight: 900;
-      color: var(--text-secondary);
-      text-shadow: 0 0 4px rgba(0,0,0,0.8);
-    }
+    .btn-photo { background-color: var(--btn-photo); }
+    .btn-mapview { background-color: var(--btn-map); }
+    .btn-cache { background-color: #0891b2; }
+    .kml-box-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .kml-upload-card { background: var(--bg-tertiary); border: 2px dashed var(--border-color); padding: 16px; border-radius: 10px; transition: all 0.2s; }
+    .kml-upload-card:hover { border-color: var(--accent-primary); }
+    .field-gis-container { display: grid; grid-template-columns: 280px 1fr; gap: 14px; margin-top: 12px; }
+    .compass-box { background: var(--compass-bg); color: var(--text-primary); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), var(--shadow); border: 2px solid var(--border-color); }
+    .compass-dial { width: 160px; height: 160px; border: 4px solid var(--compass-border); border-radius: 50%; position: relative; margin: 12px 0; background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--compass-bg) 100%); box-shadow: 0 0 20px rgba(0,168,255,0.3), inset 0 0 10px rgba(0,0,0,0.5); }
+    .compass-cardinal { position: absolute; font-size: 1em; font-weight: 900; color: var(--text-secondary); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
     .card-n { top: 8px; left: 50%; transform: translateX(-50%); color: #ef4444; font-size: 1.1em; }
     .card-s { bottom: 8px; left: 50%; transform: translateX(-50%); }
     .card-e { right: 10px; top: 50%; transform: translateY(-50%); }
     .card-o { left: 10px; top: 50%; transform: translateY(-50%); }
-
-    .compass-needle {
-      width: 6px;
-      height: 110px;
-      position: absolute;
-      top: 25px;
-      left: 77px;
-      transform-origin: 3px 55px;
-      transition: transform 0.12s ease-out;
-    }
-    .needle-north {
-      width: 0; height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 55px solid #ef4444;
-      margin-left: -5px;
-      filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8));
-    }
-    .needle-south {
-      width: 0; height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 55px solid #cbd5e1;
-      margin-left: -5px;
-    }
-
-    .status-badge {
-      font-size: 0.8em;
-      padding: 6px 12px;
-      border-radius: 20px;
-      background: var(--badge-bg);
-      color: var(--badge-text);
-      border: 1px solid var(--border-color);
-      margin-top: 6px;
-      display: inline-block;
-      width: 100%;
-      word-break: break-word;
-      font-weight: 600;
-    }
-
-    #mapaField {
-      height: 450px;
-      width: 100%;
-      border-radius: 10px;
-      border: 2px solid var(--border-color);
-      z-index: 1;
-    }
-
-    .user-location-marker {
-      width: 24px;
-      height: 24px;
-      background-color: var(--accent-primary);
-      border: 3px solid #ffffff;
-      border-radius: 50%;
-      box-shadow: 0 0 12px rgba(0,0,0,0.6);
-      position: relative;
-    }
-    .user-location-marker::after {
-      content: '';
-      position: absolute;
-      top: -6px; left: -6px;
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      border: 2px solid var(--accent-primary);
-      animation: pulseGps 1.6s infinite;
-      opacity: 0;
-    }
-    @keyframes pulseGps {
-      0% { transform: scale(0.8); opacity: 0.9; }
-      100% { transform: scale(2.2); opacity: 0; }
-    }
-
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 12px; 
-      background: var(--card-bg);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td { 
-      border: 1px solid var(--border-color); 
-      padding: 12px; 
-      text-align: left; 
-      font-size: 0.95em; 
-    }
-    th { 
-      background-color: var(--nav-bg); 
-      color: var(--nav-active);
-      font-weight: 700;
-    }
-    tr:hover { 
-      background-color: var(--bg-tertiary); 
-      cursor: pointer; 
-    }
-    tr.row-completada td { 
-      background-color: rgba(16,185,129,0.1) !important; 
-    }
-
+    .compass-needle { width: 6px; height: 110px; position: absolute; top: 25px; left: 77px; transform-origin: 3px 55px; transition: transform 0.12s ease-out; }
+    .needle-north { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 55px solid #ef4444; margin-left: -5px; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); }
+    .needle-south { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 55px solid #cbd5e1; margin-left: -5px; }
+    .status-badge { font-size: 0.8em; padding: 6px 12px; border-radius: 20px; background: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--border-color); margin-top: 6px; display: inline-block; width: 100%; word-break: break-word; font-weight: 600; }
+    #mapaField, #mapaCompletoField { height: 450px; width: 100%; border-radius: 10px; border: 2px solid var(--border-color); z-index: 1; }
+    #mapaCompletoField { height: 600px; }
+    .user-location-marker { width: 24px; height: 24px; background-color: var(--accent-primary); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 12px rgba(0,0,0,0.6); position: relative; }
+    .user-location-marker::after { content: ''; position: absolute; top: -6px; left: -6px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--accent-primary); animation: pulseGps 1.6s infinite; opacity: 0; }
+    @keyframes pulseGps { 0% { transform: scale(0.8); opacity: 0.9; } 100% { transform: scale(2.2); opacity: 0; } }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; background: var(--card-bg); border-radius: 8px; overflow: hidden; }
+    th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; font-size: 0.95em; }
+    th { background-color: var(--nav-bg); color: var(--nav-active); font-weight: 700; }
+    tr:hover { background-color: var(--bg-tertiary); cursor: pointer; }
+    tr.row-completada td { background-color: rgba(16,185,129,0.1) !important; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .hidden { display: none !important; }
-    .badge-estado { 
-      font-size: 0.8em; 
-      padding: 4px 10px; 
-      border-radius: 12px; 
-      font-weight: bold; 
-      background: rgba(16,185,129,0.2); 
-      color: var(--btn-success);
-      border: 1px solid var(--btn-success);
-    }
-
-    .panel-config { 
-      background: var(--bg-tertiary); 
-      border: 2px solid var(--border-color); 
-      border-radius: 12px; 
-      padding: 16px; 
-      margin-bottom: 12px;
-    }
-    
-    details.collapsible-module {
-      background: var(--bg-tertiary);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-top: 12px;
-    }
-    details.collapsible-module summary {
-      padding: 14px 18px;
-      font-weight: 700;
-      color: var(--accent-primary);
-      cursor: pointer;
-      background: var(--bg-secondary);
-      user-select: none;
-      border-radius: 8px;
-    }
-    .consult-box { 
-      background: var(--card-bg); 
-      border: 1px solid var(--border-color); 
-      border-radius: 8px; 
-      padding: 12px; 
-      margin-bottom: 10px; 
-    }
-
+    .badge-estado { font-size: 0.8em; padding: 4px 10px; border-radius: 12px; font-weight: bold; background: rgba(16,185,129,0.2); color: var(--btn-success); border: 1px solid var(--btn-success); }
+    .panel-config { background: var(--bg-tertiary); border: 2px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 12px; }
+    details.collapsible-module { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; margin-top: 12px; }
+    details.collapsible-module summary { padding: 14px 18px; font-weight: 700; color: var(--accent-primary); cursor: pointer; background: var(--bg-secondary); user-select: none; border-radius: 8px; }
+    .consult-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
     .relative { position: relative; }
-    .search-results { 
-      border: 1px solid var(--border-color); 
-      max-height: 200px; 
-      overflow-y: auto; 
-      background: var(--card-bg); 
-      position: absolute; 
-      width: calc(100% - 2px); 
-      z-index: 20; 
-      display: none; 
-      border-radius: 0 0 6px 6px; 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-    }
-    .search-item { 
-      padding: 8px 12px; 
-      cursor: pointer; 
-      border-bottom: 1px solid var(--border-color); 
-      font-size: 0.85em; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-    }
+    .search-results { border: 1px solid var(--border-color); max-height: 200px; overflow-y: auto; background: var(--card-bg); position: absolute; width: calc(100% - 2px); z-index: 20; display: none; border-radius: 0 0 6px 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .search-item { padding: 8px 12px; cursor: pointer; border-bottom: 1px solid var(--border-color); font-size: 0.85em; display: flex; justify-content: space-between; align-items: center; }
     .search-item:hover { background-color: var(--bg-tertiary); }
     .type-badge { font-size: 0.7em; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; }
     .bg-inc { background-color: #dc2626; }
     .bg-uso { background-color: #16a34a; }
     .bg-prod { background-color: #d97706; }
-
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      backdrop-filter: blur(4px);
-    }
-    .modal-content {
-      background: var(--card-bg);
-      padding: 24px;
-      border-radius: 12px;
-      max-width: 450px;
-      width: 90%;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      border: 2px solid var(--border-color);
-    }
-
-    #toastContainer {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .toast {
-      background: var(--nav-bg);
-      color: var(--text-primary);
-      padding: 14px 20px;
-      border-radius: 10px;
-      font-size: 0.95em;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-      opacity: 0;
-      transition: all 0.3s ease;
-      border: 1px solid var(--border-color);
-      font-weight: 600;
-    }
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
+    .modal-content { background: var(--card-bg); padding: 24px; border-radius: 12px; max-width: 450px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.4); border: 2px solid var(--border-color); }
+    #toastContainer { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: var(--nav-bg); color: var(--text-primary); padding: 14px 20px; border-radius: 10px; font-size: 0.95em; box-shadow: 0 4px 16px rgba(0,0,0,0.4); opacity: 0; transition: all 0.3s ease; border: 1px solid var(--border-color); font-weight: 600; }
     .toast.show { opacity: 1; }
-
-    .proximity-alert-bar {
-      background: var(--alert-bg);
-      border: 2px solid var(--alert-border);
-      color: var(--alert-text);
-      padding: 14px 18px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      font-weight: 700;
-      font-size: 1em;
-      display: none;
-      align-items: center;
-      gap: 10px;
-      animation: alertPulse 1.5s infinite;
-      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
-    }
-    .proximity-alert-bar.visible {
-      display: flex;
-    }
-    @keyframes alertPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .dist-badge {
-      font-size: 0.75em;
-      padding: 3px 8px;
-      border-radius: 10px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
+    .proximity-alert-bar { background: var(--alert-bg); border: 2px solid var(--alert-border); color: var(--alert-text); padding: 14px 18px; border-radius: 12px; margin-bottom: 10px; font-weight: 700; font-size: 1em; display: none; align-items: center; gap: 10px; animation: alertPulse 1.5s infinite; box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3); }
+    .proximity-alert-bar.visible { display: flex; }
+    @keyframes alertPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .dist-badge { font-size: 0.75em; padding: 3px 8px; border-radius: 10px; font-weight: 700; white-space: nowrap; }
     .dist-near { background: rgba(239,68,68,0.2); color: var(--proximity-near); border: 1px solid var(--proximity-near); }
     .dist-mid { background: rgba(245,158,11,0.2); color: var(--proximity-mid); border: 1px solid var(--proximity-mid); }
     .dist-far { background: rgba(16,185,129,0.2); color: var(--proximity-far); border: 1px solid var(--proximity-far); }
-
-    .theme-selector {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin: 16px 0;
-    }
-    .theme-option {
-      background: var(--bg-secondary);
-      border: 2px solid var(--border-color);
-      border-radius: 10px;
-      padding: 16px 12px;
-      cursor: pointer;
-      transition: all 0.2s;
-      text-align: center;
-    }
-    .theme-option:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-2px);
-    }
-    .theme-option.active {
-      border-color: var(--accent-primary);
-      background: rgba(0,168,255,0.1);
-      box-shadow: 0 0 0 3px rgba(0,168,255,0.2);
-    }
-    .theme-preview {
-      width: 100%;
-      height: 60px;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      border: 1px solid var(--border-color);
-    }
-    .theme-name {
-      font-weight: 700;
-      font-size: 0.9em;
-      color: var(--text-primary);
-    }
-
-    .config-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 10px 0;
-      flex-wrap: wrap;
-    }
-    .config-row label {
-      font-weight: 600;
-      min-width: 180px;
-      color: var(--text-primary);
-    }
-    .config-row input, .config-row select {
-      max-width: 150px;
-      margin: 0;
-    }
-
+    .theme-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 16px 0; }
+    .theme-option { background: var(--bg-secondary); border: 2px solid var(--border-color); border-radius: 10px; padding: 16px 12px; cursor: pointer; transition: all 0.2s; text-align: center; }
+    .theme-option:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
+    .theme-option.active { border-color: var(--accent-primary); background: rgba(0,168,255,0.1); box-shadow: 0 0 0 3px rgba(0,168,255,0.2); }
+    .theme-preview { width: 100%; height: 60px; border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border-color); }
+    .theme-name { font-weight: 700; font-size: 0.9em; color: var(--text-primary); }
+    .config-row { display: flex; align-items: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+    .config-row label { font-weight: 600; min-width: 180px; color: var(--text-primary); }
+    .config-row input, .config-row select { max-width: 250px; margin: 0; }
     .preview-classic { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); }
     .preview-tactical { background: linear-gradient(135deg, #0a0d13 0%, #1a1d23 50%, #00a8ff 100%); }
     .preview-highcontrast { background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #ffff00 100%); }
-
+    .resumen-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .resumen-counter { background: var(--accent-primary); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.95em; }
+    .cache-info { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin: 10px 0; font-size: 0.9em; }
+    .cache-info strong { color: var(--accent-primary); }
     @media(max-width: 850px) {
       .grid-2, .kml-box-dual, .field-gis-container { grid-template-columns: 1fr; }
       .nav-btn { font-size: 0.75em; padding: 12px 4px; }
@@ -648,16 +164,18 @@
       .header-title { font-size: 1em; }
       .config-row { flex-direction: column; align-items: flex-start; }
       .config-row input, .config-row select { max-width: 100%; width: 100%; }
+      table { font-size: 0.85em; }
+      th, td { padding: 8px 6px; }
     }
   </style>
 </head>
 <body data-theme="tactical">
 
   <div class="header-bar">
-    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v14</div>
+    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v17</div>
     <div class="header-actions">
-      <button class="btn-header primary" onclick="activarSensoresGpsYBrujula()">&#x1F4E1; GPS</button>
-      <button class="btn-header" onclick="toggleConfig()">&#x2699;&#xFE0F; Config</button>
+      <button class="btn-header primary" onclick="vibrate(); activarSensoresGpsYBrujula()">&#x1F4E1; GPS</button>
+      <button class="btn-header" onclick="vibrate(); toggleConfig()">&#x2699;&#xFE0F; Config</button>
     </div>
   </div>
 
@@ -666,45 +184,81 @@
     
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F3A8; Tema Visual</h4>
     <div class="theme-selector">
-      <div class="theme-option" onclick="cambiarTema('classic')">
+      <div class="theme-option" onclick="vibrate(); cambiarTema('classic')">
         <div class="theme-preview preview-classic"></div>
         <div class="theme-name">Clásico</div>
       </div>
-      <div class="theme-option active" onclick="cambiarTema('tactical')">
+      <div class="theme-option active" onclick="vibrate(); cambiarTema('tactical')">
         <div class="theme-preview preview-tactical"></div>
         <div class="theme-name">Tactical Pro</div>
       </div>
-      <div class="theme-option" onclick="cambiarTema('highcontrast')">
+      <div class="theme-option" onclick="vibrate(); cambiarTema('highcontrast')">
         <div class="theme-preview preview-highcontrast"></div>
         <div class="theme-name">Alto Contraste</div>
       </div>
     </div>
 
-    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4E1; Alertas de Proximidad</h4>
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4F3; Respuesta Háptica</h4>
     <div class="config-row">
-      <label>&#x1F514; Distancia de alerta (metros):</label>
-      <input type="number" id="cfgDistAlerta" value="100" min="10" max="5000" step="10" onchange="guardarConfigProximidad()">
+      <label>Intensidad vibración:</label>
+      <select id="cfgVibracion" onchange="vibrate(); guardarConfigVibracion()">
+        <option value="0">Desactivada</option>
+        <option value="30">Corta (30ms)</option>
+        <option value="50" selected>Media (50ms)</option>
+        <option value="100">Larga (100ms)</option>
+        <option value="pattern">Patrón (doble pulso)</option>
+      </select>
     </div>
+    <button class="btn btn-gps" onclick="vibrate(); mostrarNotificacion('📳 Vibración de prueba')" style="margin-top:8px;">📳 Probar vibración</button>
+
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4F7; App de Cámara</h4>
     <div class="config-row">
-      <label>&#x1F50A; Sonido de alerta:</label>
-      <select id="cfgSonidoAlerta" onchange="guardarConfigProximidad()">
-        <option value="vibrar">Solo Vibración</option>
-        <option value="sonido" selected>Vibración + Sonido</option>
-        <option value="silencio">Silencio (solo visual)</option>
+      <label>Selecciona app:</label>
+      <select id="cfgAppCamara" onchange="vibrate(); actualizarPaqueteCamara()">
+        <option value="net.sourceforge.opencamera">OpenCamera</option>
+        <option value="custom">Otra app</option>
       </select>
     </div>
     <div class="config-row">
-      <label>&#x23F1;&#xFE0F; Intervalo de escaneo (seg):</label>
-      <select id="cfgIntervalo" onchange="guardarConfigProximidad()">
-        <option value="2000">2 segundos (máx precisión)</option>
-        <option value="5000" selected>5 segundos (recomendado)</option>
-        <option value="10000">10 segundos (ahorro batería)</option>
-        <option value="30000">30 segundos (mín consumo)</option>
+      <label>Paquete:</label>
+      <input type="text" id="cfgPaqueteCamara" value="net.sourceforge.opencamera" onchange="vibrate(); guardarConfigCamara()">
+    </div>
+
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4E1; Alertas de Proximidad</h4>
+    <div class="config-row">
+      <label>Distancia (metros):</label>
+      <input type="number" id="cfgDistAlerta" value="100" min="10" max="5000" step="10" onchange="vibrate(); guardarConfigProximidad()">
+    </div>
+    <div class="config-row">
+      <label>Sonido:</label>
+      <select id="cfgSonidoAlerta" onchange="vibrate(); guardarConfigProximidad()">
+        <option value="vibrar">Solo Vibración</option>
+        <option value="sonido" selected>Vibración + Sonido</option>
+        <option value="silencio">Silencio</option>
+      </select>
+    </div>
+    <div class="config-row">
+      <label>Intervalo (seg):</label>
+      <select id="cfgIntervalo" onchange="vibrate(); guardarConfigProximidad()">
+        <option value="2000">2s</option>
+        <option value="5000" selected>5s</option>
+        <option value="10000">10s</option>
+        <option value="30000">30s</option>
       </select>
     </div>
 
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F5FA;&#xFE0F; Cache de Mapas Offline</h4>
+    <div class="cache-info">
+      <strong id="cacheStats">Teselas cacheadas: 0</strong><br>
+      <small style="color:var(--text-secondary);">Precarga las teselas de las zonas con parcelas para usar sin cobertura.</small>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+      <button class="btn btn-cache" onclick="vibrate(); precargarTeselasZonas()">&#x2B07;&#xFE0F; Precargar zonas</button>
+      <button class="btn btn-danger" onclick="vibrate(); limpiarCacheTeselas()">&#x1F5D1;&#xFE0F; Limpiar cache</button>
+    </div>
+
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F524; Tamaño de Letra</h4>
-    <select id="cfgTamLetra" onchange="aplicarAjustesConfig()">
+    <select id="cfgTamLetra" onchange="vibrate(); aplicarAjustesConfig()">
       <option value="0.85em">Compacto</option>
       <option value="1em" selected>Normal</option>
       <option value="1.15em">Grande</option>
@@ -718,11 +272,12 @@
   </div>
 
   <div class="nav-bar">
-    <button id="navBtn-sec-kml" class="nav-btn active" onclick="cambiarVista('sec-kml')">&#x1F4C1; KML</button>
-    <button id="navBtn-sec-edicion" class="nav-btn" onclick="cambiarVista('sec-edicion')">&#x1F4CD; GPS</button>
-    <button id="navBtn-sec-resumen" class="nav-btn" onclick="cambiarVista('sec-resumen')">&#x1F4CB; Lista</button>
-    <button id="navBtn-sec-exportar" class="nav-btn" onclick="cambiarVista('sec-exportar')">&#x1F4BE; Export</button>
-    <button id="navBtn-sec-consultas" class="nav-btn" onclick="cambiarVista('sec-consultas')">&#x1F50D; Busca</button>
+    <button id="navBtn-sec-kml" class="nav-btn active" onclick="vibrate(); cambiarVista('sec-kml')">&#x1F4C1; KML</button>
+    <button id="navBtn-sec-resumen" class="nav-btn" onclick="vibrate(); cambiarVista('sec-resumen')">&#x1F4CB; Lista</button>
+    <button id="navBtn-sec-edicion" class="nav-btn" onclick="vibrate(); cambiarVista('sec-edicion')">&#x1F4CD; GPS</button>
+    <button id="navBtn-sec-mapa" class="nav-btn" onclick="vibrate(); cambiarVista('sec-mapa')">&#x1F5FA;&#xFE0F; Mapa</button>
+    <button id="navBtn-sec-consultas" class="nav-btn" onclick="vibrate(); cambiarVista('sec-consultas')">&#x1F50D; Busca</button>
+    <button id="navBtn-sec-exportar" class="nav-btn" onclick="vibrate(); cambiarVista('sec-exportar')">&#x1F4BE; Export</button>
   </div>
 
   <div id="sec-kml" class="card">
@@ -741,11 +296,34 @@
     </div>
     <div id="secCamposKml" class="kml-upload-card hidden">
       <h3>&#x1F4CC; Campo Identificador</h3>
-      <select id="selectCampoNombre" onchange="aplicarCampoIdentificador()"></select>
+      <select id="selectCampoNombre" onchange="vibrate(); aplicarCampoIdentificador()"></select>
     </div>
     <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
-      <button class="btn btn-danger" onclick="vibrate(100); mostrarConfirmacionLimpieza()">&#x1F5D1;&#xFE0F; Limpiar Todo</button>
+      <button class="btn btn-danger" onclick="vibrate(); mostrarConfirmacionLimpieza()">&#x1F5D1;&#xFE0F; Limpiar Todo</button>
     </div>
+  </div>
+
+  <div id="sec-resumen" class="card hidden">
+    <div class="resumen-header">
+      <h2 style="margin:0;">&#x1F4CB; Lista de Parcelas</h2>
+      <div class="resumen-counter" id="resumenContador">0 / 0</div>
+    </div>
+    <p style="font-size:0.85em; color:var(--text-secondary); margin-top:8px;"><em>Ordenada por distancia. Haz clic en una fila para ver en mapa.</em></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Dist.</th>
+          <th>ID</th>
+          <th>Referencia</th>
+          <th>Coordenadas</th>
+          <th>Fecha</th>
+          <th>Obs.</th>
+        </tr>
+      </thead>
+      <tbody id="tablaResumen">
+        <tr><td colspan="6" style="text-align: center;">No hay datos cargados</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <div id="sec-edicion" class="card relative hidden">
@@ -755,10 +333,13 @@
         <p style="margin:6px 0; font-size: 1.1em;"><strong>ID:</strong> <span id="editId">-</span></p>
         <p style="margin:6px 0; font-size: 1.4em; font-weight: 800; color: var(--accent-primary);">Ref: <span id="editNombre">-</span></p>
         <p style="margin:6px 0;"><strong>Coords:</strong> <span id="editCoords">-</span></p>
-        <div style="display:flex; gap:10px; margin:14px 0; flex-wrap:wrap;">
-          <a id="btnGmaps" class="btn btn-maps" href="#" target="_blank" rel="noopener" onclick="vibrate(30)">&#x1F5FA;&#xFE0F; Maps</a>
-          <button id="btnEstadoCompletada" class="btn btn-completar" onclick="vibrate(30); toggleEstadoCompletada()">&#x2714;&#xFE0F; OK</button>
-          <button class="btn btn-gps" onclick="vibrate(30); centrarEnMiUbicacion()">&#x1F4CD; GPS</button>
+        <p style="margin:6px 0; font-size:0.9em;"><strong>&#x1F4C5; Completada:</strong> <span id="editFechaCompletada" style="color:var(--btn-success);">-</span></p>
+        <div style="display:flex; gap:8px; margin:14px 0; flex-wrap:wrap;">
+          <a id="btnGmaps" class="btn btn-maps" href="#" target="_blank" rel="noopener" onclick="vibrate()">&#x1F5FA;&#xFE0F; Maps</a>
+          <button id="btnEstadoCompletada" class="btn btn-completar" onclick="vibrate(); toggleEstadoCompletada()">&#x2714;&#xFE0F; OK</button>
+          <button id="btnMiUbicacion" class="btn btn-gps" onclick="vibrate(); toggleGPSOMiUbicacion()">&#x1F4CD; GPS</button>
+          <button class="btn btn-photo" onclick="vibrate(); abrirAppFoto()">&#x1F4F7; Foto</button>
+          <button class="btn btn-mapview" onclick="vibrate(); cambiarVista('sec-mapa')">&#x1F5FA;&#xFE0F; Mapa</button>
         </div>
         <label for="inputObservaciones"><strong>&#x1F4DD; Notas:</strong></label>
         <textarea id="inputObservaciones" rows="4" oninput="guardarObservaciones()"></textarea>
@@ -773,15 +354,15 @@
           <summary>&#x1F4CB; Consultas Rápidas</summary>
           <div style="padding:10px;">
             <div class="consult-box">
-              <select id="selectUsoSigpac" onchange="vibrate(30); agregarAObservaciones(this, 'USO')"></select>
+              <select id="selectUsoSigpac" onchange="vibrate(); agregarAObservaciones(this, 'USO')"></select>
             </div>
             <div class="consult-box">
               <label><strong>Producto (PAC):</strong></label>
-              <select id="selectProducto" onchange="agregarAObservaciones(this, 'PROD')"></select>
+              <select id="selectProducto" onchange="vibrate(); agregarAObservaciones(this, 'PROD')"></select>
             </div>
             <div class="consult-box">
               <label><strong>Tipo Incidencia:</strong></label>
-              <select id="selectIncidenciaConsulta" onchange="agregarAObservaciones(this, 'INC')"></select>
+              <select id="selectIncidenciaConsulta" onchange="vibrate(); agregarAObservaciones(this, 'INC')"></select>
             </div>
           </div>
         </details>
@@ -819,31 +400,22 @@
     </div>
   </div>
 
-  <div id="sec-resumen" class="card hidden">
-    <h2>&#x1F4CB; Lista de Parcelas (ordenada por distancia)</h2>
-    <p style="font-size:0.85em; color:var(--text-secondary);"><em>La lista se reordena automáticamente según tu posición GPS. Haz clic en una fila para ver en mapa.</em></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Dist.</th>
-          <th>ID</th>
-          <th>Nombre / Referencia</th>
-          <th>Coordenadas</th>
-          <th>Obs.</th>
-        </tr>
-      </thead>
-      <tbody id="tablaResumen">
-        <tr><td colspan="5" style="text-align: center;">No hay datos cargados</td></tr>
-      </tbody>
-    </table>
+  <div id="sec-mapa" class="card hidden">
+    <h2>&#x1F5FA;&#xFE0F; Mapa Completo de Parcelas</h2>
+    <p style="font-size:0.85em; color:var(--text-secondary);">Vista general con todos los puntos y contornos. 🔴 Pendiente | 🟢 Completada</p>
+    <div id="mapaCompletoField"></div>
+    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-gps" onclick="vibrate(); ajustarMapaCompleto()">&#x1F50D; Ajustar vista</button>
+      <button class="btn btn-completar" onclick="vibrate(); cambiarVista('sec-edicion')">&#x21A9;&#xFE0F; Volver a GPS</button>
+    </div>
   </div>
 
   <div id="sec-exportar" class="card hidden">
     <h2>&#x1F4BE; Exportar Información</h2>
     <p style="font-size:0.88em;">Descarga la información catalogada y notas registradas en campo.</p>
     <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
-      <button class="btn btn-export" onclick="exportarCSV()">&#x1F4CA; Exportar CSV</button>
-      <button class="btn btn-export-json" onclick="exportarJSON()">&#x1F4BE; Backup JSON</button>
+      <button class="btn btn-export" onclick="vibrate(); exportarCSV()">&#x1F4CA; Exportar CSV</button>
+      <button class="btn btn-export-json" onclick="vibrate(); exportarJSON()">&#x1F4BE; Backup JSON</button>
     </div>
   </div>
 
@@ -881,8 +453,8 @@
       <h3>&#x26A0;&#xFE0F; Confirmar Limpieza</h3>
       <p>¿Deseas borrar todos los datos guardados y comenzar de nuevo?</p>
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-        <button class="btn btn-completar" onclick="cerrarModalConfirm()">Cancelar</button>
-        <button class="btn btn-danger" onclick="limpiarLocalStorage()">Sí, Borrar Todo</button>
+        <button class="btn btn-completar" onclick="vibrate(); cerrarModalConfirm()">Cancelar</button>
+        <button class="btn btn-danger" onclick="vibrate(); limpiarLocalStorage()">Sí, Borrar Todo</button>
       </div>
     </div>
   </div>
@@ -894,6 +466,9 @@
     let contornosGeom = [];
     let parcelaActualIndex = -1;
     let leafletMap = null;
+    let mapaCompleto = null;
+    let markersCompletos = [];
+    let polygonsCompletos = [];
     let userMarker = null;
     let accuracyCircle = null;
     let connectionLine = null;
@@ -909,31 +484,24 @@
     let intervaloEscaneo = 5000;
     let parcelasAlertadas = new Set();
     let audioCtx = null;
+    let paqueteCamara = 'net.sourceforge.opencamera';
+    let modoGPSenUsuario = false;
+    let patronVibracion = 50; // NUEVO: configuración háptica
+    const CACHE_NAME = 'sigpac-tiles-v1';
 
     const USOS_SIGPAC_DB = [
-      { codigo: "TA", descripcion: "Tierras Arables" },
-      { codigo: "TH", descripcion: "Huerta" },
-      { codigo: "CS", descripcion: "Cítricos" },
-      { codigo: "FY", descripcion: "Frutales" },
-      { codigo: "OV", descripcion: "Olivar" },
-      { codigo: "VI", descripcion: "Viñedo" },
-      { codigo: "FL", descripcion: "Frutos Secos" },
-      { codigo: "FS", descripcion: "Frutos Secos y Olivar" },
-      { codigo: "CI", descripcion: "Cítricos e Invernaderos" },
-      { codigo: "IV", descripcion: "Invernaderos y cultivos bajo cubierta" },
-      { codigo: "FO", descripcion: "Forestal" },
-      { codigo: "PA", descripcion: "Pastizal" },
-      { codigo: "PR", descripcion: "Pastizal con Arbolado" },
-      { codigo: "PS", descripcion: "Pastizal con Matorral" },
-      { codigo: "AG", descripcion: "Aguas Continentales" },
-      { codigo: "ED", descripcion: "Edificaciones" },
-      { codigo: "ZU", descripcion: "Zona Urbana" },
-      { codigo: "IM", descripcion: "Improductivo" },
-      { codigo: "CA", descripcion: "Caminos" },
-      { codigo: "ZC", descripcion: "Zona de Concentración Parcelaria" }
+      { codigo: "TA", descripcion: "Tierras Arables" }, { codigo: "TH", descripcion: "Huerta" },
+      { codigo: "CS", descripcion: "Cítricos" }, { codigo: "FY", descripcion: "Frutales" },
+      { codigo: "OV", descripcion: "Olivar" }, { codigo: "VI", descripcion: "Viñedo" },
+      { codigo: "FL", descripcion: "Frutos Secos" }, { codigo: "FS", descripcion: "Frutos Secos y Olivar" },
+      { codigo: "CI", descripcion: "Cítricos e Invernaderos" }, { codigo: "IV", descripcion: "Invernaderos y cultivos bajo cubierta" },
+      { codigo: "FO", descripcion: "Forestal" }, { codigo: "PA", descripcion: "Pastizal" },
+      { codigo: "PR", descripcion: "Pastizal con Arbolado" }, { codigo: "PS", descripcion: "Pastizal con Matorral" },
+      { codigo: "AG", descripcion: "Aguas Continentales" }, { codigo: "ED", descripcion: "Edificaciones" },
+      { codigo: "ZU", descripcion: "Zona Urbana" }, { codigo: "IM", descripcion: "Improductivo" },
+      { codigo: "CA", descripcion: "Caminos" }, { codigo: "ZC", descripcion: "Zona de Concentración Parcelaria" }
     ];
-
-    const PRODUCTOS_DB = [
+     const PRODUCTOS_DB = [
   { codigo:0, descripcion:"PRODUCTO DESCONOCIDO" },
   { codigo:1, descripcion:"TRIGO BLANDO" },
   { codigo:2, descripcion:"ESPELTA" },
@@ -2007,9 +1575,31 @@
   { "codigo": "237", "descripcion": "Visto en campo 2026" },
   { "codigo": "238", "descripcion": "Monitorizaci  n 2026: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "239", "descripcion": "Actividad agraria comprobada en 2026" }
-]; 
-    function vibrate(ms) { if ("vibrate" in navigator) navigator.vibrate(ms); }
+];  
 
+    /* ============================================
+       VIBRACIÓN CONFIGURABLE
+       ============================================ */
+    function vibrate() {
+      if (!("vibrate" in navigator)) return;
+      if (patronVibracion === 0) return;
+      if (patronVibracion === 'pattern') {
+        navigator.vibrate([50, 30, 50]);
+      } else {
+        navigator.vibrate(parseInt(patronVibracion));
+      }
+    }
+
+    function guardarConfigVibracion() {
+      const val = document.getElementById('cfgVibracion').value;
+      patronVibracion = val === 'pattern' ? 'pattern' : parseInt(val);
+      localStorage.setItem('sigpac_vibracion', val);
+      mostrarNotificacion(`📳 Vibración: ${val === 'pattern' ? 'Patrón' : val + 'ms'}`);
+    }
+
+    /* ============================================
+       UTILIDADES
+       ============================================ */
     function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
       const p1 = lat1 * Math.PI/180, p2 = lat2 * Math.PI/180;
@@ -2017,109 +1607,307 @@
       const a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
       return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     }
-
     function calcularRumboEntrePuntos(lat1, lon1, lat2, lon2) {
-      const p1 = lat1 * Math.PI / 180;
-      const p2 = lat2 * Math.PI / 180;
+      const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
       const dl = (lon2 - lon1) * Math.PI / 180;
       const y = Math.sin(dl) * Math.cos(p2);
       const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
       return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
     }
-
-    function rumboACardinal(grados) {
-      const c = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
-      return c[Math.round(grados / 45) % 8];
+    function rumboACardinal(g) { return ['N','NE','E','SE','S','SO','O','NO'][Math.round(g/45)%8]; }
+    function formatearDistancia(m) { return m > 1000 ? (m/1000).toFixed(2) + ' km' : Math.round(m) + ' m'; }
+    function formatearFecha(d) {
+      if (!d) return '-';
+      const date = new Date(d);
+      const dd = String(date.getDate()).padStart(2, '0');
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const yyyy = date.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
     }
 
-    function formatearDistancia(m) {
-      return m > 1000 ? (m/1000).toFixed(2) + ' km' : Math.round(m) + ' m';
-    }
+    /* ============================================
+       CACHE DE TESELAS OFFLINE
+       ============================================ */
+    async function precargarTeselasZonas() {
+      if (parcelas.length === 0) {
+        mostrarNotificacion("⚠️ No hay parcelas cargadas");
+        return;
+      }
+      
+      if (!('caches' in window)) {
+        mostrarNotificacion("⚠️ Tu navegador no soporta caché offline");
+        return;
+      }
 
-    function solicitarPermisoNotificaciones() {
-      if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
+      mostrarNotificacion("⬇️ Iniciando precarga de teselas...");
+      
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        
+        // Calcular bounding box de todas las parcelas
+        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+        parcelas.forEach(p => {
+          if (p.lat < minLat) minLat = p.lat;
+          if (p.lat > maxLat) maxLat = p.lat;
+          if (p.lng < minLng) minLng = p.lng;
+          if (p.lng > maxLng) maxLng = p.lng;
+        });
+        
+        // Añadir margen de 10%
+        const marginLat = (maxLat - minLat) * 0.15 || 0.01;
+        const marginLng = (maxLng - minLng) * 0.15 || 0.01;
+        minLat -= marginLat; maxLat += marginLat;
+        minLng -= marginLng; maxLng += marginLng;
+        
+        // Niveles de zoom a precargar (14-17 son los más útiles en campo)
+        const zooms = [14, 15, 16, 17];
+        let totalTeselas = 0;
+        let teselasCacheadas = 0;
+        
+        for (let z of zooms) {
+          const xMin = lon2tileX(minLng, z);
+          const xMax = lon2tileX(maxLng, z);
+          const yMin = lat2tileY(maxLat, z);
+          const yMax = lat2tileY(minLat, z);
+          
+          for (let x = xMin; x <= xMax; x++) {
+            for (let y = yMin; y <= yMax; y++) {
+              const url = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+              totalTeselas++;
+              
+              try {
+                const existing = await cache.match(url);
+                if (!existing) {
+                  const response = await fetch(url, { mode: 'cors' });
+                  if (response.ok) {
+                    await cache.put(url, response);
+                    teselasCacheadas++;
+                  }
+                } else {
+                  teselasCacheadas++;
+                }
+              } catch (e) {
+                // Si falla una, continuar con las demás
+              }
+              
+              // Actualizar progreso cada 20 teselas
+              if (totalTeselas % 20 === 0) {
+                mostrarNotificacion(`⬇️ ${teselasCacheadas}/${totalTeselas} teselas...`);
+              }
+            }
+          }
+        }
+        
+        localStorage.setItem('sigpac_teselas_cacheadas', teselasCacheadas);
+        actualizarStatsCache();
+        mostrarNotificacion(`✅ ${teselasCacheadas} teselas cacheadas (zoom 14-17)`);
+        
+      } catch (e) {
+        console.error("Error cache:", e);
+        mostrarNotificacion("⚠️ Error al precargar: " + e.message);
       }
     }
 
+    function lon2tileX(lon, zoom) {
+      return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+    }
+    function lat2tileY(lat, zoom) {
+      return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+    }
+
+    async function limpiarCacheTeselas() {
+      if ('caches' in window) {
+        await caches.delete(CACHE_NAME);
+        localStorage.removeItem('sigpac_teselas_cacheadas');
+        actualizarStatsCache();
+        mostrarNotificacion("🗑️ Cache de teselas limpiado");
+      }
+    }
+
+    async function actualizarStatsCache() {
+      const el = document.getElementById('cacheStats');
+      if (!el) return;
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          const keys = await cache.keys();
+          const count = keys.length;
+          localStorage.setItem('sigpac_teselas_cacheadas', count);
+          el.textContent = `Teselas cacheadas: ${count}`;
+        } catch (e) {
+          el.textContent = `Teselas cacheadas: 0`;
+        }
+      } else {
+        el.textContent = `Teselas cacheadas: No soportado`;
+      }
+    }
+
+    /* ============================================
+       BOTÓN FOTO
+       ============================================ */
+    function abrirAppFoto() {
+      if (parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) {
+        mostrarNotificacion("⚠️ Selecciona primero una parcela");
+        return;
+      }
+      const nombre = parcelas[parcelaActualIndex].nombre;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(nombre).then(() => {
+          mostrarNotificacion("📋 Copiado: " + nombre);
+        }).catch(() => fallbackCopiar(nombre));
+      } else fallbackCopiar(nombre);
+      
+      setTimeout(() => {
+        const pkg = paqueteCamara || 'net.sourceforge.opencamera';
+        const intentUrl = `intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${pkg};end`;
+        const marketUrl = `market://details?id=${pkg}`;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = intentUrl;
+        document.body.appendChild(iframe);
+        setTimeout(() => {
+          if (!document.hidden) window.location.href = marketUrl;
+          if (iframe.parentNode) document.body.removeChild(iframe);
+        }, 1500);
+      }, 300);
+    }
+    function fallbackCopiar(texto) {
+      const ta = document.createElement('textarea');
+      ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); mostrarNotificacion("📋 Copiado: " + texto); }
+      catch(e) { mostrarNotificacion("⚠️ No se pudo copiar"); }
+      document.body.removeChild(ta);
+    }
+    function actualizarPaqueteCamara() {
+      const sel = document.getElementById('cfgAppCamara').value;
+      const input = document.getElementById('cfgPaqueteCamara');
+      if (sel === 'net.sourceforge.opencamera') input.value = 'net.sourceforge.opencamera';
+      else { input.value = ''; input.focus(); }
+      guardarConfigCamara();
+    }
+    function guardarConfigCamara() {
+      paqueteCamara = document.getElementById('cfgPaqueteCamara').value.trim() || 'net.sourceforge.opencamera';
+      localStorage.setItem('sigpac_paquete_camara', paqueteCamara);
+    }
+
+    /* ============================================
+       TOGGLE GPS / MI UBICACIÓN
+       ============================================ */
+    function toggleGPSOMiUbicacion() {
+      if (!userCoords) { activarSensoresGpsYBrujula(); mostrarNotificacion("Buscando señal GPS..."); return; }
+      if (!leafletMap) return;
+      if (!modoGPSenUsuario) {
+        leafletMap.setView([userCoords.lat, userCoords.lng], 18);
+        if (userMarker) userMarker.openPopup();
+        modoGPSenUsuario = true;
+        document.getElementById('btnMiUbicacion').innerHTML = '&#x1F3AF; Parcela';
+        mostrarNotificacion("Centrado en tu ubicación.");
+      } else {
+        if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
+          const p = parcelas[parcelaActualIndex];
+          leafletMap.setView([p.lat, p.lng], 17);
+          if (parcelMarker) parcelMarker.openPopup();
+        }
+        modoGPSenUsuario = false;
+        document.getElementById('btnMiUbicacion').innerHTML = '&#x1F4CD; GPS';
+        mostrarNotificacion("Centrado en la parcela.");
+      }
+    }
+
+    /* ============================================
+       MAPA COMPLETO
+       ============================================ */
+    function initMapaCompleto() {
+      if (mapaCompleto) return;
+      mapaCompleto = L.map('mapaCompletoField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
+      const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+      esriSat.addTo(mapaCompleto);
+      L.control.layers({ 'Satélite (Esri)': esriSat, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(mapaCompleto);
+    }
+    function dibujarMapaCompleto() {
+      if (!mapaCompleto) initMapaCompleto();
+      markersCompletos.forEach(m => mapaCompleto.removeLayer(m));
+      polygonsCompletos.forEach(p => mapaCompleto.removeLayer(p));
+      markersCompletos = []; polygonsCompletos = [];
+      const bounds = L.latLngBounds();
+      let tieneDatos = false;
+      const iconoPendiente = L.divIcon({ className: 'custom-pin', html: `<div style="width:22px; height:22px; background:#ef4444; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.6);"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
+      const iconoCompletada = L.divIcon({ className: 'custom-pin', html: `<div style="width:22px; height:22px; background:#10b981; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.6);"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
+      parcelas.forEach((p, idx) => {
+        const icono = p.completada ? iconoCompletada : iconoPendiente;
+        const marker = L.marker([p.lat, p.lng], { icon: icono }).addTo(mapaCompleto);
+        marker.bindPopup(`<b style="color:#0284c7;">📍 ${p.nombre}</b><br><small>ID: ${p.id}</small>${p.completada ? '<br><span style="color:#10b981; font-weight:bold;">✔ ' + formatearFecha(p.fechaCompletada) + '</span>' : ''}<br><button onclick="cargarParcelaEnEdicion(${idx}); cambiarVista('sec-edicion');" style="margin-top:6px; padding:6px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Ver detalle</button>`);
+        markersCompletos.push(marker);
+        bounds.extend([p.lat, p.lng]);
+        tieneDatos = true;
+      });
+      contornosGeom.forEach((coords, idx) => {
+        if (coords && coords.length > 0) {
+          const poly = L.polygon(coords, { color: '#38bdf8', weight: 2, fillOpacity: 0.2, fillColor: '#38bdf8' }).addTo(mapaCompleto);
+          poly.bindPopup(`<b>Contorno #${idx+1}</b><br><button onclick="cargarParcelaEnEdicion(${idx}); cambiarVista('sec-edicion');" style="margin-top:6px; padding:6px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Ver parcela</button>`);
+          polygonsCompletos.push(poly);
+          bounds.extend(poly.getBounds());
+          tieneDatos = true;
+        }
+      });
+      if (tieneDatos && bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
+    }
+    function ajustarMapaCompleto() {
+      if (mapaCompleto && (markersCompletos.length > 0 || polygonsCompletos.length > 0)) {
+        const bounds = L.latLngBounds();
+        markersCompletos.forEach(m => bounds.extend(m.getLatLng()));
+        polygonsCompletos.forEach(p => bounds.extend(p.getBounds()));
+        if (bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
+      }
+    }
+
+    /* ============================================
+       ALERTAS PROXIMIDAD
+       ============================================ */
+    function solicitarPermisoNotificaciones() {
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+    }
     function reproducirSonidoAlerta() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = 880;
-        osc.type = 'sine';
-        gain.gain.value = 0.3;
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = 880; osc.type = 'sine'; gain.gain.value = 0.3;
         osc.start();
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
         osc.stop(audioCtx.currentTime + 0.5);
       } catch(e) {}
     }
-
     function lanzarAlertaProximidad(parcela, distancia, rumbo) {
       const card = rumboACardinal(rumbo);
       const distTxt = formatearDistancia(distancia);
       const msg = `La parcela ${parcela.nombre} está a ${distTxt} en el rumbo ${Math.round(rumbo)}° (${card})`;
-
       const bar = document.getElementById('proximityAlertBar');
       const txt = document.getElementById('proximityAlertText');
-      if (bar && txt) {
-        txt.textContent = msg;
-        bar.classList.add('visible');
-      }
-
-      if (sonidoAlerta !== 'silencio') {
-        vibrate([300, 100, 300, 100, 300]);
-      }
-
-      if (sonidoAlerta === 'sonido') {
-        reproducirSonidoAlerta();
-      }
-
+      if (bar && txt) { txt.textContent = msg; bar.classList.add('visible'); }
+      if (sonidoAlerta !== 'silencio') vibrate();
+      if (sonidoAlerta === 'sonido') reproducirSonidoAlerta();
       if ('Notification' in window && Notification.permission === 'granted') {
-        try {
-          new Notification('&#x1F4CD; Parcela Cercana', {
-            body: msg,
-            tag: 'prox-' + parcela.id,
-            requireInteraction: false
-          });
-        } catch(e) {}
+        try { new Notification('📍 Parcela Cercana', { body: msg, tag: 'prox-' + parcela.id }); } catch(e) {}
       }
-
-      mostrarNotificacion('&#x1F4CD; ' + msg);
+      mostrarNotificacion('📍 ' + msg);
     }
-
     function iniciarMonitorProximidad() {
       if (monitorProximidadInterval) clearInterval(monitorProximidadInterval);
-      
       monitorProximidadInterval = setInterval(() => {
         if (!userCoords || parcelas.length === 0) return;
-
-        let masCercana = null;
-        let distMinima = Infinity;
-
+        let masCercana = null, distMinima = Infinity;
         parcelas.forEach((p, idx) => {
           const d = calcularDistanciaMetros(userCoords.lat, userCoords.lng, p.lat, p.lng);
           p._distancia = d;
           p._rumbo = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
-
-          if (d < distMinima) {
-            distMinima = d;
-            masCercana = { parcela: p, idx: idx, dist: d, rumbo: p._rumbo };
-          }
-
-          if (d <= distAlerta && !parcelasAlertadas.has(p.id)) {
-            parcelasAlertadas.add(p.id);
-            lanzarAlertaProximidad(p, d, p._rumbo);
-          }
-
-          if (d > distAlerta * 1.5) {
-            parcelasAlertadas.delete(p.id);
-          }
+          if (d < distMinima) { distMinima = d; masCercana = { parcela: p, idx, dist: d, rumbo: p._rumbo }; }
+          if (d <= distAlerta && !parcelasAlertadas.has(p.id)) { parcelasAlertadas.add(p.id); lanzarAlertaProximidad(p, d, p._rumbo); }
+          if (d > distAlerta * 1.5) parcelasAlertadas.delete(p.id);
         });
-
         if (masCercana && masCercana.dist <= distAlerta * 2) {
           const bar = document.getElementById('proximityAlertBar');
           const txt = document.getElementById('proximityAlertText');
@@ -2132,35 +1920,31 @@
           const bar = document.getElementById('proximityAlertBar');
           if (bar) bar.classList.remove('visible');
         }
-
         renderTablaResumen();
-
       }, intervaloEscaneo);
     }
-
     function guardarConfigProximidad() {
       distAlerta = parseInt(document.getElementById('cfgDistAlerta').value) || 100;
       sonidoAlerta = document.getElementById('cfgSonidoAlerta').value;
       intervaloEscaneo = parseInt(document.getElementById('cfgIntervalo').value) || 5000;
-      
       localStorage.setItem('sigpac_dist_alerta', distAlerta);
       localStorage.setItem('sigpac_sonido_alerta', sonidoAlerta);
       localStorage.setItem('sigpac_intervalo', intervaloEscaneo);
-      
       iniciarMonitorProximidad();
-      mostrarNotificacion(`Alerta configurada: ${distAlerta}m cada ${intervaloEscaneo/1000}s`);
+      mostrarNotificacion(`Alerta: ${distAlerta}m cada ${intervaloEscaneo/1000}s`);
     }
 
+    /* ============================================
+       GPS Y BRÚJULA
+       ============================================ */
     function initMap() {
       if (leafletMap) return;
       leafletMap = L.map('mapaField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
       const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
       const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-      const ignPnoa = L.tileLayer.wms('https://www.ign.es/wms-inspire/pnoa-ma', { layers: 'OI.OrtoimageCoverage', format: 'image/png', transparent: true, maxZoom: 20 });
       esriSat.addTo(leafletMap);
-      L.control.layers({ 'Satélite (Esri)': esriSat, 'Ortofoto (PNOA/IGN)': ignPnoa, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(leafletMap);
+      L.control.layers({ 'Satélite (Esri)': esriSat, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(leafletMap);
     }
-
     function activarSensoresGpsYBrujula() {
       solicitarPermisoNotificaciones();
       iniciarGeolocalizacionPasoAPaso();
@@ -2168,18 +1952,11 @@
       intentarBloquearOrientacion();
       iniciarMonitorProximidad();
     }
-
     function intentarBloquearOrientacion() {
-      if (screen.orientation && typeof screen.orientation.lock === 'function') {
-        screen.orientation.lock('portrait-primary').catch(() => {});
-      }
+      if (screen.orientation && typeof screen.orientation.lock === 'function') screen.orientation.lock('portrait-primary').catch(() => {});
     }
-
     function iniciarGeolocalizacionPasoAPaso() {
-      if (!("geolocation" in navigator)) {
-        actualizarBadgeGps("GPS no soportado");
-        return;
-      }
+      if (!("geolocation" in navigator)) { actualizarBadgeGps("GPS no soportado"); return; }
       actualizarBadgeGps("GPS: Conectando satélites...");
       navigator.geolocation.getCurrentPosition(
         (pos) => { procesarPosicionGps(pos); iniciarWatchGps(); },
@@ -2187,31 +1964,22 @@
         { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
       );
     }
-
     function iniciarWatchGps() {
-      navigator.geolocation.watchPosition(
-        procesarPosicionGps,
-        (err) => {
-          let msg = "GPS: Error " + err.code;
-          if (err.code === 1) msg = "GPS: Permiso denegado";
-          if (err.code === 2) msg = "GPS: Sin cobertura";
-          if (err.code === 3) msg = "GPS: Timeout";
-          actualizarBadgeGps(msg);
-        },
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 }
-      );
+      navigator.geolocation.watchPosition(procesarPosicionGps, (err) => {
+        let msg = "GPS: Error " + err.code;
+        if (err.code === 1) msg = "GPS: Permiso denegado";
+        if (err.code === 2) msg = "GPS: Sin cobertura";
+        if (err.code === 3) msg = "GPS: Timeout";
+        actualizarBadgeGps(msg);
+      }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
     }
-
     function procesarPosicionGps(pos) {
       userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy || 10 };
       actualizarBadgeGps(`GPS: OK (±${Math.round(userCoords.accuracy)}m)`);
       actualizarMapaUbicacion(userCoords.lat, userCoords.lng, userCoords.accuracy);
       actualizarCalculosNav();
-      if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) {
-        actualizarRumboUI(pos.coords.heading, "GPS Satélite");
-      }
+      if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) actualizarRumboUI(pos.coords.heading, "GPS Satélite");
     }
-
     function actualizarMapaUbicacion(lat, lng, accuracy) {
       if (!leafletMap) return;
       const latLng = [lat, lng];
@@ -2219,55 +1987,29 @@
       if (!userMarker) {
         userMarker = L.marker(latLng, { icon: userIcon, zIndexOffset: 1000 }).addTo(leafletMap);
         userMarker.bindPopup(`<b>Tu Ubicación</b><br>±${Math.round(accuracy)}m`);
-      } else {
-        userMarker.setLatLng(latLng);
-      }
-      if (!accuracyCircle) {
-        accuracyCircle = L.circle(latLng, { radius: accuracy, color: '#0284c7', fillColor: '#38bdf8', fillOpacity: 0.15, weight: 1.5 }).addTo(leafletMap);
-      } else {
-        accuracyCircle.setLatLng(latLng);
-        accuracyCircle.setRadius(accuracy);
-      }
+      } else userMarker.setLatLng(latLng);
+      if (!accuracyCircle) accuracyCircle = L.circle(latLng, { radius: accuracy, color: '#0284c7', fillColor: '#38bdf8', fillOpacity: 0.15, weight: 1.5 }).addTo(leafletMap);
+      else { accuracyCircle.setLatLng(latLng); accuracyCircle.setRadius(accuracy); }
       if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
         const p = parcelas[parcelaActualIndex];
-        if (!connectionLine) {
-          connectionLine = L.polyline([latLng, [p.lat, p.lng]], { color: '#ef4444', weight: 2.5, dashArray: '6, 6' }).addTo(leafletMap);
-        } else {
-          connectionLine.setLatLngs([latLng, [p.lat, p.lng]]);
-        }
+        if (!connectionLine) connectionLine = L.polyline([latLng, [p.lat, p.lng]], { color: '#ef4444', weight: 2.5, dashArray: '6, 6' }).addTo(leafletMap);
+        else connectionLine.setLatLngs([latLng, [p.lat, p.lng]]);
       }
     }
-
-    function centrarEnMiUbicacion() {
-      if (userCoords && leafletMap) {
-        leafletMap.setView([userCoords.lat, userCoords.lng], 18);
-        if (userMarker) userMarker.openPopup();
-        mostrarNotificacion("Mapa centrado en tu posición.");
-      } else {
-        activarSensoresGpsYBrujula();
-        mostrarNotificacion("Buscando señal GPS...");
-      }
-    }
-
     function iniciarSensorOrientacionAvanzado() {
       if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
         DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') escucharEventosOrientacion(); }).catch(console.error);
-      } else {
-        escucharEventosOrientacion();
-      }
+      } else escucharEventosOrientacion();
     }
-
     function escucharEventosOrientacion() {
       if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', procesarOrientacionEuler, true);
       window.addEventListener('deviceorientation', procesarOrientacionEuler, true);
     }
-
     function procesarOrientacionEuler(e) {
       sensorSampleCount++;
       let heading = null, fuente = "Giroscopio";
-      if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) {
-        heading = e.webkitCompassHeading; fuente = "iOS Mag";
-      } else if (e.alpha !== null) {
+      if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) { heading = e.webkitCompassHeading; fuente = "iOS Mag"; }
+      else if (e.alpha !== null) {
         const a = e.alpha, b = e.beta || 0, g = e.gamma || 0;
         const x = b*Math.PI/180, y = g*Math.PI/180, z = a*Math.PI/180;
         const cX=Math.cos(x),cY=Math.cos(y),cZ=Math.cos(z),sX=Math.sin(x),sY=Math.sin(y),sZ=Math.sin(z);
@@ -2279,7 +2021,6 @@
       }
       if (heading !== null && !isNaN(heading)) actualizarRumboUI(heading, fuente);
     }
-
     function actualizarRumboUI(heading, fuente) {
       currentHeading = heading;
       const needle = document.getElementById('compassNeedle');
@@ -2295,21 +2036,20 @@
       actualizarBadgeBrujula(`${fuente} (${sensorSampleCount})`);
       actualizarCalculosNav();
     }
-
     function actualizarCalculosNav() {
       if (!userCoords || parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) return;
       const p = parcelas[parcelaActualIndex];
       const dist = calcularDistanciaMetros(userCoords.lat, userCoords.lng, p.lat, p.lng);
       const rumbo = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
-      const td = document.getElementById('txtDistancia');
-      if (td) td.textContent = formatearDistancia(dist);
-      const tr = document.getElementById('txtRumboDestino');
-      if (tr) tr.textContent = `${Math.round(rumbo)}° ${rumboACardinal(rumbo)}`;
+      const td = document.getElementById('txtDistancia'); if (td) td.textContent = formatearDistancia(dist);
+      const tr = document.getElementById('txtRumboDestino'); if (tr) tr.textContent = `${Math.round(rumbo)}° ${rumboACardinal(rumbo)}`;
     }
-
     function actualizarBadgeGps(t) { const e = document.getElementById('gpsStatusBadge'); if (e) e.textContent = t; }
     function actualizarBadgeBrujula(t) { const e = document.getElementById('compassStatusBadge'); if (e) e.textContent = t; }
 
+    /* ============================================
+       KML
+       ============================================ */
     function setupKMLListeners() {
       document.getElementById('inputKmlPuntos').addEventListener('change', (e) => {
         const f = e.target.files[0]; if (!f) return;
@@ -2320,7 +2060,6 @@
         const r = new FileReader(); r.onload = (ev) => parseKMLContornos(ev.target.result); r.readAsText(f);
       });
     }
-
     function parseKMLPuntos(xmlText) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
@@ -2341,7 +2080,7 @@
         for (let d of pm.getElementsByTagName('Data')) { const k = d.getAttribute('name'); if (k && !rawProps[k]) { const v = d.getElementsByTagName('value')[0]; rawProps[k] = v ? v.textContent.trim() : d.textContent.trim(); kmlFieldsList.add(k); } }
         const ext = pm.getElementsByTagName('ExtendedData')[0];
         if (ext) { for (let c of ext.children) { if (c.tagName !== 'SchemaData' && c.tagName !== 'Data' && c.tagName !== 'SimpleData') { if (!rawProps[c.tagName]) { rawProps[c.tagName] = c.textContent.trim(); kmlFieldsList.add(c.tagName); } } } }
-        parcelas.push({ id: i+1, nombre: rawProps['name'] || `Parcela ${i+1}`, lat, lng, observaciones: '', completada: false, rawProps, _distancia: null, _rumbo: null });
+        parcelas.push({ id: i+1, nombre: rawProps['name'] || `Parcela ${i+1}`, lat, lng, observaciones: '', completada: false, fechaCompletada: null, rawProps, _distancia: null, _rumbo: null });
       }
       document.getElementById('totalPuntos').textContent = parcelas.length;
       poblarSelectCampoIdentificador();
@@ -2349,8 +2088,9 @@
       renderTablaResumen();
       if (parcelas.length > 0) cargarParcelaEnEdicion(0);
       mostrarNotificacion(`${parcelas.length} parcelas cargadas.`);
+      // Auto-precargar teselas tras cargar KML
+      setTimeout(() => precargarTeselasZonas(), 1500);
     }
-
     function poblarSelectCampoIdentificador(campoGuardado = null) {
       const sel = document.getElementById('selectCampoNombre');
       const sec = document.getElementById('secCamposKml');
@@ -2363,7 +2103,6 @@
       else { const h = arr.find(c => ['nombre','name','ref','referencia','recinto','parcela','id_parcela','cod_rec'].some(p => c.toLowerCase().includes(p))); if (h) sel.value = h; }
       aplicarCampoIdentificador(false);
     }
-
     function parseKMLContornos(xmlText) {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
@@ -2379,7 +2118,6 @@
       if (parcelaActualIndex >= 0) cargarParcelaEnEdicion(parcelaActualIndex);
       mostrarNotificacion(`${contornosGeom.length} contornos cargados.`);
     }
-
     function aplicarCampoIdentificador(notificar = true) {
       const sel = document.getElementById('selectCampoNombre');
       if (!sel) return;
@@ -2390,6 +2128,9 @@
       if (notificar) mostrarNotificacion(`Campo cambiado a: "${field}"`);
     }
 
+    /* ============================================
+       EDICIÓN - CON FECHA DE COMPLETADO
+       ============================================ */
     function cargarParcelaEnEdicion(idx) {
       if (idx < 0 || idx >= parcelas.length) return;
       parcelaActualIndex = idx;
@@ -2399,8 +2140,16 @@
       document.getElementById('editCoords').textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
       document.getElementById('inputObservaciones').value = p.observaciones || '';
       document.getElementById('btnGmaps').href = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+      // Mostrar fecha de completado
+      const fechaEl = document.getElementById('editFechaCompletada');
+      if (fechaEl) {
+        fechaEl.textContent = p.completada ? formatearFecha(p.fechaCompletada) : 'Pendiente';
+        fechaEl.style.color = p.completada ? 'var(--btn-success)' : 'var(--text-secondary)';
+      }
       const bc = document.getElementById('btnEstadoCompletada');
-      if (p.completada) { bc.classList.add('activa'); bc.textContent = '✔ Completada'; } else { bc.classList.remove('activa'); bc.textContent = '✔ Completar'; }
+      if (p.completada) { bc.classList.add('activa'); bc.textContent = '✔ ' + formatearFecha(p.fechaCompletada); } else { bc.classList.remove('activa'); bc.textContent = '✔ Completar'; }
+      modoGPSenUsuario = false;
+      document.getElementById('btnMiUbicacion').innerHTML = '&#x1F4CD; GPS';
       const kc = document.getElementById('kmlDataContent');
       if (kc) {
         let html = "";
@@ -2411,7 +2160,7 @@
       }
       if (leafletMap) {
         if (parcelMarker) leafletMap.removeLayer(parcelMarker);
-        parcelMarker = L.marker([p.lat, p.lng]).addTo(leafletMap).bindPopup(`<b style="font-size:1.1em; color:#0284c7;">&#x1F4CD; ${p.nombre}</b>`);
+        parcelMarker = L.marker([p.lat, p.lng]).addTo(leafletMap).bindPopup(`<b style="font-size:1.1em; color:#0284c7;">📍 ${p.nombre}</b>`);
         if (parcelPolygon) leafletMap.removeLayer(parcelPolygon);
         if (contornosGeom[idx]) { parcelPolygon = L.polygon(contornosGeom[idx], { color: '#38bdf8', weight: 3, fillOpacity: 0.3 }).addTo(leafletMap); leafletMap.fitBounds(parcelPolygon.getBounds(), { padding: [30, 30] }); }
         else leafletMap.setView([p.lat, p.lng], 17);
@@ -2419,28 +2168,42 @@
       }
       actualizarCalculosNav();
     }
-
     function guardarObservaciones() {
       if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
         parcelas[parcelaActualIndex].observaciones = document.getElementById('inputObservaciones').value;
         guardarEnLocalStorage(); renderTablaResumen();
       }
     }
-
     function toggleEstadoCompletada() {
       if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
-        parcelas[parcelaActualIndex].completada = !parcelas[parcelaActualIndex].completada;
+        const p = parcelas[parcelaActualIndex];
+        p.completada = !p.completada;
+        // Guardar/limpiar fecha de completado
+        if (p.completada) {
+          p.fechaCompletada = new Date().toISOString();
+          mostrarNotificacion(`✔ Completada el ${formatearFecha(p.fechaCompletada)}`);
+        } else {
+          p.fechaCompletada = null;
+          mostrarNotificacion("↩️ Marcada como pendiente");
+        }
         guardarEnLocalStorage(); cargarParcelaEnEdicion(parcelaActualIndex); renderTablaResumen();
       }
     }
 
+    /* ============================================
+       TABLA CON FECHA
+       ============================================ */
     function renderTablaResumen() {
       const tbody = document.getElementById('tablaResumen');
+      const contador = document.getElementById('resumenContador');
       if (!tbody) return;
-      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay datos cargados</td></tr>'; return; }
-
+      if (contador) {
+        const total = parcelas.length;
+        const completadas = parcelas.filter(p => p.completada).length;
+        contador.textContent = `${completadas} / ${total}`;
+      }
+      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay datos cargados</td></tr>'; return; }
       let indices = parcelas.map((p, i) => i);
-      
       if (userCoords) {
         indices.sort((a, b) => {
           const da = parcelas[a]._distancia !== null ? parcelas[a]._distancia : calcularDistanciaMetros(userCoords.lat, userCoords.lng, parcelas[a].lat, parcelas[a].lng);
@@ -2448,7 +2211,6 @@
           return da - db;
         });
       }
-
       tbody.innerHTML = indices.map(i => {
         const p = parcelas[i];
         let distHtml = '<span style="color:var(--text-secondary);">--</span>';
@@ -2458,16 +2220,20 @@
           else if (p._distancia <= distAlerta * 3) cls = 'dist-mid';
           distHtml = `<span class="dist-badge ${cls}">${formatearDistancia(p._distancia)}</span>`;
         }
+        const fechaHtml = p.completada ? `<span style="color:var(--btn-success); font-weight:600;">${formatearFecha(p.fechaCompletada)}</span>` : '<span style="color:var(--text-secondary);">-</span>';
         return `<tr class="${p.completada ? 'row-completada' : ''}" onclick="cargarParcelaEnEdicion(${i}); cambiarVista('sec-edicion');">
-          <td>${distHtml}</td>
-          <td>${p.id}</td>
-          <td>${p.nombre} ${p.completada ? '<span class="badge-estado">OK</span>' : ''}</td>
-          <td>${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</td>
-          <td>${p.observaciones || '-'}</td>
+          <td>${distHtml}</td><td>${p.id}</td>
+          <td>${p.nombre}</td>
+          <td>${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</td>
+          <td>${fechaHtml}</td>
+          <td>${p.observaciones ? '📝' : '-'}</td>
         </tr>`;
       }).join('');
     }
 
+    /* ============================================
+       LOCALSTORAGE
+       ============================================ */
     function guardarEnLocalStorage() {
       try {
         localStorage.setItem('sigpac_parcelas_data', JSON.stringify(parcelas));
@@ -2477,7 +2243,6 @@
         if (s && s.value) localStorage.setItem('sigpac_selected_field', s.value);
       } catch(e) { console.warn("Error LS:", e); }
     }
-
     function cargarDeLocalStorage() {
       try {
         const sp = localStorage.getItem('sigpac_parcelas_data');
@@ -2487,23 +2252,24 @@
         if (sp) { parcelas = JSON.parse(sp); document.getElementById('totalPuntos').textContent = parcelas.length; }
         if (sc) { contornosGeom = JSON.parse(sc); document.getElementById('totalContornos').textContent = contornosGeom.length; }
         if (sf) { kmlFieldsList = new Set(JSON.parse(sf)); poblarSelectCampoIdentificador(ss); }
-        
         const da = localStorage.getItem('sigpac_dist_alerta');
         const sa = localStorage.getItem('sigpac_sonido_alerta');
         const iv = localStorage.getItem('sigpac_intervalo');
         if (da) { distAlerta = parseInt(da); document.getElementById('cfgDistAlerta').value = da; }
         if (sa) { sonidoAlerta = sa; document.getElementById('cfgSonidoAlerta').value = sa; }
         if (iv) { intervaloEscaneo = parseInt(iv); document.getElementById('cfgIntervalo').value = iv; }
-
+        const pc = localStorage.getItem('sigpac_paquete_camara');
+        if (pc) { paqueteCamara = pc; document.getElementById('cfgPaqueteCamara').value = pc; }
+        const vib = localStorage.getItem('sigpac_vibracion');
+        if (vib) { patronVibracion = vib === 'pattern' ? 'pattern' : parseInt(vib); document.getElementById('cfgVibracion').value = vib; }
         const st = localStorage.getItem('sigpac_theme');
         if (st) cambiarTema(st, false);
         const sl = localStorage.getItem('sigpac_tam_letra');
         if (sl) { document.getElementById('cfgTamLetra').value = sl; document.body.style.fontSize = sl; }
-
         if (parcelas.length > 0) { renderTablaResumen(); cargarParcelaEnEdicion(0); mostrarNotificacion("Datos previos cargados."); }
+        actualizarStatsCache();
       } catch(e) { console.warn("Error LS:", e); }
     }
-
     function mostrarConfirmacionLimpieza() { document.getElementById('modalConfirm').classList.remove('hidden'); }
     function cerrarModalConfirm() { document.getElementById('modalConfirm').classList.add('hidden'); }
     function limpiarLocalStorage() {
@@ -2515,14 +2281,15 @@
       renderTablaResumen(); cerrarModalConfirm(); mostrarNotificacion("Memoria limpiada.");
     }
 
+    /* ============================================
+       BÚSQUEDA
+       ============================================ */
     function agregarAObservaciones(sel, tipo) {
       if (!sel.value) return;
-      const o = document.getElementById('inputObservaciones');
-      if (!o) return;
+      const o = document.getElementById('inputObservaciones'); if (!o) return;
       o.value = o.value ? `${o.value}\n[${tipo}] ${sel.value}` : `[${tipo}] ${sel.value}`;
       sel.value = ''; guardarObservaciones(); mostrarNotificacion("Añadido a observaciones.");
     }
-
     function filtrarGlobal() {
       const q = document.getElementById('inputBuscador').value.trim().toLowerCase();
       const rc = document.getElementById('searchResults');
@@ -2543,14 +2310,12 @@
       rc.innerHTML = html || '<div class="search-item">Sin coincidencias</div>';
       rc.style.display = 'block';
     }
-
     function seleccionarResuBuscador(texto) {
       const o = document.getElementById('inputObservaciones');
       if (o) { o.value = o.value ? `${o.value}\n${texto}` : texto; guardarObservaciones(); }
       document.getElementById('searchResults').style.display = 'none';
       document.getElementById('inputBuscador').value = '';
     }
-
     function filtrarConsultasRegex() {
       const input = document.getElementById('inputRegexConsultas');
       const status = document.getElementById('regexStatus');
@@ -2571,6 +2336,9 @@
       renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',regex);
     }
 
+    /* ============================================
+       CONFIG Y UI
+       ============================================ */
     function toggleConfig() { document.getElementById('panelConfig').classList.toggle('hidden'); }
     function cambiarTema(tema, guardar = true) {
       document.body.setAttribute('data-theme', tema);
@@ -2583,13 +2351,14 @@
     }
     function aplicarAjustesConfig() { const t = document.getElementById('cfgTamLetra').value; document.body.style.fontSize = t; localStorage.setItem('sigpac_tam_letra', t); }
     function cambiarVista(secId) {
-      ['sec-kml','sec-edicion','sec-resumen','sec-exportar','sec-consultas'].forEach(id => {
+      ['sec-kml','sec-resumen','sec-edicion','sec-mapa','sec-exportar','sec-consultas'].forEach(id => {
         const e = document.getElementById(id); if (e) e.classList.add('hidden');
         const b = document.getElementById('navBtn-'+id); if (b) b.classList.remove('active');
       });
       const ts = document.getElementById(secId); if (ts) ts.classList.remove('hidden');
       const tb = document.getElementById('navBtn-'+secId); if (tb) tb.classList.add('active');
       if (secId === 'sec-edicion' && leafletMap) setTimeout(() => leafletMap.invalidateSize(), 200);
+      if (secId === 'sec-mapa') { initMapaCompleto(); setTimeout(() => { mapaCompleto.invalidateSize(); dibujarMapaCompleto(); }, 200); }
     }
     function poblardesplegables() {
       const llenar = (id, items, label) => { const s = document.getElementById(id); if (!s) return; s.innerHTML = `<option value="">-- ${label} --</option>` + items.map(i => `<option value="${i.codigo}: ${i.descripcion}">${i.codigo} - ${i.descripcion}</option>`).join(''); };
@@ -2603,10 +2372,17 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
     }
 
+    /* ============================================
+       EXPORTAR - CON FECHA
+       ============================================ */
     function exportarCSV() {
       if (!parcelas.length) return mostrarNotificacion("No hay datos.");
-      let csv = "ID;Nombre;Latitud;Longitud;Estado;Observaciones\n";
-      parcelas.forEach(p => { const o = (p.observaciones||'').replace(/;/g,',').replace(/\n/g,' '); csv += `${p.id};"${p.nombre}";${p.lat};${p.lng};${p.completada?'Completada':'Pendiente'};"${o}"\n`; });
+      let csv = "ID;Nombre;Latitud;Longitud;Estado;FechaCompletado;Observaciones\n";
+      parcelas.forEach(p => { 
+        const o = (p.observaciones||'').replace(/;/g,',').replace(/\n/g,' '); 
+        const fecha = p.completada ? formatearFecha(p.fechaCompletada) : '';
+        csv += `${p.id};"${p.nombre}";${p.lat};${p.lng};${p.completada?'Completada':'Pendiente'};"${fecha}";"${o}"\n`; 
+      });
       descargarArchivo(csv, "catalogo_sigpac.csv", "text/csv;charset=utf-8;");
       mostrarNotificacion("✅ CSV exportado.");
     }
