@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gestión de Parcelas y SIGPAC v17 - Tactical Pro</title>
+  <title>Visitar Parcelas</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/@tmcw/togeojson@5.8.1/dist/togeojson.umd.js"></script>
 
   <style>
     [data-theme="classic"] {
@@ -68,15 +70,15 @@
     .btn-header:hover { background: var(--accent-primary); color: white; }
     .btn-header.primary { background: var(--accent-primary); color: white; border-color: var(--accent-secondary); }
     .btn-header.primary:hover { background: var(--accent-secondary); }
-    .nav-bar { display: flex; background: var(--nav-bg); border-radius: 12px; margin-bottom: 10px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--border-color); flex-wrap: wrap; }
-    .nav-btn { flex: 1; min-width: 60px; padding: 14px 8px; color: var(--nav-text); background: none; border: none; font-weight: 600; cursor: pointer; text-align: center; font-size: 0.85em; transition: all 0.2s; border-bottom: 3px solid transparent; }
+    .nav-bar { display: flex; background: var(--nav-bg); border-radius: 12px; margin-bottom: 10px; overflow-x: auto; box-shadow: var(--shadow); border: 1px solid var(--border-color); flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    .nav-btn { flex: 0 0 auto; min-width: 70px; padding: 14px 8px; color: var(--nav-text); background: none; border: none; font-weight: 600; cursor: pointer; text-align: center; font-size: 0.85em; transition: all 0.2s; border-bottom: 3px solid transparent; white-space: nowrap; }
     .nav-btn:hover { color: var(--nav-active); background: rgba(255,255,255,0.05); }
     .nav-btn.active { color: var(--nav-active); border-bottom-color: var(--accent-primary); background: rgba(0,168,255,0.1); }
     .card { background: var(--card-bg); padding: 16px; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border-color); }
     h2, h3 { margin-top: 0; color: var(--accent-primary); font-size: 1.15em; font-weight: 700; }
     input[type="file"], input[type="text"], input[type="number"], select, textarea { width: 100%; padding: 12px; margin: 6px 0; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1em; background: var(--input-bg); color: var(--text-primary); transition: all 0.2s; }
     input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-primary); background: var(--bg-secondary); box-shadow: 0 0 0 3px rgba(0,168,255,0.1); }
-    .btn { background-color: var(--btn-primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95em; font-weight: 600; text-decoration: none; transition: all 0.2s; }
+    .btn { background-color: var(--btn-primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95em; font-weight: 600; text-decoration: none; transition: all 0.2s; }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     .btn:active { transform: translateY(0); }
     .btn-export { background-color: var(--btn-success); }
@@ -89,6 +91,7 @@
     .btn-photo { background-color: var(--btn-photo); }
     .btn-mapview { background-color: var(--btn-map); }
     .btn-cache { background-color: #0891b2; }
+    .btn-integrate { background-color: var(--btn-success); color: white; font-weight: 700; }
     .kml-box-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .kml-upload-card { background: var(--bg-tertiary); border: 2px dashed var(--border-color); padding: 16px; border-radius: 10px; transition: all 0.2s; }
     .kml-upload-card:hover { border-color: var(--accent-primary); }
@@ -104,7 +107,7 @@
     .needle-north { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 55px solid #ef4444; margin-left: -5px; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); }
     .needle-south { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 55px solid #cbd5e1; margin-left: -5px; }
     .status-badge { font-size: 0.8em; padding: 6px 12px; border-radius: 20px; background: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--border-color); margin-top: 6px; display: inline-block; width: 100%; word-break: break-word; font-weight: 600; }
-    #mapaField, #mapaCompletoField { height: 450px; width: 100%; border-radius: 10px; border: 2px solid var(--border-color); z-index: 1; }
+    #mapaField, #mapaCompletoField, #mapPreview { height: 450px; width: 100%; border-radius: 10px; border: 2px solid var(--border-color); z-index: 1; background: var(--bg-primary); }
     #mapaCompletoField { height: 600px; }
     .user-location-marker { width: 24px; height: 24px; background-color: var(--accent-primary); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 12px rgba(0,0,0,0.6); position: relative; }
     .user-location-marker::after { content: ''; position: absolute; top: -6px; left: -6px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--accent-primary); animation: pulseGps 1.6s infinite; opacity: 0; }
@@ -157,9 +160,53 @@
     .resumen-counter { background: var(--accent-primary); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.95em; }
     .cache-info { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; margin: 10px 0; font-size: 0.9em; }
     .cache-info strong { color: var(--accent-primary); }
+
+    .sigpac-mod-field { margin-bottom: 20px; }
+    .sigpac-mod-label { display: block; font-size: 0.88rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; color: var(--accent-primary); }
+    .sigpac-mod-code-row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .sigpac-mod-actions-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+    .sigpac-mod-btn-secondary { background: var(--bg-tertiary); color: var(--accent-primary); border: 1px solid var(--border-color); }
+    .sigpac-mod-btn-secondary:hover { background: var(--bg-secondary); }
+    .sigpac-mod-import-box { display: block; border: 2px dashed var(--border-color); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: background 0.15s; }
+    .sigpac-mod-import-box:hover { background: var(--bg-tertiary); }
+    .sigpac-mod-import-box input[type="file"] { display: none; }
+    .sigpac-mod-helper { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
+    .sigpac-mod-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .sigpac-mod-chip { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-primary); padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; display: inline-flex; align-items: center; gap: 8px; }
+    .sigpac-mod-chip button { background: transparent; border: none; color: var(--text-secondary); font-size: 1.1rem; padding: 0; cursor: pointer; line-height: 1; font-weight: normal; }
+    .sigpac-mod-chip button:hover { color: var(--btn-danger); }
+    .sigpac-mod-status { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; }
+    .sigpac-mod-status.hidden { display: none; }
+    .sigpac-mod-status.error { background: rgba(239,68,68,0.1); border: 1px solid var(--btn-danger); color: var(--btn-danger); }
+    .sigpac-mod-status.success { background: rgba(16,185,129,0.1); border: 1px solid var(--btn-success); color: var(--btn-success); }
+    .sigpac-mod-status.info { background: var(--bg-tertiary); border: 1px solid var(--border-color); color: var(--text-secondary); }
+    .sigpac-mod-progress-wrap { display: none; margin-top: 20px; }
+    .sigpac-mod-progress-meta { display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 6px; }
+    .sigpac-mod-progress-bar { background: var(--bg-primary); border-radius: 6px; height: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+    .sigpac-mod-progress-fill { background: var(--accent-primary); width: 0; height: 100%; transition: width 0.2s ease; }
+    .sigpac-mod-progress-code { font-size: 0.8rem; color: var(--text-secondary); font-family: monospace; margin-top: 4px; }
+    .sigpac-mod-error-panel { margin-top: 18px; border: 1px solid var(--btn-danger); border-radius: 14px; background: rgba(239,68,68,0.05); padding: 16px 18px; }
+    .sigpac-mod-error-panel.hidden { display: none; }
+    .sigpac-mod-error-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+    .sigpac-mod-error-panel-title { font-weight: 800; font-size: .97rem; color: var(--btn-danger); }
+    .sigpac-mod-error-copy-btn { border: 1px solid var(--btn-danger); background: rgba(239,68,68,0.1); color: var(--text-primary); border-radius: 8px; padding: 5px 12px; font-size: .88rem; font-weight: 700; cursor: pointer; }
+    .sigpac-mod-error-copy-btn:hover { background: rgba(239,68,68,0.2); }
+    .sigpac-mod-error-dismiss-btn { border: 0; background: transparent; color: var(--text-secondary); font-size: 1.1rem; cursor: pointer; padding: 2px 6px; }
+    .sigpac-mod-error-panel-desc { margin: 0 0 12px; font-size: .92rem; color: var(--text-secondary); line-height: 1.5; }
+    .sigpac-mod-error-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 5px; max-height: 220px; overflow-y: auto; }
+    .sigpac-mod-error-list li { display: flex; align-items: center; }
+    .sigpac-mod-error-list code { font-family: monospace; font-size: .93rem; color: var(--btn-danger); background: rgba(239,68,68,0.1); border-radius: 6px; padding: 4px 10px; }
+    .sigpac-mod-map-card.hidden { display: none; }
+    .sigpac-mod-map-head { margin-bottom: 12px; }
+    .sigpac-mod-map-head h3 { color: var(--text-primary); font-size: 1.15rem; }
+    .sigpac-mod-map-head p { font-size: 0.88rem; color: var(--text-secondary); }
+    .leaflet-popup-content-wrapper { background: var(--card-bg) !important; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); }
+    .leaflet-popup-tip { background: var(--card-bg) !important; }
+    .map-label { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+
     @media(max-width: 850px) {
-      .grid-2, .kml-box-dual, .field-gis-container { grid-template-columns: 1fr; }
-      .nav-btn { font-size: 0.75em; padding: 12px 4px; }
+      .grid-2, .kml-box-dual, .field-gis-container, .sigpac-mod-code-row { grid-template-columns: 1fr; flex-direction: column; }
+      .nav-btn { font-size: 0.75em; padding: 12px 8px; }
       .btn { padding: 14px 20px; font-size: 1em; }
       .header-title { font-size: 1em; }
       .config-row { flex-direction: column; align-items: flex-start; }
@@ -172,7 +219,7 @@
 <body data-theme="tactical">
 
   <div class="header-bar">
-    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v17</div>
+    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v25</div>
     <div class="header-actions">
       <button class="btn-header primary" onclick="vibrate(); activarSensoresGpsYBrujula()">&#x1F4E1; GPS</button>
       <button class="btn-header" onclick="vibrate(); toggleConfig()">&#x2699;&#xFE0F; Config</button>
@@ -181,94 +228,36 @@
 
   <div id="panelConfig" class="panel-config hidden">
     <h3>&#x2699;&#xFE0F; Configuración Avanzada</h3>
-    
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F3A8; Tema Visual</h4>
     <div class="theme-selector">
-      <div class="theme-option" onclick="vibrate(); cambiarTema('classic')">
-        <div class="theme-preview preview-classic"></div>
-        <div class="theme-name">Clásico</div>
-      </div>
-      <div class="theme-option active" onclick="vibrate(); cambiarTema('tactical')">
-        <div class="theme-preview preview-tactical"></div>
-        <div class="theme-name">Tactical Pro</div>
-      </div>
-      <div class="theme-option" onclick="vibrate(); cambiarTema('highcontrast')">
-        <div class="theme-preview preview-highcontrast"></div>
-        <div class="theme-name">Alto Contraste</div>
-      </div>
+      <div class="theme-option" onclick="vibrate(); cambiarTema('classic')"><div class="theme-preview preview-classic"></div><div class="theme-name">Clásico</div></div>
+      <div class="theme-option active" onclick="vibrate(); cambiarTema('tactical')"><div class="theme-preview preview-tactical"></div><div class="theme-name">Tactical Pro</div></div>
+      <div class="theme-option" onclick="vibrate(); cambiarTema('highcontrast')"><div class="theme-preview preview-highcontrast"></div><div class="theme-name">Alto Contraste</div></div>
     </div>
-
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4F3; Respuesta Háptica</h4>
     <div class="config-row">
       <label>Intensidad vibración:</label>
       <select id="cfgVibracion" onchange="vibrate(); guardarConfigVibracion()">
-        <option value="0">Desactivada</option>
-        <option value="30">Corta (30ms)</option>
-        <option value="50" selected>Media (50ms)</option>
-        <option value="100">Larga (100ms)</option>
-        <option value="pattern">Patrón (doble pulso)</option>
+        <option value="0">Desactivada</option><option value="30">Corta (30ms)</option><option value="50" selected>Media (50ms)</option><option value="100">Larga (100ms)</option><option value="pattern">Patrón</option>
       </select>
     </div>
     <button class="btn btn-gps" onclick="vibrate(); mostrarNotificacion('📳 Vibración de prueba')" style="margin-top:8px;">📳 Probar vibración</button>
-
-    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4F7; App de Cámara</h4>
-    <div class="config-row">
-      <label>Selecciona app:</label>
-      <select id="cfgAppCamara" onchange="vibrate(); actualizarPaqueteCamara()">
-        <option value="net.sourceforge.opencamera">OpenCamera</option>
-        <option value="custom">Otra app</option>
-      </select>
-    </div>
-    <div class="config-row">
-      <label>Paquete:</label>
-      <input type="text" id="cfgPaqueteCamara" value="net.sourceforge.opencamera" onchange="vibrate(); guardarConfigCamara()">
-    </div>
-
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F4E1; Alertas de Proximidad</h4>
-    <div class="config-row">
-      <label>Distancia (metros):</label>
-      <input type="number" id="cfgDistAlerta" value="100" min="10" max="5000" step="10" onchange="vibrate(); guardarConfigProximidad()">
-    </div>
-    <div class="config-row">
-      <label>Sonido:</label>
-      <select id="cfgSonidoAlerta" onchange="vibrate(); guardarConfigProximidad()">
-        <option value="vibrar">Solo Vibración</option>
-        <option value="sonido" selected>Vibración + Sonido</option>
-        <option value="silencio">Silencio</option>
-      </select>
-    </div>
-    <div class="config-row">
-      <label>Intervalo (seg):</label>
-      <select id="cfgIntervalo" onchange="vibrate(); guardarConfigProximidad()">
-        <option value="2000">2s</option>
-        <option value="5000" selected>5s</option>
-        <option value="10000">10s</option>
-        <option value="30000">30s</option>
-      </select>
-    </div>
-
+    <div class="config-row"><label>Distancia (m):</label><input type="number" id="cfgDistAlerta" value="100" min="10" max="5000" step="10" onchange="vibrate(); guardarConfigProximidad()"></div>
+    <div class="config-row"><label>Sonido:</label><select id="cfgSonidoAlerta" onchange="vibrate(); guardarConfigProximidad()"><option value="vibrar">Solo Vibración</option><option value="sonido" selected>Vibración + Sonido</option><option value="silencio">Silencio</option></select></div>
+    <div class="config-row"><label>Intervalo (s):</label><select id="cfgIntervalo" onchange="vibrate(); guardarConfigProximidad()"><option value="2000">2s</option><option value="5000" selected>5s</option><option value="10000">10s</option><option value="30000">30s</option></select></div>
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F5FA;&#xFE0F; Cache de Mapas Offline</h4>
-    <div class="cache-info">
-      <strong id="cacheStats">Teselas cacheadas: 0</strong><br>
-      <small style="color:var(--text-secondary);">Precarga las teselas de las zonas con parcelas para usar sin cobertura.</small>
-    </div>
+    <div class="cache-info"><strong id="cacheStats">Teselas cacheadas: 0</strong><br><small style="color:var(--text-secondary);">Precarga las teselas de las zonas con parcelas.</small></div>
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
       <button class="btn btn-cache" onclick="vibrate(); precargarTeselasZonas()">&#x2B07;&#xFE0F; Precargar zonas</button>
       <button class="btn btn-danger" onclick="vibrate(); limpiarCacheTeselas()">&#x1F5D1;&#xFE0F; Limpiar cache</button>
     </div>
-
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F524; Tamaño de Letra</h4>
-    <select id="cfgTamLetra" onchange="vibrate(); aplicarAjustesConfig()">
-      <option value="0.85em">Compacto</option>
-      <option value="1em" selected>Normal</option>
-      <option value="1.15em">Grande</option>
-      <option value="1.3em">Extra Grande</option>
-    </select>
+    <select id="cfgTamLetra" onchange="vibrate(); aplicarAjustesConfig()"><option value="0.85em">Compacto</option><option value="1em" selected>Normal</option><option value="1.15em">Grande</option><option value="1.3em">Extra Grande</option></select>
   </div>
 
   <div id="proximityAlertBar" class="proximity-alert-bar">
-    <span style="font-size:1.5em;">&#x1F4CD;</span>
-    <span id="proximityAlertText">--</span>
+    <span style="font-size:1.5em;">&#x1F4CD;</span><span id="proximityAlertText">--</span>
   </div>
 
   <div class="nav-bar">
@@ -276,6 +265,7 @@
     <button id="navBtn-sec-resumen" class="nav-btn" onclick="vibrate(); cambiarVista('sec-resumen')">&#x1F4CB; Lista</button>
     <button id="navBtn-sec-edicion" class="nav-btn" onclick="vibrate(); cambiarVista('sec-edicion')">&#x1F4CD; GPS</button>
     <button id="navBtn-sec-mapa" class="nav-btn" onclick="vibrate(); cambiarVista('sec-mapa')">&#x1F5FA;&#xFE0F; Mapa</button>
+    <button id="navBtn-sec-sigpac" class="nav-btn" onclick="vibrate(); cambiarVista('sec-sigpac')">&#x1F5FA;&#xFE0F; SIGPAC</button>
     <button id="navBtn-sec-consultas" class="nav-btn" onclick="vibrate(); cambiarVista('sec-consultas')">&#x1F50D; Busca</button>
     <button id="navBtn-sec-exportar" class="nav-btn" onclick="vibrate(); cambiarVista('sec-exportar')">&#x1F4BE; Export</button>
   </div>
@@ -283,47 +273,17 @@
   <div id="sec-kml" class="card">
     <h2>&#x1F4C1; Cargar KML</h2>
     <div class="kml-box-dual">
-      <div class="kml-upload-card">
-        <h3>&#x1F4CD; Puntos</h3>
-        <input type="file" id="inputKmlPuntos" accept=".kml">
-        <p style="font-size:0.9em; margin-top:8px;">Cargados: <strong id="totalPuntos">0</strong></p>
-      </div>
-      <div class="kml-upload-card">
-        <h3>&#x1F5FA;&#xFE0F; Contornos</h3>
-        <input type="file" id="inputKmlContornos" accept=".kml">
-        <p style="font-size:0.9em; margin-top:8px;">Recintos: <strong id="totalContornos">0</strong></p>
-      </div>
+      <div class="kml-upload-card"><h3>&#x1F4CD; Puntos</h3><input type="file" id="inputKmlPuntos" accept=".kml"><p style="font-size:0.9em; margin-top:8px;">Cargados: <strong id="totalPuntos">0</strong></p></div>
+      <div class="kml-upload-card"><h3>&#x1F5FA;&#xFE0F; Contornos</h3><input type="file" id="inputKmlContornos" accept=".kml"><p style="font-size:0.9em; margin-top:8px;">Recintos: <strong id="totalContornos">0</strong></p></div>
     </div>
-    <div id="secCamposKml" class="kml-upload-card hidden">
-      <h3>&#x1F4CC; Campo Identificador</h3>
-      <select id="selectCampoNombre" onchange="vibrate(); aplicarCampoIdentificador()"></select>
-    </div>
-    <div style="margin-top: 16px; display: flex; justify-content: flex-end;">
-      <button class="btn btn-danger" onclick="vibrate(); mostrarConfirmacionLimpieza()">&#x1F5D1;&#xFE0F; Limpiar Todo</button>
-    </div>
+    <div id="secCamposKml" class="kml-upload-card hidden"><h3>&#x1F4CC; Campo Identificador</h3><select id="selectCampoNombre" onchange="vibrate(); aplicarCampoIdentificador()"></select></div>
+    <div style="margin-top: 16px; display: flex; justify-content: flex-end;"><button class="btn btn-danger" onclick="vibrate(); mostrarConfirmacionLimpieza()">&#x1F5D1;&#xFE0F; Limpiar Todo</button></div>
   </div>
 
   <div id="sec-resumen" class="card hidden">
-    <div class="resumen-header">
-      <h2 style="margin:0;">&#x1F4CB; Lista de Parcelas</h2>
-      <div class="resumen-counter" id="resumenContador">0 / 0</div>
-    </div>
+    <div class="resumen-header"><h2 style="margin:0;">&#x1F4CB; Lista de Parcelas</h2><div class="resumen-counter" id="resumenContador">0 / 0</div></div>
     <p style="font-size:0.85em; color:var(--text-secondary); margin-top:8px;"><em>Ordenada por distancia. Haz clic en una fila para ver en mapa.</em></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Dist.</th>
-          <th>ID</th>
-          <th>Referencia</th>
-          <th>Coordenadas</th>
-          <th>Fecha</th>
-          <th>Obs.</th>
-        </tr>
-      </thead>
-      <tbody id="tablaResumen">
-        <tr><td colspan="6" style="text-align: center;">No hay datos cargados</td></tr>
-      </tbody>
-    </table>
+    <table><thead><tr><th>Dist.</th><th>ID</th><th>Referencia</th><th>Coordenadas</th><th>Fecha</th><th>Obs.</th></tr></thead><tbody id="tablaResumen"><tr><td colspan="6" style="text-align: center;">No hay datos cargados</td></tr></tbody></table>
   </div>
 
   <div id="sec-edicion" class="card relative hidden">
@@ -345,25 +305,13 @@
         <textarea id="inputObservaciones" rows="4" oninput="guardarObservaciones()"></textarea>
       </div>
       <div>
-        <div class="relative">
-          <h3>&#x1F50E; Buscador</h3>
-          <input type="text" id="inputBuscador" oninput="filtrarGlobal()">
-          <div id="searchResults" class="search-results"></div>
-        </div>
+        <div class="relative"><h3>&#x1F50E; Buscador</h3><input type="text" id="inputBuscador" oninput="filtrarGlobal()"><div id="searchResults" class="search-results"></div></div>
         <details class="collapsible-module">
           <summary>&#x1F4CB; Consultas Rápidas</summary>
           <div style="padding:10px;">
-            <div class="consult-box">
-              <select id="selectUsoSigpac" onchange="vibrate(); agregarAObservaciones(this, 'USO')"></select>
-            </div>
-            <div class="consult-box">
-              <label><strong>Producto (PAC):</strong></label>
-              <select id="selectProducto" onchange="vibrate(); agregarAObservaciones(this, 'PROD')"></select>
-            </div>
-            <div class="consult-box">
-              <label><strong>Tipo Incidencia:</strong></label>
-              <select id="selectIncidenciaConsulta" onchange="vibrate(); agregarAObservaciones(this, 'INC')"></select>
-            </div>
+            <div class="consult-box"><select id="selectUsoSigpac" onchange="vibrate(); agregarAObservaciones(this, 'USO')"></select></div>
+            <div class="consult-box"><label><strong>Producto (PAC):</strong></label><select id="selectProducto" onchange="vibrate(); agregarAObservaciones(this, 'PROD')"></select></div>
+            <div class="consult-box"><label><strong>Tipo Incidencia:</strong></label><select id="selectIncidenciaConsulta" onchange="vibrate(); agregarAObservaciones(this, 'INC')"></select></div>
           </div>
         </details>
       </div>
@@ -374,14 +322,8 @@
         <div id="gpsStatusBadge" class="status-badge">GPS: Esperando señal...</div>
         <div id="compassStatusBadge" class="status-badge">Brújula: Inactiva</div>
         <div class="compass-dial">
-          <div class="compass-cardinal card-n">N</div>
-          <div class="compass-cardinal card-s">S</div>
-          <div class="compass-cardinal card-e">E</div>
-          <div class="compass-cardinal card-o">O</div>
-          <div id="compassNeedle" class="compass-needle">
-            <div class="needle-north"></div>
-            <div class="needle-south"></div>
-          </div>
+          <div class="compass-cardinal card-n">N</div><div class="compass-cardinal card-s">S</div><div class="compass-cardinal card-e">E</div><div class="compass-cardinal card-o">O</div>
+          <div id="compassNeedle" class="compass-needle"><div class="needle-north"></div><div class="needle-south"></div></div>
           <div id="bearingNeedle" style="position: absolute; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 50px solid #22c55e; top: 30px; left: 73px; transform-origin: 7px 50px; filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8)); z-index: 10;"></div>
         </div>
         <div style="font-size:1.15em; font-weight:800;" id="txtRumbo">--°</div>
@@ -393,8 +335,7 @@
       <div>
         <div id="mapaField"></div>
         <div id="kmlInfoBox" style="margin-top:10px; padding:10px; background:var(--bg-tertiary); border-radius:6px; font-size: 0.85em;">
-          <strong>Datos KML de la parcela:</strong>
-          <div id="kmlDataContent" style="margin-top:5px; color: var(--text-secondary);">Selecciona una parcela...</div>
+          <strong>Datos KML de la parcela:</strong><div id="kmlDataContent" style="margin-top:5px; color: var(--text-secondary);">Selecciona una parcela...</div>
         </div>
       </div>
     </div>
@@ -410,13 +351,91 @@
     </div>
   </div>
 
-  <div id="sec-exportar" class="card hidden">
-    <h2>&#x1F4BE; Exportar Información</h2>
-    <p style="font-size:0.88em;">Descarga la información catalogada y notas registradas en campo.</p>
-    <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
-      <button class="btn btn-export" onclick="vibrate(); exportarCSV()">&#x1F4CA; Exportar CSV</button>
-      <button class="btn btn-export-json" onclick="vibrate(); exportarJSON()">&#x1F4BE; Backup JSON</button>
+  <div id="sec-sigpac" class="card hidden">
+    <h2>&#x1F5FA;&#xFE0F; Buscador SIGPAC a KML</h2>
+    <p style="font-size:0.88em; color:var(--text-secondary); margin-bottom: 16px;">Convierte parcelas SIGPAC en KML o intégralas directamente en la app principal.</p>
+    
+    <div class="sigpac-mod-field">
+      <label class="sigpac-mod-label" for="queryName">Nombre de la consulta</label>
+      <input id="queryName" type="text" placeholder="Ej: Finca Los Olivos" />
     </div>
+
+    <div class="sigpac-mod-field">
+      <label class="sigpac-mod-label" for="codeInput">Códigos SIGPAC</label>
+      <div class="sigpac-mod-code-row">
+        <input id="codeInput" type="text" placeholder="Ej: 2-67-0-0-39-36-1" />
+        <button id="addCodeBtn" class="btn btn-gps" type="button" style="flex:0 0 auto;">+ Añadir</button>
+      </div>
+
+      <label class="sigpac-mod-import-box" for="fileInput">
+        <input id="fileInput" type="file" accept=".csv,.xls,.xlsx" />
+        <span style="color: var(--text-secondary); display: inline-flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width: 20px; height: 20px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M12 18v-6"></path><path d="m9 15 3-3 3 3"></path></svg>
+          Importar desde Excel o CSV
+        </span>
+      </label>
+      <div class="sigpac-mod-helper">Columnas separadas o código completo en una única celda.</div>
+
+      <div id="detectedChips" class="sigpac-mod-chips"></div>
+      
+      <div id="sigpacResultsPanel" class="hidden" style="margin-top: 16px;">
+        <h3 style="font-size: 1rem; color: var(--accent-primary); margin-bottom: 8px;">✅ Resultados encontrados (<span id="sigpacResultsCount">0</span>)</h3>
+        <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+            <thead style="position: sticky; top: 0; background: var(--bg-tertiary);">
+              <tr>
+                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color);">Referencia</th>
+                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color);">Municipio</th>
+                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color);">Pol/Par/Rec</th>
+                <th style="padding: 8px; text-align: left; border-bottom: 1px solid var(--border-color);">Superficie</th>
+              </tr>
+            </thead>
+            <tbody id="sigpacResultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="batchStatus" class="sigpac-mod-status hidden"></div>
+      
+      <div id="errorPanel" class="sigpac-mod-error-panel hidden">
+        <div class="sigpac-mod-error-panel-head">
+          <span class="sigpac-mod-error-panel-title">⚠️ Referencias sin resultado</span>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="errorCopyBtn" type="button" class="sigpac-mod-error-copy-btn">📋 Copiar lista</button>
+            <button id="errorDismissBtn" type="button" class="sigpac-mod-error-dismiss-btn" aria-label="Cerrar">✕</button>
+          </div>
+        </div>
+        <p class="sigpac-mod-error-panel-desc">Las siguientes referencias no devolvieron datos. Verifica si existen o si el servicio presenta latencias.</p>
+        <ul id="errorList" class="sigpac-mod-error-list"></ul>
+      </div>
+
+      <div id="batchProgress" class="sigpac-mod-progress-wrap">
+        <div class="sigpac-mod-progress-meta">
+          <strong id="progressTitle">Procesando parcelas…</strong>
+          <span id="progressCounter">0 / 0</span>
+        </div>
+        <div class="sigpac-mod-progress-bar"><div id="progressFill" class="sigpac-mod-progress-fill"></div></div>
+        <div id="progressCode" class="sigpac-mod-progress-code"></div>
+      </div>
+    </div>
+
+    <div class="sigpac-mod-actions-row">
+      <button id="clearBtn" class="btn sigpac-mod-btn-secondary" type="button">Nueva búsqueda</button>
+      <button id="previewBtn" class="btn sigpac-mod-btn-secondary" type="button">🗺️ Ver mapa</button>
+      <button id="downloadBtn" class="btn btn-export" type="button">⬇️ Descargar KML</button>
+      <button id="integrateBtn" class="btn btn-integrate" type="button">🔄 INTEGRAR</button>
+      <label class="btn sigpac-mod-btn-secondary" for="kmlInput" style="cursor: pointer;">📂 Cargar KML
+        <input id="kmlInput" type="file" accept=".kml,application/vnd.google-earth.kml+xml" hidden />
+      </label>
+    </div>
+
+    <section class="sigpac-mod-map-card hidden" id="mapCard" style="margin-top: 24px;">
+      <div class="sigpac-mod-map-head">
+        <h3>Mapa de recintos</h3>
+        <p>Polígonos y centroides renderizados sobre ortofoto oficial del PNOA.</p>
+      </div>
+      <div id="mapPreview"></div>
+    </section>
   </div>
 
   <div id="sec-consultas" class="card hidden">
@@ -426,25 +445,23 @@
       <label for="inputRegexConsultas"><strong>&#x1F50D; Acotar catálogo por REGEX o Texto:</strong></label>
       <div style="display: flex; gap: 10px; align-items: center; margin-top: 6px; flex-wrap: wrap;">
         <input type="text" id="inputRegexConsultas" placeholder="Ej: ^(1|2)\d, Cítri.*, TA|CS, ^10$" oninput="filtrarConsultasRegex()" style="flex: 1; min-width: 250px;">
-        <label style="font-size: 0.85em; font-weight: 600; cursor: pointer; white-space: nowrap;">
-          <input type="checkbox" id="chkCaseSensitive" onchange="filtrarConsultasRegex()"> Mayúsculas
-        </label>
+        <label style="font-size: 0.85em; font-weight: 600; cursor: pointer; white-space: nowrap;"><input type="checkbox" id="chkCaseSensitive" onchange="filtrarConsultasRegex()"> Mayúsculas</label>
       </div>
       <div id="regexStatus" style="font-size: 0.8em; margin-top: 4px; color: var(--text-secondary);"></div>
     </div>
     <div class="grid-2">
-      <div class="consult-box">
-        <h3>&#x1F331; Usos SIGPAC (<span id="countUsos">0</span>)</h3>
-        <div id="listUsosRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div>
-      </div>
-      <div class="consult-box">
-        <h3>&#x1F69C; Productos PAC (<span id="countProductos">0</span>)</h3>
-        <div id="listProductosRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div>
-      </div>
-      <div class="consult-box" style="grid-column: 1 / -1;">
-        <h3>&#x26A0;&#xFE0F; Incidencias SIGPAC (<span id="countIncidencias">0</span>)</h3>
-        <div id="listIncidenciasRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div>
-      </div>
+      <div class="consult-box"><h3>&#x1F331; Usos SIGPAC (<span id="countUsos">0</span>)</h3><div id="listUsosRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div></div>
+      <div class="consult-box"><h3>&#x1F69C; Productos PAC (<span id="countProductos">0</span>)</h3><div id="listProductosRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div></div>
+      <div class="consult-box" style="grid-column: 1 / -1;"><h3>&#x26A0;&#xFE0F; Incidencias SIGPAC (<span id="countIncidencias">0</span>)</h3><div id="listIncidenciasRegex" style="max-height: 250px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 6px; padding: 6px; background: var(--bg-tertiary);"></div></div>
+    </div>
+  </div>
+
+  <div id="sec-exportar" class="card hidden">
+    <h2>&#x1F4BE; Exportar Información</h2>
+    <p style="font-size:0.88em;">Descarga la información catalogada y notas registradas en campo.</p>
+    <div style="display: flex; gap: 12px; margin-top: 15px; flex-wrap: wrap;">
+      <button class="btn btn-export" onclick="vibrate(); exportarCSV()">&#x1F4CA; Exportar CSV</button>
+      <button class="btn btn-export-json" onclick="vibrate(); exportarJSON()">&#x1F4BE; Backup JSON</button>
     </div>
   </div>
 
@@ -462,6 +479,9 @@
   <div id="toastContainer"></div>
 
   <script>
+    /* =========================================================================
+       VARIABLES GLOBALES
+       ========================================================================= */
     let parcelas = [];
     let contornosGeom = [];
     let parcelaActualIndex = -1;
@@ -484,11 +504,699 @@
     let intervaloEscaneo = 5000;
     let parcelasAlertadas = new Set();
     let audioCtx = null;
-    let paqueteCamara = 'net.sourceforge.opencamera';
     let modoGPSenUsuario = false;
-    let patronVibracion = 50; // NUEVO: configuración háptica
+    let patronVibracion = 50;
     const CACHE_NAME = 'sigpac-tiles-v1';
 
+    /* =========================================================================
+       FUNCIÓN GLOBAL: Formatear referencia SIGPAC
+       ========================================================================= */
+function padReferenceGlobal(parts) {
+  if (!Array.isArray(parts) || parts.length !== 7) {
+    console.error('padReferenceGlobal: parts inválido', parts);
+    return 'Referencia inválida';
+  }
+  const widths = [2, 3, 1, 1, 3, 5, 1];
+  return parts.map((part, idx) => {
+    const num = parseInt(part, 10);
+    if (isNaN(num)) {
+      console.error('padReferenceGlobal: parte no es número', part);
+      return '0';
+    }
+    return String(num).padStart(widths[idx], '0');
+  }).join('-');
+}
+
+    /* =========================================================================
+       FUNCIÓN GLOBAL: Integrar colección SIGPAC en la app principal
+       ========================================================================= */
+    window.integrarColeccionSIGPAC = function(okItems) {
+      if (!okItems || okItems.length === 0) {
+        mostrarNotificacion("⚠️ No hay datos válidos para integrar");
+        return;
+      }
+
+      let nuevosPuntos = 0;
+      let nuevosContornos = 0;
+      const startIndex = parcelas.length;
+
+      okItems.forEach((item, idx) => {
+        let geojson = item.geojson;
+        let feature = geojson;
+        if (geojson.type === 'FeatureCollection') {
+          feature = geojson.features[0];
+        }
+
+        if (!feature || !feature.geometry) return;
+
+const props = feature.properties || {};
+
+// Reconstruir la referencia EXACTA como la introdujo el usuario (sin padding)
+let nombre;
+if (item.parts && Array.isArray(item.parts)) {
+  nombre = item.parts.join('-');
+} else if (item.id) {
+  nombre = item.id;
+} else {
+  nombre = `Parcela SIGPAC ${startIndex + idx + 1}`;
+}
+        
+        
+        let lat = 0, lng = 0;
+        const geom = feature.geometry;
+
+        if (geom.type === 'Point') {
+          lng = geom.coordinates[0];
+          lat = geom.coordinates[1];
+        } else if (geom.type === 'Polygon') {
+          const ring = geom.coordinates[0];
+          lng = ring[0][0];
+          lat = ring[0][1];
+          contornosGeom.push(ring.map(c => [c[1], c[0]]));
+          nuevosContornos++;
+        } else if (geom.type === 'MultiPolygon') {
+          const ring = geom.coordinates[0][0];
+          lng = ring[0][0];
+          lat = ring[0][1];
+          contornosGeom.push(ring.map(c => [c[1], c[0]]));
+          nuevosContornos++;
+        }
+
+        const rawProps = {};
+        for (const key in props) {
+          rawProps[key] = props[key];
+          kmlFieldsList.add(key);
+        }
+
+        parcelas.push({
+          id: startIndex + idx + 1,
+          nombre: nombre,
+          lat: lat,
+          lng: lng,
+          observaciones: '',
+          completada: false,
+          fechaCompletada: null,
+          rawProps: rawProps,
+          _distancia: null,
+          _rumbo: null
+        });
+        nuevosPuntos++;
+      });
+
+ guardarEnLocalStorage();
+// NO llamar a poblarSelectCampoIdentificador() aquí, porque sobrescribiría los nombres
+renderTablaResumen();
+
+mostrarNotificacion(`✅ Integrados: ${nuevosPuntos} parcelas, ${nuevosContornos} contornos`);
+cambiarVista('sec-resumen');
+    };
+
+    /* =========================================================================
+       UTILIDADES
+       ========================================================================= */
+    function vibrate() {
+      if (!("vibrate" in navigator)) return;
+      if (patronVibracion === 0) return;
+      if (patronVibracion === 'pattern') navigator.vibrate([50, 30, 50]);
+      else navigator.vibrate(parseInt(patronVibracion));
+    }
+    function guardarConfigVibracion() {
+      const val = document.getElementById('cfgVibracion').value;
+      patronVibracion = val === 'pattern' ? 'pattern' : parseInt(val);
+      localStorage.setItem('sigpac_vibracion', val);
+      mostrarNotificacion(`📳 Vibración: ${val === 'pattern' ? 'Patrón' : val + 'ms'}`);
+    }
+    function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const p1 = lat1 * Math.PI/180, p2 = lat2 * Math.PI/180;
+      const dp = (lat2-lat1) * Math.PI/180, dl = (lon2-lon1) * Math.PI/180;
+      const a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    function calcularRumboEntrePuntos(lat1, lon1, lat2, lon2) {
+      const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
+      const dl = (lon2 - lon1) * Math.PI / 180;
+      const y = Math.sin(dl) * Math.cos(p2);
+      const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
+      return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+    }
+    function rumboACardinal(g) { return ['N','NE','E','SE','S','SO','O','NO'][Math.round(g/45)%8]; }
+    function formatearDistancia(m) { return m > 1000 ? (m/1000).toFixed(2) + ' km' : Math.round(m) + ' m'; }
+    function formatearFecha(d) {
+      if (!d) return '-';
+      const date = new Date(d);
+      return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+    }
+
+    /* =========================================================================
+       CACHE DE TESELAS
+       ========================================================================= */
+    async function precargarTeselasZonas() {
+      if (parcelas.length === 0) { mostrarNotificacion("⚠️ No hay parcelas cargadas"); return; }
+      if (!('caches' in window)) { mostrarNotificacion("⚠️ Tu navegador no soporta caché offline"); return; }
+      mostrarNotificacion(`⬇️ Iniciando precarga de teselas para ${parcelas.length} parcelas...`);
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+        parcelas.forEach(p => {
+          if (p.lat < minLat) minLat = p.lat; if (p.lat > maxLat) maxLat = p.lat;
+          if (p.lng < minLng) minLng = p.lng; if (p.lng > maxLng) maxLng = p.lng;
+        });
+        const marginLat = (maxLat - minLat) * 0.15 || 0.01;
+        const marginLng = (maxLng - minLng) * 0.15 || 0.01;
+        minLat -= marginLat; maxLat += marginLat; minLng -= marginLng; maxLng += marginLng;
+        const zooms = [14, 15, 16, 17];
+        let totalTeselas = 0, teselasCacheadas = 0;
+        for (let z of zooms) {
+          const xMin = Math.floor((minLng + 180) / 360 * Math.pow(2, z)), xMax = Math.floor((maxLng + 180) / 360 * Math.pow(2, z));
+          const yMin = Math.floor((1 - Math.log(Math.tan(maxLat * Math.PI / 180) + 1 / Math.cos(maxLat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z));
+          const yMax = Math.floor((1 - Math.log(Math.tan(minLat * Math.PI / 180) + 1 / Math.cos(minLat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, z));
+          for (let x = xMin; x <= xMax; x++) {
+            for (let y = yMin; y <= yMax; y++) {
+              const url = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
+              totalTeselas++;
+              try {
+                const existing = await cache.match(url);
+                if (!existing) {
+                  const response = await fetch(url, { mode: 'cors' });
+                  if (response.ok) { await cache.put(url, response); teselasCacheadas++; }
+                } else { teselasCacheadas++; }
+              } catch (e) {}
+            }
+          }
+        }
+        localStorage.setItem('sigpac_teselas_cacheadas', teselasCacheadas);
+        actualizarStatsCache();
+        mostrarNotificacion(`✅ Completado: ${teselasCacheadas} teselas cacheadas (zoom 14-17)`);
+      } catch (e) { mostrarNotificacion("⚠️ Error al precargar: " + e.message); }
+    }
+    async function limpiarCacheTeselas() {
+      if ('caches' in window) {
+        await caches.delete(CACHE_NAME);
+        localStorage.removeItem('sigpac_teselas_cacheadas');
+        actualizarStatsCache();
+        mostrarNotificacion("🗑️ Cache de teselas limpiado");
+      }
+    }
+    async function actualizarStatsCache() {
+      const el = document.getElementById('cacheStats');
+      if (!el) return;
+      if ('caches' in window) {
+        try {
+          const cache = await caches.open(CACHE_NAME);
+          const count = (await cache.keys()).length;
+          localStorage.setItem('sigpac_teselas_cacheadas', count);
+          el.textContent = `Teselas cacheadas: ${count}`;
+        } catch (e) { el.textContent = `Teselas cacheadas: 0`; }
+      } else { el.textContent = `Teselas cacheadas: No soportado`; }
+    }
+
+    /* =========================================================================
+       BOTÓN FOTO
+       ========================================================================= */
+    function abrirAppFoto() {
+      if (parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) { mostrarNotificacion("⚠️ Selecciona primero una parcela"); return; }
+      const nombre = parcelas[parcelaActualIndex].nombre;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(nombre).then(() => mostrarNotificacion("📋 Referencia copiada: " + nombre)).catch(() => fallbackCopiar(nombre));
+      } else fallbackCopiar(nombre);
+      setTimeout(() => {
+        const intentUrl = `intent:#Intent;action=android.media.action.IMAGE_CAPTURE;end`;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none'; iframe.src = intentUrl; document.body.appendChild(iframe);
+        setTimeout(() => {
+          if (!document.hidden) mostrarNotificacion("⚠️ No se detectaron apps de cámara");
+          if (iframe.parentNode) document.body.removeChild(iframe);
+        }, 2000);
+      }, 500);
+    }
+    function fallbackCopiar(texto) {
+      const ta = document.createElement('textarea'); ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); mostrarNotificacion("📋 Copiado: " + texto); } catch(e) { mostrarNotificacion("⚠️ No se pudo copiar"); }
+      document.body.removeChild(ta);
+    }
+
+    /* =========================================================================
+       TOGGLE GPS
+       ========================================================================= */
+    function toggleGPSOMiUbicacion() {
+      if (!userCoords) { activarSensoresGpsYBrujula(); mostrarNotificacion("Buscando señal GPS..."); return; }
+      if (!leafletMap) return;
+      if (!modoGPSenUsuario) {
+        leafletMap.setView([userCoords.lat, userCoords.lng], 18);
+        if (userMarker) userMarker.openPopup();
+        modoGPSenUsuario = true;
+        document.getElementById('btnMiUbicacion').innerHTML = '&#x1F3AF; Parcela';
+        mostrarNotificacion("Centrado en tu ubicación.");
+      } else {
+        if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
+          leafletMap.setView([parcelas[parcelaActualIndex].lat, parcelas[parcelaActualIndex].lng], 17);
+          if (parcelMarker) parcelMarker.openPopup();
+        }
+        modoGPSenUsuario = false;
+        document.getElementById('btnMiUbicacion').innerHTML = '&#x1F4CD; GPS';
+        mostrarNotificacion("Centrado en la parcela.");
+      }
+    }
+
+    /* =========================================================================
+       MAPA COMPLETO
+       ========================================================================= */
+    function initMapaCompleto() {
+      if (mapaCompleto) return;
+      mapaCompleto = L.map('mapaCompletoField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
+      const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+      esriSat.addTo(mapaCompleto);
+      L.control.layers({ 'Satélite (Esri)': esriSat, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(mapaCompleto);
+    }
+    function dibujarMapaCompleto() {
+      if (!mapaCompleto) initMapaCompleto();
+      markersCompletos.forEach(m => mapaCompleto.removeLayer(m));
+      polygonsCompletos.forEach(p => mapaCompleto.removeLayer(p));
+      markersCompletos = []; polygonsCompletos = [];
+      const bounds = L.latLngBounds();
+      let tieneDatos = false;
+      const iconoPendiente = L.divIcon({ className: 'custom-pin', html: `<div style="width:22px; height:22px; background:#ef4444; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.6);"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
+      const iconoCompletada = L.divIcon({ className: 'custom-pin', html: `<div style="width:22px; height:22px; background:#10b981; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.6);"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
+      parcelas.forEach((p, idx) => {
+        const icono = p.completada ? iconoCompletada : iconoPendiente;
+        const marker = L.marker([p.lat, p.lng], { icon: icono }).addTo(mapaCompleto);
+        marker.bindPopup(`<b style="color:#0284c7;">📍 ${p.nombre}</b><br><small>ID: ${p.id}</small>${p.completada ? '<br><span style="color:#10b981; font-weight:bold;">✔ ' + formatearFecha(p.fechaCompletada) + '</span>' : ''}<br><button onclick="cargarParcelaEnEdicion(${idx}); cambiarVista('sec-edicion');" style="margin-top:6px; padding:6px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Ver detalle</button>`);
+        markersCompletos.push(marker);
+        bounds.extend([p.lat, p.lng]);
+        tieneDatos = true;
+      });
+      contornosGeom.forEach((coords, idx) => {
+        if (coords && coords.length > 0) {
+          const poly = L.polygon(coords, { color: '#38bdf8', weight: 2, fillOpacity: 0.2, fillColor: '#38bdf8' }).addTo(mapaCompleto);
+          poly.bindPopup(`<b>Contorno #${idx+1}</b><br><button onclick="cargarParcelaEnEdicion(${idx}); cambiarVista('sec-edicion');" style="margin-top:6px; padding:6px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Ver parcela</button>`);
+          polygonsCompletos.push(poly);
+          bounds.extend(poly.getBounds());
+          tieneDatos = true;
+        }
+      });
+      if (tieneDatos && bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
+    }
+    function ajustarMapaCompleto() {
+      if (mapaCompleto && (markersCompletos.length > 0 || polygonsCompletos.length > 0)) {
+        const bounds = L.latLngBounds();
+        markersCompletos.forEach(m => bounds.extend(m.getLatLng()));
+        polygonsCompletos.forEach(p => bounds.extend(p.getBounds()));
+        if (bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
+      }
+    }
+
+    /* =========================================================================
+       ALERTAS PROXIMIDAD
+       ========================================================================= */
+    function solicitarPermisoNotificaciones() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); }
+    function reproducirSonidoAlerta() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.frequency.value = 880; osc.type = 'sine'; gain.gain.value = 0.3;
+        osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+        osc.stop(audioCtx.currentTime + 0.5);
+      } catch(e) {}
+    }
+    function lanzarAlertaProximidad(parcela, distancia, rumbo) {
+      const card = rumboACardinal(rumbo);
+      const msg = `La parcela ${parcela.nombre} está a ${formatearDistancia(distancia)} en el rumbo ${Math.round(rumbo)}° (${card})`;
+      const bar = document.getElementById('proximityAlertBar'), txt = document.getElementById('proximityAlertText');
+      if (bar && txt) { txt.textContent = msg; bar.classList.add('visible'); }
+      if (sonidoAlerta !== 'silencio') vibrate();
+      if (sonidoAlerta === 'sonido') reproducirSonidoAlerta();
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try { new Notification('📍 Parcela Cercana', { body: msg, tag: 'prox-' + parcela.id }); } catch(e) {}
+      }
+      mostrarNotificacion('📍 ' + msg);
+    }
+    function iniciarMonitorProximidad() {
+      if (monitorProximidadInterval) clearInterval(monitorProximidadInterval);
+      monitorProximidadInterval = setInterval(() => {
+        if (!userCoords || parcelas.length === 0) return;
+        let masCercana = null, distMinima = Infinity;
+        parcelas.forEach((p, idx) => {
+          const d = calcularDistanciaMetros(userCoords.lat, userCoords.lng, p.lat, p.lng);
+          p._distancia = d; p._rumbo = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
+          if (d < distMinima) { distMinima = d; masCercana = { parcela: p, idx, dist: d, rumbo: p._rumbo }; }
+          if (d <= distAlerta && !parcelasAlertadas.has(p.id)) { parcelasAlertadas.add(p.id); lanzarAlertaProximidad(p, d, p._rumbo); }
+          if (d > distAlerta * 1.5) parcelasAlertadas.delete(p.id);
+        });
+        if (masCercana && masCercana.dist <= distAlerta * 2) {
+          const bar = document.getElementById('proximityAlertBar'), txt = document.getElementById('proximityAlertText');
+          if (bar && txt) {
+            txt.textContent = `Más cercana: ${masCercana.parcela.nombre} → ${formatearDistancia(masCercana.dist)} al ${Math.round(masCercana.rumbo)}° (${rumboACardinal(masCercana.rumbo)})`;
+            bar.classList.add('visible');
+          }
+        } else {
+          const bar = document.getElementById('proximityAlertBar');
+          if (bar) bar.classList.remove('visible');
+        }
+        renderTablaResumen();
+      }, intervaloEscaneo);
+    }
+    function guardarConfigProximidad() {
+      distAlerta = parseInt(document.getElementById('cfgDistAlerta').value) || 100;
+      sonidoAlerta = document.getElementById('cfgSonidoAlerta').value;
+      intervaloEscaneo = parseInt(document.getElementById('cfgIntervalo').value) || 5000;
+      localStorage.setItem('sigpac_dist_alerta', distAlerta);
+      localStorage.setItem('sigpac_sonido_alerta', sonidoAlerta);
+      localStorage.setItem('sigpac_intervalo', intervaloEscaneo);
+      iniciarMonitorProximidad();
+      mostrarNotificacion(`Alerta: ${distAlerta}m cada ${intervaloEscaneo/1000}s`);
+    }
+
+    /* =========================================================================
+       GPS Y BRÚJULA
+       ========================================================================= */
+    function initMap() {
+      if (leafletMap) return;
+      leafletMap = L.map('mapaField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
+      const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
+      esriSat.addTo(leafletMap);
+      L.control.layers({ 'Satélite (Esri)': esriSat, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(leafletMap);
+    }
+    function activarSensoresGpsYBrujula() {
+      solicitarPermisoNotificaciones();
+      iniciarGeolocalizacionPasoAPaso();
+      iniciarSensorOrientacionAvanzado();
+      intentarBloquearOrientacion();
+      iniciarMonitorProximidad();
+    }
+    function intentarBloquearOrientacion() { if (screen.orientation && typeof screen.orientation.lock === 'function') screen.orientation.lock('portrait-primary').catch(() => {}); }
+    function iniciarGeolocalizacionPasoAPaso() {
+      if (!("geolocation" in navigator)) { actualizarBadgeGps("GPS no soportado"); return; }
+      actualizarBadgeGps("GPS: Conectando satélites...");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { procesarPosicionGps(pos); iniciarWatchGps(); },
+        (err) => { actualizarBadgeGps("GPS: Reintentando modo Red..."); iniciarWatchGps(); },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    }
+    function iniciarWatchGps() {
+      navigator.geolocation.watchPosition(procesarPosicionGps, (err) => {
+        let msg = "GPS: Error " + err.code;
+        if (err.code === 1) msg = "GPS: Permiso denegado";
+        if (err.code === 2) msg = "GPS: Sin cobertura";
+        if (err.code === 3) msg = "GPS: Timeout";
+        actualizarBadgeGps(msg);
+      }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
+    }
+    function procesarPosicionGps(pos) {
+      userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy || 10 };
+      actualizarBadgeGps(`GPS: OK (±${Math.round(userCoords.accuracy)}m)`);
+      actualizarMapaUbicacion(userCoords.lat, userCoords.lng, userCoords.accuracy);
+      actualizarCalculosNav();
+      if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) actualizarRumboUI(pos.coords.heading, "GPS Satélite");
+    }
+    function actualizarMapaUbicacion(lat, lng, accuracy) {
+      if (!leafletMap) return;
+      const latLng = [lat, lng];
+      const userIcon = L.divIcon({ className: 'custom-user-icon', html: `<div class="user-location-marker"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
+      if (!userMarker) {
+        userMarker = L.marker(latLng, { icon: userIcon, zIndexOffset: 1000 }).addTo(leafletMap);
+        userMarker.bindPopup(`<b>Tu Ubicación</b><br>±${Math.round(accuracy)}m`);
+      } else userMarker.setLatLng(latLng);
+      if (!accuracyCircle) accuracyCircle = L.circle(latLng, { radius: accuracy, color: '#0284c7', fillColor: '#38bdf8', fillOpacity: 0.15, weight: 1.5 }).addTo(leafletMap);
+      else { accuracyCircle.setLatLng(latLng); accuracyCircle.setRadius(accuracy); }
+      if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
+        const p = parcelas[parcelaActualIndex];
+        if (!connectionLine) connectionLine = L.polyline([latLng, [p.lat, p.lng]], { color: '#ef4444', weight: 2.5, dashArray: '6, 6' }).addTo(leafletMap);
+        else connectionLine.setLatLngs([latLng, [p.lat, p.lng]]);
+      }
+    }
+    function iniciarSensorOrientacionAvanzado() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+        DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') escucharEventosOrientacion(); }).catch(console.error);
+      } else escucharEventosOrientacion();
+    }
+    function escucharEventosOrientacion() {
+      if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', procesarOrientacionEuler, true);
+      window.addEventListener('deviceorientation', procesarOrientacionEuler, true);
+    }
+    function procesarOrientacionEuler(e) {
+      sensorSampleCount++;
+      let heading = null, fuente = "Giroscopio";
+      if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) { heading = e.webkitCompassHeading; fuente = "iOS Mag"; }
+      else if (e.alpha !== null) {
+        const a = e.alpha, b = e.beta || 0, g = e.gamma || 0;
+        const x = b*Math.PI/180, y = g*Math.PI/180, z = a*Math.PI/180;
+        const cX=Math.cos(x),cY=Math.cos(y),cZ=Math.cos(z),sX=Math.sin(x),sY=Math.sin(y),sZ=Math.sin(z);
+        let ch = Math.atan2(-cZ*sY-sZ*sX*cY, -sZ*sY+cZ*sX*cY)*(180/Math.PI);
+        if (ch < 0) ch += 360;
+        const sa = (screen.orientation && screen.orientation.angle) ? screen.orientation.angle : (window.orientation || 0);
+        heading = (ch + sa) % 360;
+        fuente = e.absolute ? "Magnetómetro" : "Giroscopio";
+      }
+      if (heading !== null && !isNaN(heading)) actualizarRumboUI(heading, fuente);
+    }
+    function actualizarRumboUI(heading, fuente) {
+      currentHeading = heading;
+      const needle = document.getElementById('compassNeedle');
+      if (needle) needle.style.transform = `rotate(${-heading}deg)`;
+      if (userCoords && parcelaActualIndex >= 0) {
+        const p = parcelas[parcelaActualIndex];
+        const bearing = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
+        const bNeedle = document.getElementById('bearingNeedle');
+        if (bNeedle) bNeedle.style.transform = `rotate(${bearing - heading}deg)`;
+      }
+      const txt = document.getElementById('txtRumbo');
+      if (txt) txt.textContent = `${Math.round(heading)}° ${rumboACardinal(heading)}`;
+      actualizarBadgeBrujula(`${fuente} (${sensorSampleCount})`);
+      actualizarCalculosNav();
+    }
+    function actualizarCalculosNav() {
+      if (!userCoords || parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) return;
+      const p = parcelas[parcelaActualIndex];
+      const dist = calcularDistanciaMetros(userCoords.lat, userCoords.lng, p.lat, p.lng);
+      const rumbo = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
+      const td = document.getElementById('txtDistancia'); if (td) td.textContent = formatearDistancia(dist);
+      const tr = document.getElementById('txtRumboDestino'); if (tr) tr.textContent = `${Math.round(rumbo)}° ${rumboACardinal(rumbo)}`;
+    }
+    function actualizarBadgeGps(t) { const e = document.getElementById('gpsStatusBadge'); if (e) e.textContent = t; }
+    function actualizarBadgeBrujula(t) { const e = document.getElementById('compassStatusBadge'); if (e) e.textContent = t; }
+
+    /* =========================================================================
+       KML
+       ========================================================================= */
+    function setupKMLListeners() {
+      document.getElementById('inputKmlPuntos').addEventListener('change', (e) => {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader(); r.onload = (ev) => parseKMLPuntos(ev.target.result); r.readAsText(f);
+      });
+      document.getElementById('inputKmlContornos').addEventListener('change', (e) => {
+        const f = e.target.files[0]; if (!f) return;
+        const r = new FileReader(); r.onload = (ev) => parseKMLContornos(ev.target.result); r.readAsText(f);
+      });
+    }
+    function parseKMLPuntos(xmlText) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+      const placemarks = xmlDoc.getElementsByTagName('Placemark');
+      parcelas = []; kmlFieldsList = new Set(['name', 'description']);
+      for (let i = 0; i < placemarks.length; i++) {
+        const pm = placemarks[i];
+        const coordElem = pm.getElementsByTagName('coordinates')[0];
+        if (!coordElem) continue;
+        const cr = coordElem.textContent.trim().split(/\s+/)[0].split(',');
+        const lng = parseFloat(cr[0]), lat = parseFloat(cr[1]);
+        if (isNaN(lat) || isNaN(lng)) continue;
+        const rawProps = {};
+        const ne = pm.getElementsByTagName('name')[0]; if (ne) rawProps['name'] = ne.textContent.trim();
+        const de = pm.getElementsByTagName('description')[0]; if (de) rawProps['description'] = de.textContent.trim();
+        for (let sd of pm.getElementsByTagName('SimpleData')) { const k = sd.getAttribute('name'); if (k && !rawProps[k]) { rawProps[k] = sd.textContent.trim(); kmlFieldsList.add(k); } }
+        for (let d of pm.getElementsByTagName('Data')) { const k = d.getAttribute('name'); if (k && !rawProps[k]) { const v = d.getElementsByTagName('value')[0]; rawProps[k] = v ? v.textContent.trim() : d.textContent.trim(); kmlFieldsList.add(k); } }
+        const ext = pm.getElementsByTagName('ExtendedData')[0];
+        if (ext) { for (let c of ext.children) { if (c.tagName !== 'SchemaData' && c.tagName !== 'Data' && c.tagName !== 'SimpleData') { if (!rawProps[c.tagName]) { rawProps[c.tagName] = c.textContent.trim(); kmlFieldsList.add(c.tagName); } } } }
+        parcelas.push({ id: i+1, nombre: rawProps['name'] || `Parcela ${i+1}`, lat, lng, observaciones: '', completada: false, fechaCompletada: null, rawProps, _distancia: null, _rumbo: null });
+      }
+      document.getElementById('totalPuntos').textContent = parcelas.length;
+      poblarSelectCampoIdentificador();
+      guardarEnLocalStorage();
+      renderTablaResumen();
+      if (parcelas.length > 0) cargarParcelaEnEdicion(0);
+      mostrarNotificacion(`${parcelas.length} parcelas cargadas.`);
+      setTimeout(() => precargarTeselasZonas(), 1500);
+    }
+    function poblarSelectCampoIdentificador(campoGuardado = null) {
+      const sel = document.getElementById('selectCampoNombre'), sec = document.getElementById('secCamposKml');
+      if (!sel || !sec) return;
+      if (kmlFieldsList.size === 0) { sec.classList.add('hidden'); return; }
+      sec.classList.remove('hidden');
+      const arr = Array.from(kmlFieldsList);
+      sel.innerHTML = arr.map(f => `<option value="${f}">${f}</option>`).join('');
+      if (campoGuardado && arr.includes(campoGuardado)) sel.value = campoGuardado;
+      else { const h = arr.find(c => ['nombre','name','ref','referencia','recinto','parcela','id_parcela','cod_rec'].some(p => c.toLowerCase().includes(p))); if (h) sel.value = h; }
+      aplicarCampoIdentificador(false);
+    }
+    function parseKMLContornos(xmlText) {
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+      contornosGeom = [];
+      for (let pm of xmlDoc.getElementsByTagName('Placemark')) {
+        const lr = pm.getElementsByTagName('LinearRing')[0]; if (!lr) continue;
+        const ce = lr.getElementsByTagName('coordinates')[0]; if (!ce) continue;
+        const pc = ce.textContent.trim().split(/\s+/).map(p => { const pts = p.split(','); return [parseFloat(pts[1]), parseFloat(pts[0])]; }).filter(pt => !isNaN(pt[0]) && !isNaN(pt[1]));
+        if (pc.length > 0) contornosGeom.push(pc);
+      }
+      document.getElementById('totalContornos').textContent = contornosGeom.length;
+      guardarEnLocalStorage();
+      if (parcelaActualIndex >= 0) cargarParcelaEnEdicion(parcelaActualIndex);
+      mostrarNotificacion(`${contornosGeom.length} contornos cargados.`);
+    }
+    function aplicarCampoIdentificador(notificar = true) {
+      const sel = document.getElementById('selectCampoNombre');
+      if (!sel) return;
+      const field = sel.value; if (!field) return;
+      parcelas.forEach(p => { p.nombre = (p.rawProps && p.rawProps[field]) ? p.rawProps[field] : `Parcela ${p.id}`; });
+      guardarEnLocalStorage(); renderTablaResumen();
+      if (parcelaActualIndex >= 0) cargarParcelaEnEdicion(parcelaActualIndex);
+      if (notificar) mostrarNotificacion(`Campo cambiado a: "${field}"`);
+    }
+
+    /* =========================================================================
+       EDICIÓN
+       ========================================================================= */
+    function cargarParcelaEnEdicion(idx) {
+      if (idx < 0 || idx >= parcelas.length) return;
+      parcelaActualIndex = idx;
+      const p = parcelas[idx];
+      document.getElementById('editId').textContent = p.id;
+      document.getElementById('editNombre').textContent = p.nombre;
+      document.getElementById('editCoords').textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
+      document.getElementById('inputObservaciones').value = p.observaciones || '';
+      document.getElementById('btnGmaps').href = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+      const fechaEl = document.getElementById('editFechaCompletada');
+      if (fechaEl) {
+        fechaEl.textContent = p.completada ? formatearFecha(p.fechaCompletada) : 'Pendiente';
+        fechaEl.style.color = p.completada ? 'var(--btn-success)' : 'var(--text-secondary)';
+      }
+      const bc = document.getElementById('btnEstadoCompletada');
+      if (p.completada) { bc.classList.add('activa'); bc.textContent = '✔ ' + formatearFecha(p.fechaCompletada); } else { bc.classList.remove('activa'); bc.textContent = '✔ Completar'; }
+      modoGPSenUsuario = false;
+      document.getElementById('btnMiUbicacion').innerHTML = '&#x1F4CD; GPS';
+      const kc = document.getElementById('kmlDataContent');
+      if (kc) {
+        let html = "";
+        const ci = document.getElementById('selectCampoNombre')?.value || '';
+        const vv = new Set();
+        if (p.rawProps) { for (let k in p.rawProps) { if (k === ci || !p.rawProps[k]) continue; const v = String(p.rawProps[k]).trim(); if (vv.has(v)) continue; vv.add(v); html += `<div style="margin-bottom:3px;"><strong style="color:var(--text-primary);">${k}:</strong> <span style="color:var(--text-secondary);">${p.rawProps[k]}</span></div>`; } }
+        kc.innerHTML = html || "Sin atributos adicionales.";
+      }
+      if (leafletMap) {
+        if (parcelMarker) leafletMap.removeLayer(parcelMarker);
+        parcelMarker = L.marker([p.lat, p.lng]).addTo(leafletMap).bindPopup(`<b style="font-size:1.1em; color:#0284c7;">📍 ${p.nombre}</b>`);
+        if (parcelPolygon) leafletMap.removeLayer(parcelPolygon);
+        if (contornosGeom[idx]) { parcelPolygon = L.polygon(contornosGeom[idx], { color: '#38bdf8', weight: 3, fillOpacity: 0.3 }).addTo(leafletMap); leafletMap.fitBounds(parcelPolygon.getBounds(), { padding: [30, 30] }); }
+        else leafletMap.setView([p.lat, p.lng], 17);
+        if (userCoords) actualizarMapaUbicacion(userCoords.lat, userCoords.lng, userCoords.accuracy || 10);
+      }
+      actualizarCalculosNav();
+    }
+    function guardarObservaciones() {
+      if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
+        parcelas[parcelaActualIndex].observaciones = document.getElementById('inputObservaciones').value;
+        guardarEnLocalStorage(); renderTablaResumen();
+      }
+    }
+    function toggleEstadoCompletada() {
+      if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
+        const p = parcelas[parcelaActualIndex];
+        p.completada = !p.completada;
+        if (p.completada) { p.fechaCompletada = new Date().toISOString(); mostrarNotificacion(`✔ Completada el ${formatearFecha(p.fechaCompletada)}`); }
+        else { p.fechaCompletada = null; mostrarNotificacion("↩️ Marcada como pendiente"); }
+        guardarEnLocalStorage(); cargarParcelaEnEdicion(parcelaActualIndex); renderTablaResumen();
+      }
+    }
+
+    /* =========================================================================
+       TABLA
+       ========================================================================= */
+    function renderTablaResumen() {
+      const tbody = document.getElementById('tablaResumen'), contador = document.getElementById('resumenContador');
+      if (!tbody) return;
+      if (contador) {
+        const total = parcelas.length, completadas = parcelas.filter(p => p.completada).length;
+        contador.textContent = `${completadas} / ${total}`;
+      }
+      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay datos cargados</td></tr>'; return; }
+      let indices = parcelas.map((p, i) => i);
+      if (userCoords) {
+        indices.sort((a, b) => {
+          const da = parcelas[a]._distancia !== null ? parcelas[a]._distancia : calcularDistanciaMetros(userCoords.lat, userCoords.lng, parcelas[a].lat, parcelas[a].lng);
+          const db = parcelas[b]._distancia !== null ? parcelas[b]._distancia : calcularDistanciaMetros(userCoords.lat, userCoords.lng, parcelas[b].lat, parcelas[b].lng);
+          return da - db;
+        });
+      }
+      tbody.innerHTML = indices.map(i => {
+        const p = parcelas[i];
+        let distHtml = '<span style="color:var(--text-secondary);">--</span>';
+        if (p._distancia !== null) {
+          let cls = 'dist-far';
+          if (p._distancia <= distAlerta) cls = 'dist-near';
+          else if (p._distancia <= distAlerta * 3) cls = 'dist-mid';
+          distHtml = `<span class="dist-badge ${cls}">${formatearDistancia(p._distancia)}</span>`;
+        }
+        const fechaHtml = p.completada ? `<span style="color:var(--btn-success); font-weight:600;">${formatearFecha(p.fechaCompletada)}</span>` : '<span style="color:var(--text-secondary);">-</span>';
+        return `<tr class="${p.completada ? 'row-completada' : ''}" onclick="cargarParcelaEnEdicion(${i}); cambiarVista('sec-edicion');">
+          <td>${distHtml}</td><td>${p.id}</td><td>${p.nombre}</td>
+          <td>${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</td><td>${fechaHtml}</td><td>${p.observaciones ? '📝' : '-'}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    /* =========================================================================
+       LOCALSTORAGE
+       ========================================================================= */
+    function guardarEnLocalStorage() {
+      try {
+        localStorage.setItem('sigpac_parcelas_data', JSON.stringify(parcelas));
+        localStorage.setItem('sigpac_contornos_data', JSON.stringify(contornosGeom));
+        localStorage.setItem('sigpac_fields_list', JSON.stringify(Array.from(kmlFieldsList)));
+        const s = document.getElementById('selectCampoNombre');
+        if (s && s.value) localStorage.setItem('sigpac_selected_field', s.value);
+      } catch(e) { console.warn("Error LS:", e); }
+    }
+    function cargarDeLocalStorage() {
+      try {
+        const sp = localStorage.getItem('sigpac_parcelas_data'), sc = localStorage.getItem('sigpac_contornos_data');
+        const sf = localStorage.getItem('sigpac_fields_list'), ss = localStorage.getItem('sigpac_selected_field');
+        if (sp) { parcelas = JSON.parse(sp); document.getElementById('totalPuntos').textContent = parcelas.length; }
+        if (sc) { contornosGeom = JSON.parse(sc); document.getElementById('totalContornos').textContent = contornosGeom.length; }
+        if (sf) { kmlFieldsList = new Set(JSON.parse(sf)); poblarSelectCampoIdentificador(ss); }
+        const da = localStorage.getItem('sigpac_dist_alerta'), sa = localStorage.getItem('sigpac_sonido_alerta'), iv = localStorage.getItem('sigpac_intervalo');
+        if (da) { distAlerta = parseInt(da); document.getElementById('cfgDistAlerta').value = da; }
+        if (sa) { sonidoAlerta = sa; document.getElementById('cfgSonidoAlerta').value = sa; }
+        if (iv) { intervaloEscaneo = parseInt(iv); document.getElementById('cfgIntervalo').value = iv; }
+        const vib = localStorage.getItem('sigpac_vibracion');
+        if (vib) { patronVibracion = vib === 'pattern' ? 'pattern' : parseInt(vib); document.getElementById('cfgVibracion').value = vib; }
+        const st = localStorage.getItem('sigpac_theme');
+        if (st) cambiarTema(st, false);
+        const sl = localStorage.getItem('sigpac_tam_letra');
+        if (sl) { document.getElementById('cfgTamLetra').value = sl; document.body.style.fontSize = sl; }
+        if (parcelas.length > 0) { renderTablaResumen(); cargarParcelaEnEdicion(0); mostrarNotificacion("Datos previos cargados."); }
+        actualizarStatsCache();
+      } catch(e) { console.warn("Error LS:", e); }
+    }
+    function mostrarConfirmacionLimpieza() { document.getElementById('modalConfirm').classList.remove('hidden'); }
+    function cerrarModalConfirm() { document.getElementById('modalConfirm').classList.add('hidden'); }
+    function limpiarLocalStorage() {
+      ['sigpac_parcelas_data','sigpac_contornos_data','sigpac_fields_list','sigpac_selected_field'].forEach(k => localStorage.removeItem(k));
+      parcelas = []; contornosGeom = []; kmlFieldsList = new Set();
+      document.getElementById('totalPuntos').textContent = '0';
+      document.getElementById('totalContornos').textContent = '0';
+      document.getElementById('secCamposKml').classList.add('hidden');
+      renderTablaResumen(); cerrarModalConfirm(); mostrarNotificacion("Memoria limpiada.");
+    }
+
+    /* =========================================================================
+       BÚSQUEDA PRINCIPAL (REGEX)
+       ========================================================================= */
     const USOS_SIGPAC_DB = [
       { codigo: "TA", descripcion: "Tierras Arables" }, { codigo: "TH", descripcion: "Huerta" },
       { codigo: "CS", descripcion: "Cítricos" }, { codigo: "FY", descripcion: "Frutales" },
@@ -1577,713 +2285,6 @@
   { "codigo": "239", "descripcion": "Actividad agraria comprobada en 2026" }
 ];  
 
-    /* ============================================
-       VIBRACIÓN CONFIGURABLE
-       ============================================ */
-    function vibrate() {
-      if (!("vibrate" in navigator)) return;
-      if (patronVibracion === 0) return;
-      if (patronVibracion === 'pattern') {
-        navigator.vibrate([50, 30, 50]);
-      } else {
-        navigator.vibrate(parseInt(patronVibracion));
-      }
-    }
-
-    function guardarConfigVibracion() {
-      const val = document.getElementById('cfgVibracion').value;
-      patronVibracion = val === 'pattern' ? 'pattern' : parseInt(val);
-      localStorage.setItem('sigpac_vibracion', val);
-      mostrarNotificacion(`📳 Vibración: ${val === 'pattern' ? 'Patrón' : val + 'ms'}`);
-    }
-
-    /* ============================================
-       UTILIDADES
-       ============================================ */
-    function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
-      const R = 6371e3;
-      const p1 = lat1 * Math.PI/180, p2 = lat2 * Math.PI/180;
-      const dp = (lat2-lat1) * Math.PI/180, dl = (lon2-lon1) * Math.PI/180;
-      const a = Math.sin(dp/2)*Math.sin(dp/2) + Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)*Math.sin(dl/2);
-      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    }
-    function calcularRumboEntrePuntos(lat1, lon1, lat2, lon2) {
-      const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
-      const dl = (lon2 - lon1) * Math.PI / 180;
-      const y = Math.sin(dl) * Math.cos(p2);
-      const x = Math.cos(p1) * Math.sin(p2) - Math.sin(p1) * Math.cos(p2) * Math.cos(dl);
-      return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-    }
-    function rumboACardinal(g) { return ['N','NE','E','SE','S','SO','O','NO'][Math.round(g/45)%8]; }
-    function formatearDistancia(m) { return m > 1000 ? (m/1000).toFixed(2) + ' km' : Math.round(m) + ' m'; }
-    function formatearFecha(d) {
-      if (!d) return '-';
-      const date = new Date(d);
-      const dd = String(date.getDate()).padStart(2, '0');
-      const mm = String(date.getMonth() + 1).padStart(2, '0');
-      const yyyy = date.getFullYear();
-      return `${dd}/${mm}/${yyyy}`;
-    }
-
-    /* ============================================
-       CACHE DE TESELAS OFFLINE
-       ============================================ */
-    async function precargarTeselasZonas() {
-      if (parcelas.length === 0) {
-        mostrarNotificacion("⚠️ No hay parcelas cargadas");
-        return;
-      }
-      
-      if (!('caches' in window)) {
-        mostrarNotificacion("⚠️ Tu navegador no soporta caché offline");
-        return;
-      }
-
-      mostrarNotificacion("⬇️ Iniciando precarga de teselas...");
-      
-      try {
-        const cache = await caches.open(CACHE_NAME);
-        
-        // Calcular bounding box de todas las parcelas
-        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
-        parcelas.forEach(p => {
-          if (p.lat < minLat) minLat = p.lat;
-          if (p.lat > maxLat) maxLat = p.lat;
-          if (p.lng < minLng) minLng = p.lng;
-          if (p.lng > maxLng) maxLng = p.lng;
-        });
-        
-        // Añadir margen de 10%
-        const marginLat = (maxLat - minLat) * 0.15 || 0.01;
-        const marginLng = (maxLng - minLng) * 0.15 || 0.01;
-        minLat -= marginLat; maxLat += marginLat;
-        minLng -= marginLng; maxLng += marginLng;
-        
-        // Niveles de zoom a precargar (14-17 son los más útiles en campo)
-        const zooms = [14, 15, 16, 17];
-        let totalTeselas = 0;
-        let teselasCacheadas = 0;
-        
-        for (let z of zooms) {
-          const xMin = lon2tileX(minLng, z);
-          const xMax = lon2tileX(maxLng, z);
-          const yMin = lat2tileY(maxLat, z);
-          const yMax = lat2tileY(minLat, z);
-          
-          for (let x = xMin; x <= xMax; x++) {
-            for (let y = yMin; y <= yMax; y++) {
-              const url = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`;
-              totalTeselas++;
-              
-              try {
-                const existing = await cache.match(url);
-                if (!existing) {
-                  const response = await fetch(url, { mode: 'cors' });
-                  if (response.ok) {
-                    await cache.put(url, response);
-                    teselasCacheadas++;
-                  }
-                } else {
-                  teselasCacheadas++;
-                }
-              } catch (e) {
-                // Si falla una, continuar con las demás
-              }
-              
-              // Actualizar progreso cada 20 teselas
-              if (totalTeselas % 20 === 0) {
-                mostrarNotificacion(`⬇️ ${teselasCacheadas}/${totalTeselas} teselas...`);
-              }
-            }
-          }
-        }
-        
-        localStorage.setItem('sigpac_teselas_cacheadas', teselasCacheadas);
-        actualizarStatsCache();
-        mostrarNotificacion(`✅ ${teselasCacheadas} teselas cacheadas (zoom 14-17)`);
-        
-      } catch (e) {
-        console.error("Error cache:", e);
-        mostrarNotificacion("⚠️ Error al precargar: " + e.message);
-      }
-    }
-
-    function lon2tileX(lon, zoom) {
-      return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
-    }
-    function lat2tileY(lat, zoom) {
-      return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
-    }
-
-    async function limpiarCacheTeselas() {
-      if ('caches' in window) {
-        await caches.delete(CACHE_NAME);
-        localStorage.removeItem('sigpac_teselas_cacheadas');
-        actualizarStatsCache();
-        mostrarNotificacion("🗑️ Cache de teselas limpiado");
-      }
-    }
-
-    async function actualizarStatsCache() {
-      const el = document.getElementById('cacheStats');
-      if (!el) return;
-      if ('caches' in window) {
-        try {
-          const cache = await caches.open(CACHE_NAME);
-          const keys = await cache.keys();
-          const count = keys.length;
-          localStorage.setItem('sigpac_teselas_cacheadas', count);
-          el.textContent = `Teselas cacheadas: ${count}`;
-        } catch (e) {
-          el.textContent = `Teselas cacheadas: 0`;
-        }
-      } else {
-        el.textContent = `Teselas cacheadas: No soportado`;
-      }
-    }
-
-    /* ============================================
-       BOTÓN FOTO
-       ============================================ */
-    function abrirAppFoto() {
-      if (parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) {
-        mostrarNotificacion("⚠️ Selecciona primero una parcela");
-        return;
-      }
-      const nombre = parcelas[parcelaActualIndex].nombre;
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(nombre).then(() => {
-          mostrarNotificacion("📋 Copiado: " + nombre);
-        }).catch(() => fallbackCopiar(nombre));
-      } else fallbackCopiar(nombre);
-      
-      setTimeout(() => {
-        const pkg = paqueteCamara || 'net.sourceforge.opencamera';
-        const intentUrl = `intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package=${pkg};end`;
-        const marketUrl = `market://details?id=${pkg}`;
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = intentUrl;
-        document.body.appendChild(iframe);
-        setTimeout(() => {
-          if (!document.hidden) window.location.href = marketUrl;
-          if (iframe.parentNode) document.body.removeChild(iframe);
-        }, 1500);
-      }, 300);
-    }
-    function fallbackCopiar(texto) {
-      const ta = document.createElement('textarea');
-      ta.value = texto; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); mostrarNotificacion("📋 Copiado: " + texto); }
-      catch(e) { mostrarNotificacion("⚠️ No se pudo copiar"); }
-      document.body.removeChild(ta);
-    }
-    function actualizarPaqueteCamara() {
-      const sel = document.getElementById('cfgAppCamara').value;
-      const input = document.getElementById('cfgPaqueteCamara');
-      if (sel === 'net.sourceforge.opencamera') input.value = 'net.sourceforge.opencamera';
-      else { input.value = ''; input.focus(); }
-      guardarConfigCamara();
-    }
-    function guardarConfigCamara() {
-      paqueteCamara = document.getElementById('cfgPaqueteCamara').value.trim() || 'net.sourceforge.opencamera';
-      localStorage.setItem('sigpac_paquete_camara', paqueteCamara);
-    }
-
-    /* ============================================
-       TOGGLE GPS / MI UBICACIÓN
-       ============================================ */
-    function toggleGPSOMiUbicacion() {
-      if (!userCoords) { activarSensoresGpsYBrujula(); mostrarNotificacion("Buscando señal GPS..."); return; }
-      if (!leafletMap) return;
-      if (!modoGPSenUsuario) {
-        leafletMap.setView([userCoords.lat, userCoords.lng], 18);
-        if (userMarker) userMarker.openPopup();
-        modoGPSenUsuario = true;
-        document.getElementById('btnMiUbicacion').innerHTML = '&#x1F3AF; Parcela';
-        mostrarNotificacion("Centrado en tu ubicación.");
-      } else {
-        if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
-          const p = parcelas[parcelaActualIndex];
-          leafletMap.setView([p.lat, p.lng], 17);
-          if (parcelMarker) parcelMarker.openPopup();
-        }
-        modoGPSenUsuario = false;
-        document.getElementById('btnMiUbicacion').innerHTML = '&#x1F4CD; GPS';
-        mostrarNotificacion("Centrado en la parcela.");
-      }
-    }
-
-    /* ============================================
-       MAPA COMPLETO
-       ============================================ */
-    function initMapaCompleto() {
-      if (mapaCompleto) return;
-      mapaCompleto = L.map('mapaCompletoField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
-      const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
-      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-      esriSat.addTo(mapaCompleto);
-      L.control.layers({ 'Satélite (Esri)': esriSat, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(mapaCompleto);
-    }
-    function dibujarMapaCompleto() {
-      if (!mapaCompleto) initMapaCompleto();
-      markersCompletos.forEach(m => mapaCompleto.removeLayer(m));
-      polygonsCompletos.forEach(p => mapaCompleto.removeLayer(p));
-      markersCompletos = []; polygonsCompletos = [];
-      const bounds = L.latLngBounds();
-      let tieneDatos = false;
-      const iconoPendiente = L.divIcon({ className: 'custom-pin', html: `<div style="width:22px; height:22px; background:#ef4444; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.6);"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
-      const iconoCompletada = L.divIcon({ className: 'custom-pin', html: `<div style="width:22px; height:22px; background:#10b981; border:3px solid #ffffff; border-radius:50%; box-shadow:0 0 8px rgba(0,0,0,0.6);"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
-      parcelas.forEach((p, idx) => {
-        const icono = p.completada ? iconoCompletada : iconoPendiente;
-        const marker = L.marker([p.lat, p.lng], { icon: icono }).addTo(mapaCompleto);
-        marker.bindPopup(`<b style="color:#0284c7;">📍 ${p.nombre}</b><br><small>ID: ${p.id}</small>${p.completada ? '<br><span style="color:#10b981; font-weight:bold;">✔ ' + formatearFecha(p.fechaCompletada) + '</span>' : ''}<br><button onclick="cargarParcelaEnEdicion(${idx}); cambiarVista('sec-edicion');" style="margin-top:6px; padding:6px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Ver detalle</button>`);
-        markersCompletos.push(marker);
-        bounds.extend([p.lat, p.lng]);
-        tieneDatos = true;
-      });
-      contornosGeom.forEach((coords, idx) => {
-        if (coords && coords.length > 0) {
-          const poly = L.polygon(coords, { color: '#38bdf8', weight: 2, fillOpacity: 0.2, fillColor: '#38bdf8' }).addTo(mapaCompleto);
-          poly.bindPopup(`<b>Contorno #${idx+1}</b><br><button onclick="cargarParcelaEnEdicion(${idx}); cambiarVista('sec-edicion');" style="margin-top:6px; padding:6px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Ver parcela</button>`);
-          polygonsCompletos.push(poly);
-          bounds.extend(poly.getBounds());
-          tieneDatos = true;
-        }
-      });
-      if (tieneDatos && bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
-    }
-    function ajustarMapaCompleto() {
-      if (mapaCompleto && (markersCompletos.length > 0 || polygonsCompletos.length > 0)) {
-        const bounds = L.latLngBounds();
-        markersCompletos.forEach(m => bounds.extend(m.getLatLng()));
-        polygonsCompletos.forEach(p => bounds.extend(p.getBounds()));
-        if (bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
-      }
-    }
-
-    /* ============================================
-       ALERTAS PROXIMIDAD
-       ============================================ */
-    function solicitarPermisoNotificaciones() {
-      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
-    }
-    function reproducirSonidoAlerta() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.value = 880; osc.type = 'sine'; gain.gain.value = 0.3;
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
-        osc.stop(audioCtx.currentTime + 0.5);
-      } catch(e) {}
-    }
-    function lanzarAlertaProximidad(parcela, distancia, rumbo) {
-      const card = rumboACardinal(rumbo);
-      const distTxt = formatearDistancia(distancia);
-      const msg = `La parcela ${parcela.nombre} está a ${distTxt} en el rumbo ${Math.round(rumbo)}° (${card})`;
-      const bar = document.getElementById('proximityAlertBar');
-      const txt = document.getElementById('proximityAlertText');
-      if (bar && txt) { txt.textContent = msg; bar.classList.add('visible'); }
-      if (sonidoAlerta !== 'silencio') vibrate();
-      if (sonidoAlerta === 'sonido') reproducirSonidoAlerta();
-      if ('Notification' in window && Notification.permission === 'granted') {
-        try { new Notification('📍 Parcela Cercana', { body: msg, tag: 'prox-' + parcela.id }); } catch(e) {}
-      }
-      mostrarNotificacion('📍 ' + msg);
-    }
-    function iniciarMonitorProximidad() {
-      if (monitorProximidadInterval) clearInterval(monitorProximidadInterval);
-      monitorProximidadInterval = setInterval(() => {
-        if (!userCoords || parcelas.length === 0) return;
-        let masCercana = null, distMinima = Infinity;
-        parcelas.forEach((p, idx) => {
-          const d = calcularDistanciaMetros(userCoords.lat, userCoords.lng, p.lat, p.lng);
-          p._distancia = d;
-          p._rumbo = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
-          if (d < distMinima) { distMinima = d; masCercana = { parcela: p, idx, dist: d, rumbo: p._rumbo }; }
-          if (d <= distAlerta && !parcelasAlertadas.has(p.id)) { parcelasAlertadas.add(p.id); lanzarAlertaProximidad(p, d, p._rumbo); }
-          if (d > distAlerta * 1.5) parcelasAlertadas.delete(p.id);
-        });
-        if (masCercana && masCercana.dist <= distAlerta * 2) {
-          const bar = document.getElementById('proximityAlertBar');
-          const txt = document.getElementById('proximityAlertText');
-          if (bar && txt) {
-            const card = rumboACardinal(masCercana.rumbo);
-            txt.textContent = `Más cercana: ${masCercana.parcela.nombre} → ${formatearDistancia(masCercana.dist)} al ${Math.round(masCercana.rumbo)}° (${card})`;
-            bar.classList.add('visible');
-          }
-        } else {
-          const bar = document.getElementById('proximityAlertBar');
-          if (bar) bar.classList.remove('visible');
-        }
-        renderTablaResumen();
-      }, intervaloEscaneo);
-    }
-    function guardarConfigProximidad() {
-      distAlerta = parseInt(document.getElementById('cfgDistAlerta').value) || 100;
-      sonidoAlerta = document.getElementById('cfgSonidoAlerta').value;
-      intervaloEscaneo = parseInt(document.getElementById('cfgIntervalo').value) || 5000;
-      localStorage.setItem('sigpac_dist_alerta', distAlerta);
-      localStorage.setItem('sigpac_sonido_alerta', sonidoAlerta);
-      localStorage.setItem('sigpac_intervalo', intervaloEscaneo);
-      iniciarMonitorProximidad();
-      mostrarNotificacion(`Alerta: ${distAlerta}m cada ${intervaloEscaneo/1000}s`);
-    }
-
-    /* ============================================
-       GPS Y BRÚJULA
-       ============================================ */
-    function initMap() {
-      if (leafletMap) return;
-      leafletMap = L.map('mapaField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
-      const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
-      const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-      esriSat.addTo(leafletMap);
-      L.control.layers({ 'Satélite (Esri)': esriSat, 'Callejero (OSM)': osm }, null, { position: 'topright' }).addTo(leafletMap);
-    }
-    function activarSensoresGpsYBrujula() {
-      solicitarPermisoNotificaciones();
-      iniciarGeolocalizacionPasoAPaso();
-      iniciarSensorOrientacionAvanzado();
-      intentarBloquearOrientacion();
-      iniciarMonitorProximidad();
-    }
-    function intentarBloquearOrientacion() {
-      if (screen.orientation && typeof screen.orientation.lock === 'function') screen.orientation.lock('portrait-primary').catch(() => {});
-    }
-    function iniciarGeolocalizacionPasoAPaso() {
-      if (!("geolocation" in navigator)) { actualizarBadgeGps("GPS no soportado"); return; }
-      actualizarBadgeGps("GPS: Conectando satélites...");
-      navigator.geolocation.getCurrentPosition(
-        (pos) => { procesarPosicionGps(pos); iniciarWatchGps(); },
-        (err) => { actualizarBadgeGps("GPS: Reintentando modo Red..."); iniciarWatchGps(); },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
-      );
-    }
-    function iniciarWatchGps() {
-      navigator.geolocation.watchPosition(procesarPosicionGps, (err) => {
-        let msg = "GPS: Error " + err.code;
-        if (err.code === 1) msg = "GPS: Permiso denegado";
-        if (err.code === 2) msg = "GPS: Sin cobertura";
-        if (err.code === 3) msg = "GPS: Timeout";
-        actualizarBadgeGps(msg);
-      }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 });
-    }
-    function procesarPosicionGps(pos) {
-      userCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude, accuracy: pos.coords.accuracy || 10 };
-      actualizarBadgeGps(`GPS: OK (±${Math.round(userCoords.accuracy)}m)`);
-      actualizarMapaUbicacion(userCoords.lat, userCoords.lng, userCoords.accuracy);
-      actualizarCalculosNav();
-      if (pos.coords.heading !== null && !isNaN(pos.coords.heading)) actualizarRumboUI(pos.coords.heading, "GPS Satélite");
-    }
-    function actualizarMapaUbicacion(lat, lng, accuracy) {
-      if (!leafletMap) return;
-      const latLng = [lat, lng];
-      const userIcon = L.divIcon({ className: 'custom-user-icon', html: `<div class="user-location-marker"></div>`, iconSize: [22, 22], iconAnchor: [11, 11] });
-      if (!userMarker) {
-        userMarker = L.marker(latLng, { icon: userIcon, zIndexOffset: 1000 }).addTo(leafletMap);
-        userMarker.bindPopup(`<b>Tu Ubicación</b><br>±${Math.round(accuracy)}m`);
-      } else userMarker.setLatLng(latLng);
-      if (!accuracyCircle) accuracyCircle = L.circle(latLng, { radius: accuracy, color: '#0284c7', fillColor: '#38bdf8', fillOpacity: 0.15, weight: 1.5 }).addTo(leafletMap);
-      else { accuracyCircle.setLatLng(latLng); accuracyCircle.setRadius(accuracy); }
-      if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
-        const p = parcelas[parcelaActualIndex];
-        if (!connectionLine) connectionLine = L.polyline([latLng, [p.lat, p.lng]], { color: '#ef4444', weight: 2.5, dashArray: '6, 6' }).addTo(leafletMap);
-        else connectionLine.setLatLngs([latLng, [p.lat, p.lng]]);
-      }
-    }
-    function iniciarSensorOrientacionAvanzado() {
-      if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-        DeviceOrientationEvent.requestPermission().then(s => { if (s === 'granted') escucharEventosOrientacion(); }).catch(console.error);
-      } else escucharEventosOrientacion();
-    }
-    function escucharEventosOrientacion() {
-      if ('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute', procesarOrientacionEuler, true);
-      window.addEventListener('deviceorientation', procesarOrientacionEuler, true);
-    }
-    function procesarOrientacionEuler(e) {
-      sensorSampleCount++;
-      let heading = null, fuente = "Giroscopio";
-      if (e.webkitCompassHeading !== undefined && e.webkitCompassHeading !== null) { heading = e.webkitCompassHeading; fuente = "iOS Mag"; }
-      else if (e.alpha !== null) {
-        const a = e.alpha, b = e.beta || 0, g = e.gamma || 0;
-        const x = b*Math.PI/180, y = g*Math.PI/180, z = a*Math.PI/180;
-        const cX=Math.cos(x),cY=Math.cos(y),cZ=Math.cos(z),sX=Math.sin(x),sY=Math.sin(y),sZ=Math.sin(z);
-        let ch = Math.atan2(-cZ*sY-sZ*sX*cY, -sZ*sY+cZ*sX*cY)*(180/Math.PI);
-        if (ch < 0) ch += 360;
-        const sa = (screen.orientation && screen.orientation.angle) ? screen.orientation.angle : (window.orientation || 0);
-        heading = (ch + sa) % 360;
-        fuente = e.absolute ? "Magnetómetro" : "Giroscopio";
-      }
-      if (heading !== null && !isNaN(heading)) actualizarRumboUI(heading, fuente);
-    }
-    function actualizarRumboUI(heading, fuente) {
-      currentHeading = heading;
-      const needle = document.getElementById('compassNeedle');
-      if (needle) needle.style.transform = `rotate(${-heading}deg)`;
-      if (userCoords && parcelaActualIndex >= 0) {
-        const p = parcelas[parcelaActualIndex];
-        const bearing = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
-        const bNeedle = document.getElementById('bearingNeedle');
-        if (bNeedle) bNeedle.style.transform = `rotate(${bearing - heading}deg)`;
-      }
-      const txt = document.getElementById('txtRumbo');
-      if (txt) txt.textContent = `${Math.round(heading)}° ${rumboACardinal(heading)}`;
-      actualizarBadgeBrujula(`${fuente} (${sensorSampleCount})`);
-      actualizarCalculosNav();
-    }
-    function actualizarCalculosNav() {
-      if (!userCoords || parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) return;
-      const p = parcelas[parcelaActualIndex];
-      const dist = calcularDistanciaMetros(userCoords.lat, userCoords.lng, p.lat, p.lng);
-      const rumbo = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
-      const td = document.getElementById('txtDistancia'); if (td) td.textContent = formatearDistancia(dist);
-      const tr = document.getElementById('txtRumboDestino'); if (tr) tr.textContent = `${Math.round(rumbo)}° ${rumboACardinal(rumbo)}`;
-    }
-    function actualizarBadgeGps(t) { const e = document.getElementById('gpsStatusBadge'); if (e) e.textContent = t; }
-    function actualizarBadgeBrujula(t) { const e = document.getElementById('compassStatusBadge'); if (e) e.textContent = t; }
-
-    /* ============================================
-       KML
-       ============================================ */
-    function setupKMLListeners() {
-      document.getElementById('inputKmlPuntos').addEventListener('change', (e) => {
-        const f = e.target.files[0]; if (!f) return;
-        const r = new FileReader(); r.onload = (ev) => parseKMLPuntos(ev.target.result); r.readAsText(f);
-      });
-      document.getElementById('inputKmlContornos').addEventListener('change', (e) => {
-        const f = e.target.files[0]; if (!f) return;
-        const r = new FileReader(); r.onload = (ev) => parseKMLContornos(ev.target.result); r.readAsText(f);
-      });
-    }
-    function parseKMLPuntos(xmlText) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-      const placemarks = xmlDoc.getElementsByTagName('Placemark');
-      parcelas = [];
-      kmlFieldsList = new Set(['name', 'description']);
-      for (let i = 0; i < placemarks.length; i++) {
-        const pm = placemarks[i];
-        const coordElem = pm.getElementsByTagName('coordinates')[0];
-        if (!coordElem) continue;
-        const cr = coordElem.textContent.trim().split(/\s+/)[0].split(',');
-        const lng = parseFloat(cr[0]), lat = parseFloat(cr[1]);
-        if (isNaN(lat) || isNaN(lng)) continue;
-        const rawProps = {};
-        const ne = pm.getElementsByTagName('name')[0]; if (ne) rawProps['name'] = ne.textContent.trim();
-        const de = pm.getElementsByTagName('description')[0]; if (de) rawProps['description'] = de.textContent.trim();
-        for (let sd of pm.getElementsByTagName('SimpleData')) { const k = sd.getAttribute('name'); if (k && !rawProps[k]) { rawProps[k] = sd.textContent.trim(); kmlFieldsList.add(k); } }
-        for (let d of pm.getElementsByTagName('Data')) { const k = d.getAttribute('name'); if (k && !rawProps[k]) { const v = d.getElementsByTagName('value')[0]; rawProps[k] = v ? v.textContent.trim() : d.textContent.trim(); kmlFieldsList.add(k); } }
-        const ext = pm.getElementsByTagName('ExtendedData')[0];
-        if (ext) { for (let c of ext.children) { if (c.tagName !== 'SchemaData' && c.tagName !== 'Data' && c.tagName !== 'SimpleData') { if (!rawProps[c.tagName]) { rawProps[c.tagName] = c.textContent.trim(); kmlFieldsList.add(c.tagName); } } } }
-        parcelas.push({ id: i+1, nombre: rawProps['name'] || `Parcela ${i+1}`, lat, lng, observaciones: '', completada: false, fechaCompletada: null, rawProps, _distancia: null, _rumbo: null });
-      }
-      document.getElementById('totalPuntos').textContent = parcelas.length;
-      poblarSelectCampoIdentificador();
-      guardarEnLocalStorage();
-      renderTablaResumen();
-      if (parcelas.length > 0) cargarParcelaEnEdicion(0);
-      mostrarNotificacion(`${parcelas.length} parcelas cargadas.`);
-      // Auto-precargar teselas tras cargar KML
-      setTimeout(() => precargarTeselasZonas(), 1500);
-    }
-    function poblarSelectCampoIdentificador(campoGuardado = null) {
-      const sel = document.getElementById('selectCampoNombre');
-      const sec = document.getElementById('secCamposKml');
-      if (!sel || !sec) return;
-      if (kmlFieldsList.size === 0) { sec.classList.add('hidden'); return; }
-      sec.classList.remove('hidden');
-      const arr = Array.from(kmlFieldsList);
-      sel.innerHTML = arr.map(f => `<option value="${f}">${f}</option>`).join('');
-      if (campoGuardado && arr.includes(campoGuardado)) sel.value = campoGuardado;
-      else { const h = arr.find(c => ['nombre','name','ref','referencia','recinto','parcela','id_parcela','cod_rec'].some(p => c.toLowerCase().includes(p))); if (h) sel.value = h; }
-      aplicarCampoIdentificador(false);
-    }
-    function parseKMLContornos(xmlText) {
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-      contornosGeom = [];
-      for (let pm of xmlDoc.getElementsByTagName('Placemark')) {
-        const lr = pm.getElementsByTagName('LinearRing')[0]; if (!lr) continue;
-        const ce = lr.getElementsByTagName('coordinates')[0]; if (!ce) continue;
-        const pc = ce.textContent.trim().split(/\s+/).map(p => { const pts = p.split(','); return [parseFloat(pts[1]), parseFloat(pts[0])]; }).filter(pt => !isNaN(pt[0]) && !isNaN(pt[1]));
-        if (pc.length > 0) contornosGeom.push(pc);
-      }
-      document.getElementById('totalContornos').textContent = contornosGeom.length;
-      guardarEnLocalStorage();
-      if (parcelaActualIndex >= 0) cargarParcelaEnEdicion(parcelaActualIndex);
-      mostrarNotificacion(`${contornosGeom.length} contornos cargados.`);
-    }
-    function aplicarCampoIdentificador(notificar = true) {
-      const sel = document.getElementById('selectCampoNombre');
-      if (!sel) return;
-      const field = sel.value; if (!field) return;
-      parcelas.forEach(p => { p.nombre = (p.rawProps && p.rawProps[field]) ? p.rawProps[field] : `Parcela ${p.id}`; });
-      guardarEnLocalStorage(); renderTablaResumen();
-      if (parcelaActualIndex >= 0) cargarParcelaEnEdicion(parcelaActualIndex);
-      if (notificar) mostrarNotificacion(`Campo cambiado a: "${field}"`);
-    }
-
-    /* ============================================
-       EDICIÓN - CON FECHA DE COMPLETADO
-       ============================================ */
-    function cargarParcelaEnEdicion(idx) {
-      if (idx < 0 || idx >= parcelas.length) return;
-      parcelaActualIndex = idx;
-      const p = parcelas[idx];
-      document.getElementById('editId').textContent = p.id;
-      document.getElementById('editNombre').textContent = p.nombre;
-      document.getElementById('editCoords').textContent = `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`;
-      document.getElementById('inputObservaciones').value = p.observaciones || '';
-      document.getElementById('btnGmaps').href = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
-      // Mostrar fecha de completado
-      const fechaEl = document.getElementById('editFechaCompletada');
-      if (fechaEl) {
-        fechaEl.textContent = p.completada ? formatearFecha(p.fechaCompletada) : 'Pendiente';
-        fechaEl.style.color = p.completada ? 'var(--btn-success)' : 'var(--text-secondary)';
-      }
-      const bc = document.getElementById('btnEstadoCompletada');
-      if (p.completada) { bc.classList.add('activa'); bc.textContent = '✔ ' + formatearFecha(p.fechaCompletada); } else { bc.classList.remove('activa'); bc.textContent = '✔ Completar'; }
-      modoGPSenUsuario = false;
-      document.getElementById('btnMiUbicacion').innerHTML = '&#x1F4CD; GPS';
-      const kc = document.getElementById('kmlDataContent');
-      if (kc) {
-        let html = "";
-        const ci = document.getElementById('selectCampoNombre')?.value || '';
-        const vv = new Set();
-        if (p.rawProps) { for (let k in p.rawProps) { if (k === ci || !p.rawProps[k]) continue; const v = String(p.rawProps[k]).trim(); if (vv.has(v)) continue; vv.add(v); html += `<div style="margin-bottom:3px;"><strong style="color:var(--text-primary);">${k}:</strong> <span style="color:var(--text-secondary);">${p.rawProps[k]}</span></div>`; } }
-        kc.innerHTML = html || "Sin atributos adicionales.";
-      }
-      if (leafletMap) {
-        if (parcelMarker) leafletMap.removeLayer(parcelMarker);
-        parcelMarker = L.marker([p.lat, p.lng]).addTo(leafletMap).bindPopup(`<b style="font-size:1.1em; color:#0284c7;">📍 ${p.nombre}</b>`);
-        if (parcelPolygon) leafletMap.removeLayer(parcelPolygon);
-        if (contornosGeom[idx]) { parcelPolygon = L.polygon(contornosGeom[idx], { color: '#38bdf8', weight: 3, fillOpacity: 0.3 }).addTo(leafletMap); leafletMap.fitBounds(parcelPolygon.getBounds(), { padding: [30, 30] }); }
-        else leafletMap.setView([p.lat, p.lng], 17);
-        if (userCoords) actualizarMapaUbicacion(userCoords.lat, userCoords.lng, userCoords.accuracy || 10);
-      }
-      actualizarCalculosNav();
-    }
-    function guardarObservaciones() {
-      if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
-        parcelas[parcelaActualIndex].observaciones = document.getElementById('inputObservaciones').value;
-        guardarEnLocalStorage(); renderTablaResumen();
-      }
-    }
-    function toggleEstadoCompletada() {
-      if (parcelaActualIndex >= 0 && parcelas[parcelaActualIndex]) {
-        const p = parcelas[parcelaActualIndex];
-        p.completada = !p.completada;
-        // Guardar/limpiar fecha de completado
-        if (p.completada) {
-          p.fechaCompletada = new Date().toISOString();
-          mostrarNotificacion(`✔ Completada el ${formatearFecha(p.fechaCompletada)}`);
-        } else {
-          p.fechaCompletada = null;
-          mostrarNotificacion("↩️ Marcada como pendiente");
-        }
-        guardarEnLocalStorage(); cargarParcelaEnEdicion(parcelaActualIndex); renderTablaResumen();
-      }
-    }
-
-    /* ============================================
-       TABLA CON FECHA
-       ============================================ */
-    function renderTablaResumen() {
-      const tbody = document.getElementById('tablaResumen');
-      const contador = document.getElementById('resumenContador');
-      if (!tbody) return;
-      if (contador) {
-        const total = parcelas.length;
-        const completadas = parcelas.filter(p => p.completada).length;
-        contador.textContent = `${completadas} / ${total}`;
-      }
-      if (!parcelas.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay datos cargados</td></tr>'; return; }
-      let indices = parcelas.map((p, i) => i);
-      if (userCoords) {
-        indices.sort((a, b) => {
-          const da = parcelas[a]._distancia !== null ? parcelas[a]._distancia : calcularDistanciaMetros(userCoords.lat, userCoords.lng, parcelas[a].lat, parcelas[a].lng);
-          const db = parcelas[b]._distancia !== null ? parcelas[b]._distancia : calcularDistanciaMetros(userCoords.lat, userCoords.lng, parcelas[b].lat, parcelas[b].lng);
-          return da - db;
-        });
-      }
-      tbody.innerHTML = indices.map(i => {
-        const p = parcelas[i];
-        let distHtml = '<span style="color:var(--text-secondary);">--</span>';
-        if (p._distancia !== null) {
-          let cls = 'dist-far';
-          if (p._distancia <= distAlerta) cls = 'dist-near';
-          else if (p._distancia <= distAlerta * 3) cls = 'dist-mid';
-          distHtml = `<span class="dist-badge ${cls}">${formatearDistancia(p._distancia)}</span>`;
-        }
-        const fechaHtml = p.completada ? `<span style="color:var(--btn-success); font-weight:600;">${formatearFecha(p.fechaCompletada)}</span>` : '<span style="color:var(--text-secondary);">-</span>';
-        return `<tr class="${p.completada ? 'row-completada' : ''}" onclick="cargarParcelaEnEdicion(${i}); cambiarVista('sec-edicion');">
-          <td>${distHtml}</td><td>${p.id}</td>
-          <td>${p.nombre}</td>
-          <td>${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</td>
-          <td>${fechaHtml}</td>
-          <td>${p.observaciones ? '📝' : '-'}</td>
-        </tr>`;
-      }).join('');
-    }
-
-    /* ============================================
-       LOCALSTORAGE
-       ============================================ */
-    function guardarEnLocalStorage() {
-      try {
-        localStorage.setItem('sigpac_parcelas_data', JSON.stringify(parcelas));
-        localStorage.setItem('sigpac_contornos_data', JSON.stringify(contornosGeom));
-        localStorage.setItem('sigpac_fields_list', JSON.stringify(Array.from(kmlFieldsList)));
-        const s = document.getElementById('selectCampoNombre');
-        if (s && s.value) localStorage.setItem('sigpac_selected_field', s.value);
-      } catch(e) { console.warn("Error LS:", e); }
-    }
-    function cargarDeLocalStorage() {
-      try {
-        const sp = localStorage.getItem('sigpac_parcelas_data');
-        const sc = localStorage.getItem('sigpac_contornos_data');
-        const sf = localStorage.getItem('sigpac_fields_list');
-        const ss = localStorage.getItem('sigpac_selected_field');
-        if (sp) { parcelas = JSON.parse(sp); document.getElementById('totalPuntos').textContent = parcelas.length; }
-        if (sc) { contornosGeom = JSON.parse(sc); document.getElementById('totalContornos').textContent = contornosGeom.length; }
-        if (sf) { kmlFieldsList = new Set(JSON.parse(sf)); poblarSelectCampoIdentificador(ss); }
-        const da = localStorage.getItem('sigpac_dist_alerta');
-        const sa = localStorage.getItem('sigpac_sonido_alerta');
-        const iv = localStorage.getItem('sigpac_intervalo');
-        if (da) { distAlerta = parseInt(da); document.getElementById('cfgDistAlerta').value = da; }
-        if (sa) { sonidoAlerta = sa; document.getElementById('cfgSonidoAlerta').value = sa; }
-        if (iv) { intervaloEscaneo = parseInt(iv); document.getElementById('cfgIntervalo').value = iv; }
-        const pc = localStorage.getItem('sigpac_paquete_camara');
-        if (pc) { paqueteCamara = pc; document.getElementById('cfgPaqueteCamara').value = pc; }
-        const vib = localStorage.getItem('sigpac_vibracion');
-        if (vib) { patronVibracion = vib === 'pattern' ? 'pattern' : parseInt(vib); document.getElementById('cfgVibracion').value = vib; }
-        const st = localStorage.getItem('sigpac_theme');
-        if (st) cambiarTema(st, false);
-        const sl = localStorage.getItem('sigpac_tam_letra');
-        if (sl) { document.getElementById('cfgTamLetra').value = sl; document.body.style.fontSize = sl; }
-        if (parcelas.length > 0) { renderTablaResumen(); cargarParcelaEnEdicion(0); mostrarNotificacion("Datos previos cargados."); }
-        actualizarStatsCache();
-      } catch(e) { console.warn("Error LS:", e); }
-    }
-    function mostrarConfirmacionLimpieza() { document.getElementById('modalConfirm').classList.remove('hidden'); }
-    function cerrarModalConfirm() { document.getElementById('modalConfirm').classList.add('hidden'); }
-    function limpiarLocalStorage() {
-      ['sigpac_parcelas_data','sigpac_contornos_data','sigpac_fields_list','sigpac_selected_field'].forEach(k => localStorage.removeItem(k));
-      parcelas = []; contornosGeom = []; kmlFieldsList = new Set();
-      document.getElementById('totalPuntos').textContent = '0';
-      document.getElementById('totalContornos').textContent = '0';
-      document.getElementById('secCamposKml').classList.add('hidden');
-      renderTablaResumen(); cerrarModalConfirm(); mostrarNotificacion("Memoria limpiada.");
-    }
-
-    /* ============================================
-       BÚSQUEDA
-       ============================================ */
     function agregarAObservaciones(sel, tipo) {
       if (!sel.value) return;
       const o = document.getElementById('inputObservaciones'); if (!o) return;
@@ -2297,8 +2298,7 @@
       let html = '';
       const buscar = (db, label, bc) => {
         db.forEach(item => {
-          const cs = String(item.codigo).toLowerCase();
-          const ds = String(item.descripcion).toLowerCase();
+          const cs = String(item.codigo).toLowerCase(), ds = String(item.descripcion).toLowerCase();
           if (cs.includes(q) || ds.includes(q)) {
             html += `<div class="search-item" onclick="seleccionarResuBuscador('${label}: ${item.codigo} - ${item.descripcion}')"><span><b>${item.codigo}</b> - ${item.descripcion}</span><span class="type-badge ${bc}">${label}</span></div>`;
           }
@@ -2317,9 +2317,7 @@
       document.getElementById('inputBuscador').value = '';
     }
     function filtrarConsultasRegex() {
-      const input = document.getElementById('inputRegexConsultas');
-      const status = document.getElementById('regexStatus');
-      const chk = document.getElementById('chkCaseSensitive');
+      const input = document.getElementById('inputRegexConsultas'), status = document.getElementById('regexStatus'), chk = document.getElementById('chkCaseSensitive');
       if (!input || !status) return;
       const val = input.value.trim();
       const renderList = (db, cid, countId, regex) => {
@@ -2336,9 +2334,9 @@
       renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',regex);
     }
 
-    /* ============================================
+    /* =========================================================================
        CONFIG Y UI
-       ============================================ */
+       ========================================================================= */
     function toggleConfig() { document.getElementById('panelConfig').classList.toggle('hidden'); }
     function cambiarTema(tema, guardar = true) {
       document.body.setAttribute('data-theme', tema);
@@ -2351,7 +2349,7 @@
     }
     function aplicarAjustesConfig() { const t = document.getElementById('cfgTamLetra').value; document.body.style.fontSize = t; localStorage.setItem('sigpac_tam_letra', t); }
     function cambiarVista(secId) {
-      ['sec-kml','sec-resumen','sec-edicion','sec-mapa','sec-exportar','sec-consultas'].forEach(id => {
+      ['sec-kml','sec-resumen','sec-edicion','sec-mapa','sec-sigpac','sec-exportar','sec-consultas'].forEach(id => {
         const e = document.getElementById(id); if (e) e.classList.add('hidden');
         const b = document.getElementById('navBtn-'+id); if (b) b.classList.remove('active');
       });
@@ -2372,9 +2370,9 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
     }
 
-    /* ============================================
-       EXPORTAR - CON FECHA
-       ============================================ */
+    /* =========================================================================
+       EXPORTAR
+       ========================================================================= */
     function exportarCSV() {
       if (!parcelas.length) return mostrarNotificacion("No hay datos.");
       let csv = "ID;Nombre;Latitud;Longitud;Estado;FechaCompletado;Observaciones\n";
@@ -2392,6 +2390,9 @@
     }
     function descargarArchivo(c, n, t) { const b = new Blob(["\ufeff"+c], {type:t}); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = n; l.click(); }
 
+    /* =========================================================================
+       INICIO
+       ========================================================================= */
     window.onload = function() {
       poblardesplegables();
       initMap();
@@ -2400,6 +2401,633 @@
       cargarDeLocalStorage();
       activarSensoresGpsYBrujula();
     };
+  </script>
+
+  <!-- MÓDULO SIGPAC (Encapsulado) -->
+  <script>
+    (function () {
+      const BASE_URL = 'https://sigpac-hubcloud.es/servicioconsultassigpac/query';
+      const DEFAULT_CONCURRENCY = 4;
+      const geojsonCache = new Map();
+
+      function cleanCellValue(value) {
+        if (value === undefined || value === null) return '';
+        if (typeof value === 'number') return Number.isInteger(value) ? String(value) : String(value).replace(/\.0+$/, '');
+        return String(value).trim();
+      }
+      function padReference(parts) {
+        const widths = [2, 3, 1, 1, 3, 5, 1];
+        return parts.map((part, idx) => String(part).padStart(widths[idx], '0')).join('-');
+      }
+      function parseSigpacReference(raw) {
+        const parts = String(raw || '').trim().split(/[^\d]+/).filter(Boolean);
+        if (parts.length !== 7) throw new Error('La referencia debe tener 7 bloques.');
+        return parts.map(p => String(Number(p)));
+      }
+      function parseSigpacReferenceFromParts(parts) {
+        if (!Array.isArray(parts) || parts.length !== 7) throw new Error('No se han encontrado las 7 partes.');
+        return parts.map(value => {
+          const raw = String(value ?? '').trim();
+          if (!raw || !/^\d+$/.test(raw)) throw new Error('Los campos deben contener solo números.');
+          return String(Number(raw));
+        });
+      }
+      function getReferenceId(parts) { return padReference(parts); }
+      function buildReferenceUrl(parts) {
+        const [pr, mu, ag, zo, po, pa, re] = parts;
+        return `${BASE_URL}/recinfo/${pr}/${mu}/${ag}/${zo}/${po}/${pa}/${re}.geojson`;
+      }
+      function ensureAbortError(error) { return error?.name === 'AbortError' ? error : new DOMException('Operación cancelada.', 'AbortError'); }
+
+      async function fetchGeojsonByReference(parts, options = {}) {
+        const { signal } = options;
+        try {
+          const res = await fetch(buildReferenceUrl(parts), { method: 'GET', headers: { Accept: 'application/geo+json, application/json' }, signal });
+          if (!res.ok) throw new Error(`SIGPAC devolvió HTTP ${res.status}`);
+          return res.json();
+        } catch (error) { if (signal?.aborted) throw ensureAbortError(error); throw error; }
+      }
+
+      async function fetchGeojsonCached(parts, options = {}) {
+        const { signal, forceRefresh = false } = options;
+        const id = getReferenceId(parts);
+        if (!forceRefresh && geojsonCache.has(id)) return geojsonCache.get(id);
+        const pendingRequest = fetchGeojsonByReference(parts, { signal })
+          .then(data => { geojsonCache.set(id, data); return data; })
+          .catch(error => { if (geojsonCache.get(id) === pendingRequest) geojsonCache.delete(id); throw error; });
+        geojsonCache.set(id, pendingRequest);
+        return pendingRequest;
+      }
+
+      async function resolveReferencesBatch(references, options = {}) {
+        const { concurrency = DEFAULT_CONCURRENCY, signal, forceRefresh = false, onProgress } = options;
+        const normalizedConcurrency = Math.max(1, Number(concurrency) || DEFAULT_CONCURRENCY);
+        const results = new Array(references.length);
+        let nextIndex = 0, completed = 0;
+
+        async function worker() {
+          while (true) {
+            if (signal?.aborted) throw ensureAbortError();
+            const index = nextIndex++;
+            if (index >= references.length) return;
+            const item = references[index];
+            const id = getReferenceId(item.parts);
+            try {
+              const geojson = await fetchGeojsonCached(item.parts, { signal, forceRefresh });
+              results[index] = { ok: true, id, item, geojson };
+            } catch (error) {
+              if (signal?.aborted || error?.name === 'AbortError') throw ensureAbortError(error);
+              results[index] = { ok: false, id, item, error };
+            } finally {
+              completed += 1;
+              onProgress?.({ current: completed, total: references.length, id, index, result: results[index] });
+            }
+          }
+        }
+        const workerCount = Math.min(normalizedConcurrency, Math.max(references.length, 1));
+        await Promise.all(Array.from({ length: workerCount }, () => worker()));
+        return results;
+      }
+
+      function clearGeojsonCache(referenceId) {
+        if (referenceId) { geojsonCache.delete(referenceId); return; }
+        geojsonCache.clear();
+      }
+
+      window.SigpacUtils = { cleanCellValue, padReference, parseSigpacReference, parseSigpacReferenceFromParts, getReferenceId, fetchGeojsonCached, resolveReferencesBatch, clearGeojsonCache };
+    })();
+
+    (function () {
+      function escapeXml(value) {
+        return String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+      function ringToKmlCoordinates(ring) {
+        return ring.map(coord => { const [lon, lat, alt = 0] = coord; return `${lon},${lat},${alt}`; }).join(' ');
+      }
+      function polygonToKml(coords) {
+        const outer = coords[0], inners = coords.slice(1);
+        const innerBoundaries = inners.map(ring => `\n<innerBoundaryIs><LinearRing><coordinates>${ringToKmlCoordinates(ring)}</coordinates></LinearRing></innerBoundaryIs>`).join('');
+        return `\n<Polygon><outerBoundaryIs><LinearRing><coordinates>${ringToKmlCoordinates(outer)}</coordinates></LinearRing></outerBoundaryIs>${innerBoundaries}\n</Polygon>`;
+      }
+      function geometryToKml(geometry) {
+        if (!geometry || !geometry.type || !geometry.coordinates) throw new Error('Geometría no válida.');
+        if (geometry.type === 'Polygon') return polygonToKml(geometry.coordinates);
+        if (geometry.type === 'MultiPolygon') return geometry.coordinates.map(coords => polygonToKml(coords)).join('');
+        throw new Error(`Tipo no soportado: ${geometry.type}`);
+      }
+      function propertiesToExtendedData(properties) {
+        return Object.entries(properties || {}).map(([key, value]) => `\n<Data name="${escapeXml(key)}"><value>${escapeXml(value ?? '')}</value></Data>`).join('');
+      }
+      function getAllCoordinates(geometry) {
+        const coords = [];
+        if (geometry.type === 'Polygon') geometry.coordinates.forEach(ring => ring.forEach(coord => coords.push(coord)));
+        else if (geometry.type === 'MultiPolygon') geometry.coordinates.forEach(poly => poly.forEach(ring => ring.forEach(coord => coords.push(coord))));
+        return coords;
+      }
+      function getCentroid(geometry) {
+        const coords = getAllCoordinates(geometry);
+        let sumLon = 0, sumLat = 0;
+        coords.forEach(([lon, lat]) => { sumLon += lon; sumLat += lat; });
+        return { lon: sumLon / coords.length, lat: sumLat / coords.length };
+      }
+      function buildNameFromProperties(props, fallback) {
+        const parts = [props.provincia, props.municipio, props.agregado, props.zona, props.poligono, props.parcela, props.recinto].filter(v => v !== undefined && v !== null && v !== '');
+        return parts.length === 7 ? parts.join('-') : (props.nombre || props.name || fallback || 'Recinto');
+      }
+      function buildDescription(props) {
+        return [props.uso_sigpac ? `Uso SIGPAC: ${props.uso_sigpac}` : null, props.superficie ? `Superficie: ${props.superficie} ha` : null].filter(Boolean).join('\n');
+      }
+      function featureToPolygonPlacemark(feature, idx, label) {
+        const props = feature.properties || {};
+        const name = label || buildNameFromProperties(props, `Recinto ${idx + 1}`);
+        return `\n<Placemark><name>${escapeXml(name)}</name><description><![CDATA[${buildDescription(props)}]]></description><styleUrl>#polygonStyle</styleUrl><ExtendedData>${propertiesToExtendedData(props)}</ExtendedData>${geometryToKml(feature.geometry)}</Placemark>`;
+      }
+      function featureToCentroidPlacemark(feature, idx, label) {
+        const props = feature.properties || {};
+        const name = label || buildNameFromProperties(props, `Recinto ${idx + 1}`);
+        const centroid = getCentroid(feature.geometry);
+        return `\n<Placemark><name>${escapeXml(name)}</name><description><![CDATA[Centroide\n${buildDescription(props)}]]></description><styleUrl>#centroidStyle</styleUrl><Point><coordinates>${centroid.lon},${centroid.lat},0</coordinates></Point></Placemark>`;
+      }
+      function geojsonToFeatures(geojson) {
+        if (!geojson) throw new Error('No se recibió respuesta GeoJSON.');
+        let features = [];
+        if (geojson.type === 'FeatureCollection') features = geojson.features || [];
+        else if (geojson.type === 'Feature') features = [geojson];
+        else if (geojson.type && geojson.coordinates) features = [{ type: 'Feature', properties: {}, geometry: geojson }];
+        if (!features.length) throw new Error('No se encontraron geometrías.');
+        return features;
+      }
+      function collectReferencePlacemarks(geojson, label) {
+        const features = geojsonToFeatures(geojson);
+        return {
+          polygons: features.map((feature, idx) => featureToPolygonPlacemark(feature, idx, label)).join('\n'),
+          centroids: features.map((feature, idx) => featureToCentroidPlacemark(feature, idx, label)).join('\n'),
+          count: features.length
+        };
+      }
+      function buildKmlDocument(docName, bodyContent) {
+        const polygonStyle = '<Style id="polygonStyle"><LineStyle><color>ff0066ff</color><width>2</width></LineStyle><PolyStyle><color>4d00ff88</color></PolyStyle></Style>';
+        const centroidStyle = '<Style id="centroidStyle"><IconStyle><scale>1.1</scale><Icon><href>https://maps.google.com/mapfiles/kml/shapes/placemark_circle.png</href></Icon></IconStyle><LabelStyle><scale>0.7</scale></LabelStyle></Style>';
+        return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n<Document>\n<name>${escapeXml(docName || 'Parcelas SIGPAC')}</name>\n<description>Exportación de parcelas SIGPAC</description>\n${polygonStyle}\n${centroidStyle}\n${bodyContent}\n</Document>\n</kml>`;
+      }
+      function downloadTextFile(filename, content, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      }
+      window.KmlUtils = { escapeXml, collectReferencePlacemarks, buildKmlDocument, downloadTextFile };
+    })();
+
+    (function () {
+      const { cleanCellValue, parseSigpacReference, parseSigpacReferenceFromParts } = window.SigpacUtils;
+      function buildRowsFromSheet(sheet) {
+        const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
+        const nonEmptyRows = matrix.filter(row => Array.isArray(row) && row.some(cell => cleanCellValue(cell) !== ''));
+        if (!nonEmptyRows.length) return { headers: [], rows: [] };
+        const firstRow = nonEmptyRows[0].map(cleanCellValue);
+        const headerSignals = firstRow.filter(cell => /refer|sigpac|cod|prov|mun|agreg|zona|pol|parc|recint/i.test(cell)).length;
+        const numericSignals = firstRow.filter(cell => /^\d+$/.test(cell)).length;
+        const treatFirstAsHeader = headerSignals >= 1 && numericSignals < Math.max(3, firstRow.length - 1);
+        const headers = treatFirstAsHeader ? firstRow : firstRow.map((_, idx) => `Columna ${idx + 1}`);
+        const uniqueHeaders = []; const used = new Set();
+        headers.forEach((header, idx) => {
+          let candidate = header || `Columna ${idx + 1}`; let suffix = 2;
+          while (used.has(candidate)) candidate = `${header || `Columna ${idx + 1}`} (${suffix++})`;
+          used.add(candidate); uniqueHeaders.push(candidate);
+        });
+        const dataRows = (treatFirstAsHeader ? nonEmptyRows.slice(1) : nonEmptyRows).map((row, idx) => {
+          const obj = { __rowNumber: idx + (treatFirstAsHeader ? 2 : 1) };
+          uniqueHeaders.forEach((header, colIdx) => { obj[header] = row[colIdx] ?? ''; });
+          return obj;
+        });
+        return { headers: uniqueHeaders, rows: dataRows };
+      }
+      function getRowValues(row, currentHeaders) { return currentHeaders.map(header => row[header]); }
+      function findReferenceInRow(row, currentHeaders) {
+        for (const value of getRowValues(row, currentHeaders)) {
+          const cell = cleanCellValue(value); if (!cell) continue;
+          try { return { parts: parseSigpacReference(cell), source: cell }; } catch {}
+        }
+        return null;
+      }
+      function findNumericReferencePartsInRow(row, currentHeaders) {
+        const values = getRowValues(row, currentHeaders).map(cleanCellValue).filter(Boolean);
+        const numericOnly = values.filter(v => /^\d+$/.test(v));
+        return numericOnly.length >= 7 ? numericOnly.slice(0, 7) : null;
+      }
+      function rowToReference(row, rowIndex, currentHeaders) {
+        const detected = findReferenceInRow(row, currentHeaders);
+        if (detected) return { rowNumber: row.__rowNumber || rowIndex + 2, parts: detected.parts, source: detected.source, origin: 'file' };
+        const numericParts = findNumericReferencePartsInRow(row, currentHeaders);
+        if (numericParts) return { rowNumber: row.__rowNumber || rowIndex + 2, parts: parseSigpacReferenceFromParts(numericParts), source: numericParts.join(' | '), origin: 'file' };
+        throw new Error('No se pudo interpretar la fila.');
+      }
+      function extractReferencesFromRows(rows, headers) {
+        return rows.map((row, idx) => { try { return { ...rowToReference(row, idx, headers), ok: true }; } catch { return null; } }).filter(Boolean);
+      }
+      window.ExcelUtils = { buildRowsFromSheet, extractReferencesFromRows };
+    })();
+
+    (function () {
+      let map = null, geoJsonLayer = null, markersLayer = null;
+      const MAX_LABELS = 50, ENABLE_MARKERS = true;
+      function ensureMap() {
+        if (map) return map;
+        map = L.map('mapPreview').setView([40.0, -3.7], 6);
+        const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 });
+        const pnoa = L.tileLayer('https://tms-pnoa-ma.idee.es/1.0.0/pnoa-ma/{z}/{x}/{-y}.jpeg', { attribution: 'Ortofoto PNOA MA © IGN España', maxZoom: 19 });
+        pnoa.addTo(map);
+        L.control.layers({ '🛰️ Ortofoto PNOA': pnoa, '🗺️ Mapa OSM': osm }, {}, { collapsed: false }).addTo(map);
+        geoJsonLayer = L.layerGroup().addTo(map);
+        markersLayer = L.layerGroup().addTo(map);
+        return map;
+      }
+      function clearPreview() { if (geoJsonLayer) geoJsonLayer.clearLayers(); if (markersLayer) markersLayer.clearLayers(); }
+      function normalizeCollection(items) {
+        if (!Array.isArray(items)) return [];
+        return items.map((item, index) => {
+          if (!item) return null;
+          const geojson = item.geojson || item.data || item.featureCollection || item.feature || null;
+          const id = item.id || item.code || item.label || item.name || `Recinto ${index + 1}`;
+          if (!geojson) return null;
+          return { id, geojson };
+        }).filter(Boolean);
+      }
+      function renderPreview(items) {
+        const collection = normalizeCollection(items);
+        ensureMap(); clearPreview();
+        if (!collection.length) { setTimeout(() => map.invalidateSize(), 0); return; }
+        const allBounds = []; const showLabels = collection.length <= MAX_LABELS;
+        for (const item of collection) {
+          const { id, geojson } = item;
+          const layer = L.geoJSON(geojson, { style: { color: '#00a8ff', weight: 2, fillOpacity: 0.25 } });
+          layer.addTo(geoJsonLayer);
+          const layerBounds = layer.getBounds();
+          if (layerBounds && layerBounds.isValid()) {
+            allBounds.push(layerBounds);
+            if (ENABLE_MARKERS) {
+              const center = layerBounds.getCenter();
+              const marker = L.marker(center);
+              if (showLabels) marker.bindTooltip(id, { permanent: true, direction: 'top', offset: [0, -10], className: 'map-label' });
+              marker.bindPopup(`<div style="text-align:center; padding: 5px;"><strong style="color:#00a8ff; display:block; margin-bottom:8px;">${id}</strong><a href="https://www.google.com/maps/search/?api=1&query=${center.lat},${center.lng}" target="_blank" rel="noopener noreferrer" style="color:#fff; font-size:13px; font-weight:600; text-decoration:none; display:inline-block; background:#00a8ff; padding:6px 12px; border-radius:6px;">📍 Abrir en Google Maps</a></div>`);
+              marker.addTo(markersLayer);
+            }
+          }
+        }
+        if (allBounds.length) {
+          const combined = allBounds.reduce((acc, bounds) => acc.extend(bounds), allBounds[0]);
+          map.fitBounds(combined, { padding: [20, 20] });
+        }
+        setTimeout(() => map.invalidateSize(), 0);
+      }
+      window.MapPreview = { init: ensureMap, clearPreview, renderPreview };
+    })();
+
+    (function () {
+      const { parseSigpacReference, getReferenceId, resolveReferencesBatch, clearGeojsonCache, DEFAULT_CONCURRENCY } = window.SigpacUtils;
+      const { collectReferencePlacemarks, buildKmlDocument, downloadTextFile, escapeXml } = window.KmlUtils;
+      const { buildRowsFromSheet, extractReferencesFromRows } = window.ExcelUtils;
+
+      const batchStatusEl = document.getElementById('batchStatus');
+      const errorPanelEl = document.getElementById('errorPanel');
+      const errorListEl = document.getElementById('errorList');
+      const errorCopyBtn = document.getElementById('errorCopyBtn');
+      const errorDismissBtn = document.getElementById('errorDismissBtn');
+      const queryNameEl = document.getElementById('queryName');
+      const codeInputEl = document.getElementById('codeInput');
+      const addCodeBtn = document.getElementById('addCodeBtn');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const integrateBtn = document.getElementById('integrateBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const previewBtn = document.getElementById('previewBtn');
+      const mapCardEl = document.getElementById('mapCard');
+      const fileInputEl = document.getElementById('fileInput');
+      const kmlInputEl = document.getElementById('kmlInput');
+      const detectedChipsEl = document.getElementById('detectedChips');
+      const batchProgressEl = document.getElementById('batchProgress');
+      const progressFillEl = document.getElementById('progressFill');
+      const progressCounterEl = document.getElementById('progressCounter');
+      const progressCodeEl = document.getElementById('progressCode');
+      const progressTitleEl = document.getElementById('progressTitle');
+      const RESOLUTION_CONCURRENCY = DEFAULT_CONCURRENCY;
+
+      let currentRows = [], currentHeaders = [], parsedFileReferences = [], addedReferences = [];
+      let activeController = null;
+      let resolvedState = { signature: '', okItems: [], errors: [] };
+
+      queryNameEl.value = '';
+
+      function showStatus(msg, type = 'info') {
+        batchStatusEl.textContent = msg;
+        batchStatusEl.classList.remove('hidden', 'error', 'success', 'info');
+        batchStatusEl.classList.add(type);
+      }
+      function hideStatus() { batchStatusEl.textContent = ''; batchStatusEl.classList.add('hidden'); }
+      function showErrorPanel(errors) {
+        if (!errorPanelEl || !errors.length) return;
+        errorListEl.innerHTML = errors.map(e => `<li><code>${escapeXml(e)}</code></li>`).join('');
+        errorPanelEl.classList.remove('hidden');
+      }
+      function hideErrorPanel() { if (errorPanelEl) errorPanelEl.classList.add('hidden'); if (errorListEl) errorListEl.innerHTML = ''; }
+
+      if (errorCopyBtn) {
+        errorCopyBtn.addEventListener('click', () => {
+          const lines = Array.from(errorListEl.querySelectorAll('code')).map(el => el.textContent);
+          navigator.clipboard.writeText(lines.join('\n')).then(() => {
+            errorCopyBtn.textContent = '✓ Copiado';
+            setTimeout(() => { errorCopyBtn.textContent = '📋 Copiar lista'; }, 2000);
+          });
+        });
+      }
+      if (errorDismissBtn) errorDismissBtn.addEventListener('click', hideErrorPanel);
+
+      function getCombinedReferences() {
+        const unique = new Map();
+        parsedFileReferences.forEach(item => unique.set(getReferenceId(item.parts), item));
+        addedReferences.forEach(item => unique.set(getReferenceId(item.parts), item));
+        return [...unique.values()];
+      }
+      function getReferencesSignature(refs = getCombinedReferences()) { return refs.map(item => getReferenceId(item.parts)).sort().join('|'); }
+      function invalidateResolvedState() { resolvedState = { signature: '', okItems: [], errors: [] }; }
+      function abortActiveWork() { if (activeController) { activeController.abort(); activeController = null; } }
+
+      function renderDetectedChips() {
+        const refs = getCombinedReferences();
+        detectedChipsEl.innerHTML = refs.map(item => {
+          const id = getReferenceId(item.parts);
+          return `<span class="sigpac-mod-chip">${escapeXml(id)}<button type="button" data-remove-code="${escapeXml(id)}">×</button></span>`;
+        }).join('');
+      }
+
+      function updateSigpacResults(okItems) {
+        const panel = document.getElementById('sigpacResultsPanel');
+        const tbody = document.getElementById('sigpacResultsBody');
+        const count = document.getElementById('sigpacResultsCount');
+        if (!okItems || okItems.length === 0) {
+          panel.classList.add('hidden');
+          return;
+        }
+        panel.classList.remove('hidden');
+        count.textContent = okItems.length;
+        tbody.innerHTML = okItems.map(item => {
+          const props = item.geojson.features?.[0]?.properties || item.geojson.properties || {};
+          const ref = item.id || 'N/A';
+          const mun = props.municipio || props.Municipio || 'N/A';
+          const pol = props.poligono || props.Poligono || 'N/A';
+          const par = props.parcela || props.Parcela || 'N/A';
+          const rec = props.recinto || props.Recinto || 'N/A';
+          const sup = props.superficie || props.Superficie || 'N/A';
+          return `<tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 8px;">${ref}</td>
+            <td style="padding: 8px;">${mun}</td>
+            <td style="padding: 8px;">${pol}/${par}/${rec}</td>
+            <td style="padding: 8px;">${sup} ha</td>
+          </tr>`;
+        }).join('');
+      }
+
+      function refreshState(statusMessage = null, statusType = 'success') {
+        renderDetectedChips();
+        const total = getCombinedReferences().length;
+        if (statusMessage) showStatus(statusMessage, statusType);
+        else if (!total) showStatus('Añade los códigos manualmente o impórtalos desde un archivo Excel o CSV.', 'info');
+        else showStatus(`Hay ${total} referencia(s) lista(s) para generar el KML o integrar.`, 'success');
+      }
+
+      function addCodeFromInput() {
+        const raw = (codeInputEl.value || '').trim(); 
+        if (!raw) {
+          showStatus('⚠️ Por favor, introduce un código SIGPAC.', 'info');
+          return;
+        }
+        try {
+          const parts = parseSigpacReference(raw);
+          const id = getReferenceId(parts);
+          
+          const exists = addedReferences.some(item => getReferenceId(item.parts) === id) || 
+                         parsedFileReferences.some(item => getReferenceId(item.parts) === id);
+                         
+          if (!exists) {
+            addedReferences.push({ parts, origin: 'manual', source: raw });
+            invalidateResolvedState();
+            showStatus(`✅ Código ${id} añadido correctamente.`, 'success');
+          } else {
+            showStatus(`ℹ️ El código ${id} ya está en la lista.`, 'info');
+          }
+          
+          codeInputEl.value = ''; 
+          refreshState();
+        } catch (err) { 
+          showStatus('❌ Formato no válido. Debe tener 7 bloques numéricos (Ej: 2-67-0-0-39-36-1).', 'error');
+          console.error('Error al añadir SIGPAC:', err);
+        }
+      }
+
+      function removeReference(id) {
+        addedReferences = addedReferences.filter(item => getReferenceId(item.parts) !== id);
+        parsedFileReferences = parsedFileReferences.filter(item => getReferenceId(item.parts) !== id);
+        invalidateResolvedState(); clearGeojsonCache(id); refreshState();
+      }
+
+      function clearAllReferences() {
+        abortActiveWork();
+        addedReferences = []; parsedFileReferences = []; currentRows = []; currentHeaders = [];
+        codeInputEl.value = ''; fileInputEl.value = ''; queryNameEl.value = '';
+        invalidateResolvedState(); clearGeojsonCache(); resetProgress(); hideErrorPanel();
+        if (window.MapPreview) window.MapPreview.clearPreview();
+        mapCardEl.classList.add('hidden');
+        document.getElementById('sigpacResultsPanel').classList.add('hidden');
+        refreshState('Se han borrado todos los recintos. Ya puedes empezar una nueva búsqueda.', 'success');
+      }
+
+      function parseCurrentSheet() {
+        if (!currentRows.length) { parsedFileReferences = []; invalidateResolvedState(); refreshState(); return; }
+        const results = extractReferencesFromRows(currentRows, currentHeaders);
+        parsedFileReferences = results; invalidateResolvedState();
+        refreshState(results.length ? `${results.length} referencia(s) detectada(s) desde el archivo.` : 'No se han detectado referencias válidas en el archivo.', results.length ? 'success' : 'error');
+      }
+
+      async function handleFileUpload(file) {
+        if (!file) return;
+        try {
+          showStatus('Leyendo archivo…');
+          const buffer = await file.arrayBuffer();
+          const workbook = XLSX.read(buffer, { type: 'array' });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const parsedSheet = buildRowsFromSheet(sheet);
+          currentRows = parsedSheet.rows; currentHeaders = parsedSheet.headers;
+          if (!currentHeaders.length) { parsedFileReferences = []; invalidateResolvedState(); refreshState('La hoja seleccionada no contiene datos legibles.', 'error'); return; }
+          parseCurrentSheet();
+        } catch (err) { showStatus(err.message || 'No se pudo leer el archivo.', 'error'); }
+      }
+
+      function setProgress(current, total, code, title = 'Procesando parcelas…') {
+        batchProgressEl.style.display = 'block';
+        progressTitleEl.textContent = title;
+        progressCounterEl.textContent = `${current} / ${total}`;
+        progressCodeEl.textContent = code ? `Consultando: ${code}` : '';
+        progressFillEl.style.width = total ? `${(current / total) * 100}%` : '0%';
+      }
+      function resetProgress() {
+        batchProgressEl.style.display = 'none'; progressFillEl.style.width = '0%';
+        progressCounterEl.textContent = '0 / 0'; progressCodeEl.textContent = ''; progressTitleEl.textContent = 'Procesando parcelas…';
+      }
+
+      function getSafeFileName() {
+        const base = (queryNameEl.value || 'parcelas_sigpac').trim();
+        return base.replace(/[^\p{L}\p{N}_-]+/gu, '_').replace(/_+/g, '_').replace(/^_|_$/g, '') || 'parcelas_sigpac';
+      }
+
+      async function resolveCurrentReferences(title = 'Procesando parcelas…') {
+        const refs = getCombinedReferences();
+        if (!refs.length) throw new Error('Añade al menos un código SIGPAC o importa un archivo.');
+        const signature = getReferencesSignature(refs);
+        if (resolvedState.signature === signature && (resolvedState.okItems.length || resolvedState.errors.length)) return resolvedState;
+
+        abortActiveWork();
+        const controller = new AbortController(); activeController = controller;
+        const results = await resolveReferencesBatch(refs, {
+          concurrency: RESOLUTION_CONCURRENCY, signal: controller.signal,
+          onProgress: ({ current, total, id }) => setProgress(current, total, id, title)
+        });
+        if (activeController === controller) activeController = null;
+
+        const okItems = [], errors = [];
+        results.forEach(result => {
+          if (result?.ok) {
+            const g = result.geojson;
+            let hasFeatures = false;
+            try {
+              if (g?.type === 'FeatureCollection') hasFeatures = (g.features || []).length > 0;
+              else if (g?.type === 'Feature') hasFeatures = !!g.geometry;
+              else if (g?.type && g?.coordinates) hasFeatures = true;
+            } catch {}
+            if (hasFeatures) okItems.push({ id: result.id, parts: result.item.parts, geojson: result.geojson, label: result.id });
+            else errors.push(result.id);
+          } else if (result) errors.push(result.id);
+        });
+        resolvedState = { signature, okItems, errors };
+        return resolvedState;
+      }
+
+      function setButtonsDisabled(isDisabled) {
+        previewBtn.disabled = isDisabled; downloadBtn.disabled = isDisabled; integrateBtn.disabled = isDisabled;
+        addCodeBtn.disabled = isDisabled; clearBtn.disabled = isDisabled; codeInputEl.disabled = isDisabled; fileInputEl.disabled = isDisabled;
+      }
+
+      async function showPreview() {
+        hideStatus(); hideErrorPanel();
+        if (!getCombinedReferences().length) { showStatus('Añade al menos un código SIGPAC o importa un archivo para ver el mapa.', 'error'); return; }
+        setButtonsDisabled(true);
+        try {
+          const resolution = await resolveCurrentReferences('Cargando mapa…');
+          if (!resolution.okItems.length) throw new Error(resolution.errors.length ? `No se pudo cargar ningún recinto. ${resolution.errors.length} referencia(s) fallaron.` : 'No se pudo generar el mapa.');
+          
+          updateSigpacResults(resolution.okItems);
+          
+          mapCardEl.classList.remove('hidden');
+          window.MapPreview.renderPreview(resolution.okItems.map(item => ({ label: item.label, geojson: item.geojson })));
+          if (resolution.errors.length) {
+            showStatus(`Mapa cargado: ${resolution.okItems.length} OK · ${resolution.errors.length} sin resultado (ver abajo ↓)`, 'success');
+            showErrorPanel(resolution.errors);
+          } else showStatus(`Mapa cargado correctamente con ${resolution.okItems.length} referencia(s).`, 'success');
+          setTimeout(() => mapCardEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+        } catch (err) {
+          if (err?.name === 'AbortError') showStatus('La operación anterior se canceló para iniciar una nueva.', 'info');
+          else showStatus(err.message || 'No se pudo generar el mapa.', 'error');
+        } finally { resetProgress(); setButtonsDisabled(false); }
+      }
+
+      async function downloadUnifiedKml() {
+        hideStatus(); hideErrorPanel();
+        if (!getCombinedReferences().length) { showStatus('Añade al menos un código SIGPAC o importa un archivo.', 'error'); return; }
+        setButtonsDisabled(true);
+        try {
+          const resolution = await resolveCurrentReferences('Preparando KML…');
+          if (!resolution.okItems.length) throw new Error(resolution.errors.length ? `No se pudo obtener ningún recinto. ${resolution.errors.length} referencia(s) fallaron.` : 'No se pudo generar ninguna geometría.');
+          
+          updateSigpacResults(resolution.okItems);
+          
+          const polygonPlacemarks = [], centroidPlacemarks = [];
+          resolution.okItems.forEach(item => {
+            const placemarks = collectReferencePlacemarks(item.geojson, item.id);
+            polygonPlacemarks.push(placemarks.polygons); centroidPlacemarks.push(placemarks.centroids);
+          });
+          const docName = getSafeFileName();
+          const kml = buildKmlDocument(docName, `\n<Folder><name>Polígonos</name>${polygonPlacemarks.join('\n')}</Folder>\n<Folder><name>Centroides</name>${centroidPlacemarks.join('\n')}</Folder>`);
+          downloadTextFile(`${docName}.kml`, kml, 'application/vnd.google-earth.kml+xml');
+          if (resolution.errors.length) {
+            showStatus(`¡KML generado! ${resolution.okItems.length} recintos incluidos · ${resolution.errors.length} sin resultado (ver abajo ↓)`, 'success');
+            showErrorPanel(resolution.errors);
+          } else showStatus(`¡Proceso completado! Se han incluido ${resolution.okItems.length} referencia(s) en el KML.`, 'success');
+        } catch (err) {
+          if (err?.name === 'AbortError') showStatus('La operación anterior se canceló para iniciar una nueva.', 'info');
+          else showStatus(err.message || 'Ha ocurrido un error al generar el KML.', 'error');
+        } finally { resetProgress(); setButtonsDisabled(false); }
+      }
+
+      async function integrateToMainApp() {
+        hideStatus(); hideErrorPanel();
+        if (!getCombinedReferences().length) { showStatus('Añade al menos un código SIGPAC o importa un archivo.', 'error'); return; }
+        setButtonsDisabled(true);
+        try {
+          const resolution = await resolveCurrentReferences('Preparando integración…');
+          if (!resolution.okItems.length) throw new Error(resolution.errors.length ? `No se pudo obtener ningún recinto. ${resolution.errors.length} referencia(s) fallaron.` : 'No se pudo generar ninguna geometría.');
+          
+          updateSigpacResults(resolution.okItems);
+          
+          if (typeof window.integrarColeccionSIGPAC === 'function') {
+            window.integrarColeccionSIGPAC(resolution.okItems);
+          } else {
+            showStatus('Error: Función de integración no encontrada en la app principal.', 'error');
+          }
+
+          if (resolution.errors.length) {
+            showStatus(`Integrados ${resolution.okItems.length} recintos · ${resolution.errors.length} sin resultado (ver abajo ↓)`, 'success');
+            showErrorPanel(resolution.errors);
+          } else {
+            showStatus(`¡Integración completada! ${resolution.okItems.length} referencia(s) añadidas a la app.`, 'success');
+          }
+        } catch (err) {
+          if (err?.name === 'AbortError') showStatus('La operación se canceló.', 'info');
+          else showStatus(err.message || 'Error al integrar.', 'error');
+        } finally { resetProgress(); setButtonsDisabled(false); }
+      }
+
+      async function handleKmlUpload(file) {
+        if (!file) return;
+        try {
+          hideStatus(); showStatus('Leyendo KML…');
+          const text = await file.text();
+          const parser = new DOMParser();
+          const xml = parser.parseFromString(text, 'text/xml');
+          if (xml.querySelector('parsererror')) throw new Error('El archivo KML no es válido.');
+          const geojson = toGeoJSON.kml(xml);
+          if (!geojson || !Array.isArray(geojson.features)) throw new Error('No se pudo interpretar el KML.');
+          const polygonFeatures = geojson.features.filter(feature => feature?.geometry && (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon'));
+          if (!polygonFeatures.length) throw new Error('El KML no contiene polígonos válidos para mostrar.');
+          const items = polygonFeatures.map((feature, index) => ({ id: feature.properties?.name || `Elemento ${index + 1}`, label: feature.properties?.name || `Elemento ${index + 1}`, geojson: feature }));
+          mapCardEl.classList.remove('hidden');
+          window.MapPreview.renderPreview(items);
+          showStatus(`KML cargado correctamente con ${items.length} elemento(s).`, 'success');
+          setTimeout(() => mapCardEl.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+        } catch (err) { showStatus(err.message || 'No se pudo cargar el KML.', 'error'); }
+        finally { if (kmlInputEl) kmlInputEl.value = ''; }
+      }
+
+      addCodeBtn.addEventListener('click', addCodeFromInput);
+      codeInputEl.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); addCodeFromInput(); } });
+      detectedChipsEl.addEventListener('click', e => { const removeBtn = e.target.closest('[data-remove-code]'); if (removeBtn) removeReference(removeBtn.dataset.removeCode); });
+      downloadBtn.addEventListener('click', downloadUnifiedKml);
+      integrateBtn.addEventListener('click', integrateToMainApp);
+      previewBtn.addEventListener('click', showPreview);
+      clearBtn.addEventListener('click', clearAllReferences);
+      fileInputEl.addEventListener('change', e => handleFileUpload(e.target.files[0]));
+      if (kmlInputEl) kmlInputEl.addEventListener('change', e => handleKmlUpload(e.target.files[0]));
+
+      refreshState();
+    })();
   </script>
 </body>
 </html>
