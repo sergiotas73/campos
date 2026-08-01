@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Gestión de Parcelas y SIGPAC v26 - Tactical Pro</title>
+  <title>Gestión de Parcelas y SIGPAC v27 - Tactical Pro</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -101,15 +101,56 @@
     .kml-upload-card:hover { border-color: var(--accent-primary); }
     .field-gis-container { display: grid; grid-template-columns: 280px 1fr; gap: 14px; margin-top: 12px; }
     .compass-box { background: var(--compass-bg); color: var(--text-primary); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 20px rgba(0,0,0,0.8), var(--shadow); border: 2px solid var(--border-color); }
-    .compass-dial { width: 160px; height: 160px; border: 4px solid var(--compass-border); border-radius: 50%; position: relative; margin: 12px 0; background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--compass-bg) 100%); box-shadow: 0 0 20px rgba(0,168,255,0.3), inset 0 0 10px rgba(0,0,0,0.5); }
-    .compass-cardinal { position: absolute; font-size: 1em; font-weight: 900; color: var(--text-secondary); text-shadow: 0 0 4px rgba(0,0,0,0.8); }
+    .compass-dial { width: 160px; height: 160px; border: 4px solid var(--compass-border); border-radius: 50%; position: relative; margin: 12px 0; background: radial-gradient(circle, var(--bg-tertiary) 0%, var(--compass-bg) 100%); box-shadow: 0 0 20px rgba(0,168,255,0.3), inset 0 0 10px rgba(0,0,0,0.5); overflow: hidden; }
+    
+    /* CORRECCIÓN: La aguja ahora ocupa todo el dial para que los puntos cardinales giren con ella */
+    .compass-needle { 
+      width: 100%; 
+      height: 100%; 
+      position: absolute; 
+      top: 0; 
+      left: 0; 
+      transform-origin: center center; 
+      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); 
+    }
+    .compass-needle .needle-north,
+    .compass-needle .needle-south {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+    }
+    .compass-needle .needle-north {
+      width: 0; height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-bottom: 55px solid #ef4444;
+      margin-left: -8px;
+      margin-top: -55px;
+      filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8));
+    }
+    .compass-needle .needle-south {
+      width: 0; height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 55px solid #cbd5e1;
+      margin-left: -8px;
+      margin-top: 0;
+    }
+    
+    /* CORRECCIÓN: Puntos cardinales ahora se posicionan respecto al dial fijo */
+    .compass-cardinal { 
+      position: absolute; 
+      font-size: 1em; 
+      font-weight: 900; 
+      color: var(--text-secondary); 
+      text-shadow: 0 0 4px rgba(0,0,0,0.8);
+      z-index: 5;
+    }
     .card-n { top: 8px; left: 50%; transform: translateX(-50%); color: #ef4444; font-size: 1.1em; }
     .card-s { bottom: 8px; left: 50%; transform: translateX(-50%); }
     .card-e { right: 10px; top: 50%; transform: translateY(-50%); }
     .card-o { left: 10px; top: 50%; transform: translateY(-50%); }
-    .compass-needle { width: 6px; height: 110px; position: absolute; top: 25px; left: 77px; transform-origin: 3px 55px; transition: transform 0.12s ease-out; }
-    .needle-north { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-bottom: 55px solid #ef4444; margin-left: -5px; filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8)); }
-    .needle-south { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 55px solid #cbd5e1; margin-left: -5px; }
+    
     .status-badge { font-size: 0.8em; padding: 6px 12px; border-radius: 20px; background: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--border-color); margin-top: 6px; display: inline-block; width: 100%; word-break: break-word; font-weight: 600; }
     #mapaField, #mapaCompletoField, #mapPreview { height: 450px; width: 100%; border-radius: 10px; border: 2px solid var(--border-color); z-index: 1; background: var(--bg-primary); }
     #mapaCompletoField { height: 600px; cursor: default; }
@@ -209,63 +250,17 @@
     .leaflet-popup-tip { background: var(--card-bg) !important; }
     .map-label { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 600; padding: 2px 6px; border-radius: 4px; }
 
-    /* NUEVO: Panel de estadísticas de ruta */
-    .ruta-stats-panel {
-      background: var(--bg-tertiary);
-      border: 2px solid var(--accent-primary);
-      border-radius: 10px;
-      padding: 14px 18px;
-      margin-top: 12px;
-      font-size: 0.95em;
-    }
+    .ruta-stats-panel { background: var(--bg-tertiary); border: 2px solid var(--accent-primary); border-radius: 10px; padding: 14px 18px; margin-top: 12px; font-size: 0.95em; }
     .ruta-stats-panel.hidden { display: none; }
-    .ruta-stats-title {
-      color: var(--accent-primary);
-      font-weight: 800;
-      font-size: 1em;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .ruta-stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 10px;
-    }
-    .ruta-stat-item {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 10px 12px;
-    }
-    .ruta-stat-label {
-      font-size: 0.75em;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 4px;
-    }
-    .ruta-stat-value {
-      font-size: 1.1em;
-      font-weight: 800;
-      color: var(--text-primary);
-    }
+    .ruta-stats-title { color: var(--accent-primary); font-weight: 800; font-size: 1em; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .ruta-stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+    .ruta-stat-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 12px; }
+    .ruta-stat-label { font-size: 0.75em; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+    .ruta-stat-value { font-size: 1.1em; font-weight: 800; color: var(--text-primary); }
     .ruta-stat-value .completado { color: var(--btn-success); }
     .ruta-stat-value .pendiente { color: var(--btn-danger); }
-    .ruta-progress-bar {
-      width: 100%;
-      height: 6px;
-      background: var(--bg-primary);
-      border-radius: 3px;
-      margin-top: 6px;
-      overflow: hidden;
-    }
-    .ruta-progress-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--btn-success) 0%, var(--accent-primary) 100%);
-      transition: width 0.5s ease;
-    }
+    .ruta-progress-bar { width: 100%; height: 6px; background: var(--bg-primary); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+    .ruta-progress-fill { height: 100%; background: linear-gradient(90deg, var(--btn-success) 0%, var(--accent-primary) 100%); transition: width 0.5s ease; }
 
     @media(max-width: 850px) {
       .grid-2, .kml-box-dual, .field-gis-container, .sigpac-mod-code-row { grid-template-columns: 1fr; flex-direction: column; }
@@ -282,7 +277,7 @@
 <body data-theme="tactical">
 
   <div class="header-bar">
-    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v26</div>
+    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v27</div>
     <div class="header-actions">
       <button class="btn-header primary" onclick="vibrate(); activarSensoresGpsYBrujula()">&#x1F4E1; GPS</button>
       <button class="btn-header" onclick="vibrate(); toggleConfig()">&#x2699;&#xFE0F; Config</button>
@@ -388,9 +383,16 @@
       <div class="compass-box">
         <div id="gpsStatusBadge" class="status-badge">GPS: Esperando señal...</div>
         <div id="compassStatusBadge" class="status-badge">Brújula: Inactiva</div>
+        <!-- CORRECCIÓN: Puntos cardinales ahora están FUERA de compassNeedle (fijos en el dial) -->
         <div class="compass-dial">
-          <div class="compass-cardinal card-n">N</div><div class="compass-cardinal card-s">S</div><div class="compass-cardinal card-e">E</div><div class="compass-cardinal card-o">O</div>
-          <div id="compassNeedle" class="compass-needle"><div class="needle-north"></div><div class="needle-south"></div></div>
+          <div class="compass-cardinal card-n">N</div>
+          <div class="compass-cardinal card-s">S</div>
+          <div class="compass-cardinal card-e">E</div>
+          <div class="compass-cardinal card-o">O</div>
+          <div id="compassNeedle" class="compass-needle">
+            <div class="needle-north"></div>
+            <div class="needle-south"></div>
+          </div>
           <div id="bearingNeedle" style="position: absolute; width: 0; height: 0; border-left: 7px solid transparent; border-right: 7px solid transparent; border-bottom: 50px solid #22c55e; top: 30px; left: 73px; transform-origin: 7px 50px; filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8)); z-index: 10;"></div>
         </div>
         <div style="font-size:1.15em; font-weight:800;" id="txtRumbo">--°</div>
@@ -408,7 +410,6 @@
     </div>
   </div>
 
-  <!-- SECCIÓN MAPA COMPLETO CON RUTA ÓPTIMA MEJORADA -->
   <div id="sec-mapa" class="card hidden">
     <h2>&#x1F5FA;&#xFE0F; Mapa Completo de Parcelas</h2>
     <p style="font-size:0.85em; color:var(--text-secondary);">Vista general con todos los puntos y contornos. 🔴 Pendiente | 🟢 Completada</p>
@@ -425,7 +426,6 @@
       <strong style="color:var(--accent-primary);">&#x1F6E3;&#xFE0F; Ruta Óptima Calculada</strong>
       <div id="rutaOptimaDetalles" style="margin-top:6px; color:var(--text-secondary);"></div>
     </div>
-    <!-- NUEVO: Panel de estadísticas de ruta -->
     <div id="rutaStatsPanel" class="ruta-stats-panel hidden">
       <div class="ruta-stats-title">&#x1F4CA; Estadísticas de Itinerario</div>
       <div class="ruta-stats-grid">
@@ -589,9 +589,6 @@
   <div id="toastContainer"></div>
 
   <script>
-    /* =========================================================================
-       VARIABLES GLOBALES
-       ========================================================================= */
     let parcelas = [];
     let contornosGeom = [];
     let parcelaActualIndex = -1;
@@ -618,30 +615,27 @@
     let patronVibracion = 50;
     const CACHE_NAME = 'sigpac-tiles-v1';
 
-    /* NUEVAS VARIABLES PARA RUTA ÓPTIMA */
     let rutaOptimaActiva = false;
     let rutaOptimaLayer = null;
     let rutaOptimaMarcadores = null;
-    let rutaOptimaOrden = []; // Orden de visita calculado
-    let origenRuta = null; // {lat, lng} del punto de origen
+    let rutaOptimaOrden = [];
+    let origenRuta = null;
     let marcadorOrigen = null;
     let modoMarcarOrigen = false;
     let handlerClicMapa = null;
-    let TIEMPO_VISITA_POR_PARCELA = 15; // minutos
+    let TIEMPO_VISITA_POR_PARCELA = 15;
     let HORAS_JORNADA = 7;
     let VELOCIDAD_MEDIA_KMH = 50;
 
-    /* =========================================================================
-       FUNCIÓN GLOBAL: Formatear referencia SIGPAC
-       ========================================================================= */
+    // NUEVAS VARIABLES PARA BRÚJULA CORREGIDA
+    let anguloAcumuladoNeedle = 0;
+    let anguloAcumuladoBearing = 0;
+
     function padReferenceGlobal(parts) {
       const widths = [2, 3, 1, 1, 3, 5, 1];
       return parts.map((part, idx) => String(part).padStart(widths[idx], '0')).join('-');
     }
 
-    /* =========================================================================
-       FUNCIÓN GLOBAL: Integrar colección SIGPAC en la app principal
-       ========================================================================= */
     window.integrarColeccionSIGPAC = function(okItems) {
       if (!okItems || okItems.length === 0) {
         mostrarNotificacion("⚠️ No hay datos válidos para integrar");
@@ -719,7 +713,6 @@
       mostrarNotificacion(`✅ Integrados: ${nuevosPuntos} parcelas, ${nuevosContornos} contornos`);
       cambiarVista('sec-resumen');
 
-      // Recalcular ruta óptima si estaba activa
       if (rutaOptimaActiva) {
         setTimeout(() => {
           mostrarNotificacion('🔄 Recalculando ruta óptima con nuevas parcelas...');
@@ -729,9 +722,6 @@
       }
     };
 
-    /* =========================================================================
-       UTILIDADES
-       ========================================================================= */
     function vibrate() {
       if (!("vibrate" in navigator)) return;
       if (patronVibracion === 0) return;
@@ -766,9 +756,6 @@
       return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
     }
 
-    /* =========================================================================
-       CACHE DE TESELAS
-       ========================================================================= */
     async function precargarTeselasZonas() {
       if (parcelas.length === 0) { mostrarNotificacion("⚠️ No hay parcelas cargadas"); return; }
       if (!('caches' in window)) { mostrarNotificacion("⚠️ Tu navegador no soporta caché offline"); return; }
@@ -829,9 +816,6 @@
       } else { el.textContent = `Teselas cacheadas: No soportado`; }
     }
 
-    /* =========================================================================
-       BOTÓN FOTO
-       ========================================================================= */
     function abrirAppFoto() {
       if (parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) { mostrarNotificacion("⚠️ Selecciona primero una parcela"); return; }
       const nombre = parcelas[parcelaActualIndex].nombre;
@@ -855,9 +839,6 @@
       document.body.removeChild(ta);
     }
 
-    /* =========================================================================
-       TOGGLE GPS
-       ========================================================================= */
     function toggleGPSOMiUbicacion() {
       if (!userCoords) { activarSensoresGpsYBrujula(); mostrarNotificacion("Buscando señal GPS..."); return; }
       if (!leafletMap) return;
@@ -878,9 +859,6 @@
       }
     }
 
-    /* =========================================================================
-       MAPA COMPLETO
-       ========================================================================= */
     function initMapaCompleto() {
       if (mapaCompleto) return;
       mapaCompleto = L.map('mapaCompletoField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
@@ -926,9 +904,6 @@
       }
     }
 
-    /* =========================================================================
-       NUEVO: MARCAR ORIGEN DE RUTA
-       ========================================================================= */
     function activarModoMarcarOrigen() {
       if (!mapaCompleto) {
         initMapaCompleto();
@@ -987,7 +962,6 @@
         mostrarNotificacion('📍 Origen actualizado');
       });
 
-      // Desactivar modo marcado
       modoMarcarOrigen = false;
       const btn = document.getElementById('btnMarcarOrigen');
       btn.classList.remove('activo');
@@ -1012,7 +986,6 @@
       localStorage.removeItem('sigpac_origen_ruta');
       document.getElementById('btnBorrarOrigen').classList.add('hidden');
       
-      // Si hay ruta activa, borrarla también
       if (rutaOptimaActiva) {
         borrarRutaOptima();
       }
@@ -1052,9 +1025,6 @@
       }
     }
 
-    /* =========================================================================
-       NUEVO: CONFIGURACIÓN DE RUTA
-       ========================================================================= */
     function guardarConfigRuta() {
       TIEMPO_VISITA_POR_PARCELA = parseInt(document.getElementById('cfgTiempoVisita').value) || 15;
       HORAS_JORNADA = parseFloat(document.getElementById('cfgHorasJornada').value) || 7;
@@ -1066,7 +1036,6 @@
       
       mostrarNotificacion('⚙️ Parámetros de ruta actualizados');
       
-      // Recalcular estadísticas si hay ruta activa
       if (rutaOptimaActiva) {
         actualizarEstadisticasRuta();
       }
@@ -1082,9 +1051,6 @@
       if (vm) { VELOCIDAD_MEDIA_KMH = parseInt(vm); document.getElementById('cfgVelocidadMedia').value = vm; }
     }
 
-    /* =========================================================================
-       RUTA ÓPTIMA DE VISITA (TSP + OSRM)
-       ========================================================================= */
     function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
       const R = 6371000;
       const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
@@ -1123,9 +1089,9 @@
 
       return orden;
     }
-	    async function obtenerRutaOSRM(coords) {
+
+    async function obtenerRutaOSRM(coords) {
       if (coords.length < 2) return null;
-      // OSRM espera coordenadas en formato "lng,lat;lng,lat"
       const coordStr = coords.map(c => c[0] + ',' + c[1]).join(';');
       const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson&steps=false`;
 
@@ -1152,7 +1118,6 @@
         await new Promise(r => setTimeout(r, 500));
       }
 
-      // Verificar que hay origen marcado
       if (!origenRuta) {
         mostrarNotificacion('⚠️ Primero debes marcar un punto de origen en el mapa.');
         activarModoMarcarOrigen();
@@ -1169,40 +1134,31 @@
       document.getElementById('btnRutaOptima').disabled = true;
 
       try {
-        // Paso 1: Calcular orden óptimo con Nearest Neighbor desde el origen
         const ordenOptimo = algoritmoVecinoMasCercano(pendientes, origenRuta.lat, origenRuta.lng);
         rutaOptimaOrden = ordenOptimo;
 
-        // Paso 2: Construir coordenadas para OSRM (origen -> parcelas -> origen)
-        // OSRM usa formato [lng, lat]
         const coordsOSRM = [[origenRuta.lng, origenRuta.lat]];
         ordenOptimo.forEach(p => coordsOSRM.push([p.lng, p.lat]));
-        coordsOSRM.push([origenRuta.lng, origenRuta.lat]); // Vuelta al origen
+        coordsOSRM.push([origenRuta.lng, origenRuta.lat]);
 
-        // Paso 3: Obtener ruta real por carretera desde OSRM
         let rutaReal = null;
         let distanciaTotal = 0;
         let duracionTotal = 0;
 
         if (coordsOSRM.length >= 2) {
-          // Dividir en chunks de máximo 100 coordenadas (límite de OSRM)
-          // Cada chunk debe empezar donde terminó el anterior
           const chunks = [];
-          const chunkSize = 95; // Dejamos margen por seguridad
+          const chunkSize = 95;
           
           for (let i = 0; i < coordsOSRM.length; i += chunkSize - 1) {
             const end = Math.min(i + chunkSize, coordsOSRM.length);
             const chunk = coordsOSRM.slice(i, end);
             chunks.push(chunk);
-            // Si no llegamos al final, el siguiente chunk empieza en el último punto del actual
             if (end < coordsOSRM.length) {
-              i = end - 2; // -2 porque el for hace i++ y necesitamos que el siguiente empiece en end-1
+              i = end - 2;
             } else {
               break;
             }
           }
-
-          console.log('RUTA: Total puntos:', coordsOSRM.length, 'Chunks:', chunks.length);
 
           const todasLasGeometrias = [];
 
@@ -1210,21 +1166,15 @@
             const chunk = chunks[idx];
             if (chunk.length < 2) continue;
             
-            console.log('RUTA: Procesando chunk', idx + 1, '/', chunks.length, 'con', chunk.length, 'puntos');
-            
             const resultado = await obtenerRutaOSRM(chunk);
             if (resultado) {
               todasLasGeometrias.push(resultado.geometry);
               distanciaTotal += resultado.distancia;
               duracionTotal += resultado.duracion;
-              console.log('RUTA: Chunk OK -', (resultado.distancia/1000).toFixed(2), 'km');
             } else {
-              console.warn('RUTA: Chunk', idx + 1, 'falló. Usando líneas rectas para ese tramo.');
-              // Fallback para este chunk: líneas rectas
-              const fallbackCoords = chunk.map(c => [c[1], c[0]]); // convertir a [lat, lng]
+              const fallbackCoords = chunk.map(c => [c[1], c[0]]);
               todasLasGeometrias.push({ coordinates: fallbackCoords.map(c => [c[1], c[0]]) });
               
-              // Calcular distancia aproximada
               for (let i = 1; i < fallbackCoords.length; i++) {
                 distanciaTotal += calcularDistanciaHaversine(
                   fallbackCoords[i-1][0], fallbackCoords[i-1][1],
@@ -1238,26 +1188,22 @@
             const allCoords = [];
             todasLasGeometrias.forEach((g, idx) => {
               g.coordinates.forEach((c, cIdx) => {
-                // Evitar duplicar el punto de unión entre chunks
                 if (idx > 0 && cIdx === 0 && allCoords.length > 0) return;
-                allCoords.push([c[1], c[0]]); // convertir a [lat, lng] para Leaflet
+                allCoords.push([c[1], c[0]]);
               });
             });
             rutaReal = allCoords;
-            console.log('RUTA: Total coordenadas finales:', allCoords.length);
           }
         }
 
-        // Paso 4: Dibujar en el mapa
         borrarRutaOptimaSilencioso();
 
-        rutaOptimaLayer = L.layerGroup().addTo(mapaCompleto);
-        rutaOptimaMarcadores = L.layerGroup().addTo(mapaCompleto);
+        rutaOptimaLayer = L.featureGroup().addTo(mapaCompleto);
+        rutaOptimaMarcadores = L.featureGroup().addTo(mapaCompleto);
 
         let dibujadoCorrectamente = false;
 
         if (rutaReal && rutaReal.length > 1) {
-          console.log('RUTA: Dibujando línea con', rutaReal.length, 'puntos');
           try {
             L.polyline(rutaReal, {
               color: '#f59e0b',
@@ -1268,15 +1214,12 @@
               lineJoin: 'round'
             }).addTo(rutaOptimaLayer);
             dibujadoCorrectamente = true;
-            console.log('RUTA: Línea dibujada correctamente');
           } catch (e) {
-            console.error('RUTA: Error dibujando línea:', e);
+            console.error('Error dibujando línea:', e);
           }
         }
 
-        // Si no se dibujó correctamente, usar fallback de líneas rectas
         if (!dibujadoCorrectamente) {
-          console.log('RUTA: Usando fallback de líneas rectas');
           const coordsFallback = [[origenRuta.lat, origenRuta.lng]];
           ordenOptimo.forEach(p => coordsFallback.push([p.lat, p.lng]));
           coordsFallback.push([origenRuta.lat, origenRuta.lng]);
@@ -1298,7 +1241,6 @@
           duracionTotal = (distanciaTotal / 1000 / VELOCIDAD_MEDIA_KMH) * 3600;
         }
 
-        // Marcadores de orden de visita
         ordenOptimo.forEach((p, idx) => {
           const numIcon = L.divIcon({
             className: 'ruta-num-icon',
@@ -1311,11 +1253,9 @@
             .addTo(rutaOptimaMarcadores);
         });
 
-        // Ajustar vista
         const bounds = rutaOptimaLayer.getBounds();
         if (bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [50, 50] });
 
-        // Mostrar info
         const distKm = (distanciaTotal / 1000).toFixed(1);
         const durMin = Math.round(duracionTotal / 60);
         const durH = Math.floor(durMin / 60);
@@ -1332,7 +1272,6 @@
         document.getElementById('btnBorrarRuta').classList.remove('hidden');
         rutaOptimaActiva = true;
 
-        // Actualizar estadísticas
         actualizarEstadisticasRuta();
 
         mostrarNotificacion(`✅ Ruta calculada: ${ordenOptimo.length} paradas, ${distKm} km`);
@@ -1345,9 +1284,6 @@
       }
     }
 
-    /* =========================================================================
-       NUEVO: ESTADÍSTICAS DE RUTA
-       ========================================================================= */
     function actualizarEstadisticasRuta() {
       if (!rutaOptimaActiva || rutaOptimaOrden.length === 0) {
         document.getElementById('rutaStatsPanel').classList.add('hidden');
@@ -1356,7 +1292,6 @@
 
       document.getElementById('rutaStatsPanel').classList.remove('hidden');
 
-      // Calcular km totales y tiempo total
       let kmTotales = 0;
       const coordsRuta = [[origenRuta.lat, origenRuta.lng]];
       rutaOptimaOrden.forEach(p => coordsRuta.push([p.lat, p.lng]));
@@ -1368,7 +1303,7 @@
           coordsRuta[i][0], coordsRuta[i][1]
         );
       }
-      kmTotales = kmTotales / 1000; // a km
+      kmTotales = kmTotales / 1000;
 
       const tiempoConduccionTotalMin = (kmTotales / VELOCIDAD_MEDIA_KMH) * 60;
       const tiempoVisitaTotalMin = rutaOptimaOrden.length * TIEMPO_VISITA_POR_PARCELA;
@@ -1376,18 +1311,15 @@
       const minutosPorJornada = HORAS_JORNADA * 60;
       const jornadasTotales = Math.ceil(tiempoTotalMin / minutosPorJornada);
 
-      // Calcular km y tiempo completados (parcelas ya marcadas como completadas)
       const completadas = parcelas.filter(p => p.completada);
       const numCompletadas = completadas.length;
       const numTotales = parcelas.length;
 
-      // Estimación: proporción de parcelas completadas × totales
       const proporcionCompletada = numTotales > 0 ? numCompletadas / numTotales : 0;
       const kmCompletados = kmTotales * proporcionCompletada;
       const tiempoEmpleadoMin = tiempoTotalMin * proporcionCompletada;
       const jornadasEmpleadas = Math.ceil(tiempoEmpleadoMin / minutosPorJornada);
 
-      // Actualizar UI
       document.getElementById('statKmCompletados').textContent = kmCompletados.toFixed(1);
       document.getElementById('statKmTotales').textContent = kmTotales.toFixed(1);
       
@@ -1405,7 +1337,6 @@
       document.getElementById('statParcelasCompletadas').textContent = numCompletadas;
       document.getElementById('statParcelasTotales').textContent = numTotales;
 
-      // Actualizar barras de progreso
       const pctKm = kmTotales > 0 ? (kmCompletados / kmTotales) * 100 : 0;
       const pctTiempo = tiempoTotalMin > 0 ? (tiempoEmpleadoMin / tiempoTotalMin) * 100 : 0;
       const pctJornadas = jornadasTotales > 0 ? (jornadasEmpleadas / jornadasTotales) * 100 : 0;
@@ -1438,9 +1369,6 @@
       mostrarNotificacion('🗑️ Ruta óptima borrada.');
     }
 
-    /* =========================================================================
-       ALERTAS PROXIMIDAD
-       ========================================================================= */
     function solicitarPermisoNotificaciones() { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); }
     function reproducirSonidoAlerta() {
       try {
@@ -1500,9 +1428,6 @@
       mostrarNotificacion(`Alerta: ${distAlerta}m cada ${intervaloEscaneo/1000}s`);
     }
 
-    /* =========================================================================
-       GPS Y BRÚJULA
-       ========================================================================= */
     function initMap() {
       if (leafletMap) return;
       leafletMap = L.map('mapaField', { zoomControl: true, attributionControl: false }).setView([40.416775, -3.703790], 6);
@@ -1585,21 +1510,56 @@
       }
       if (heading !== null && !isNaN(heading)) actualizarRumboUI(heading, fuente);
     }
+
+    /* =========================================================================
+       CORRECCIÓN: Función auxiliar para calcular diferencia angular más corta
+       Evita el salto brusco de 360° cuando se pasa por el norte
+       ========================================================================= */
+    function diferenciaAngular(actual, nuevo) {
+      let diff = nuevo - actual;
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+      return diff;
+    }
+
+    /* =========================================================================
+       CORRECCIÓN: ActualizarRumboUI con interpolación angular suave
+       - Aguja roja + puntos cardinales giran suavemente sin saltos
+       - Aguja verde (rumbo al destino) también interpola correctamente
+       ========================================================================= */
     function actualizarRumboUI(heading, fuente) {
       currentHeading = heading;
+      
+      // === AGUJA ROJA (norte) ===
       const needle = document.getElementById('compassNeedle');
-      if (needle) needle.style.transform = `rotate(${-heading}deg)`;
+      if (needle) {
+        const rotacionObjetivo = -heading;
+        const diff = diferenciaAngular(anguloAcumuladoNeedle, rotacionObjetivo);
+        anguloAcumuladoNeedle += diff;
+        needle.style.transform = `rotate(${anguloAcumuladoNeedle}deg)`;
+      }
+      
+      // === AGUJA VERDE (rumbo al destino) ===
       if (userCoords && parcelaActualIndex >= 0) {
         const p = parcelas[parcelaActualIndex];
         const bearing = calcularRumboEntrePuntos(userCoords.lat, userCoords.lng, p.lat, p.lng);
         const bNeedle = document.getElementById('bearingNeedle');
-        if (bNeedle) bNeedle.style.transform = `rotate(${bearing - heading}deg)`;
+        if (bNeedle) {
+          const rotacionBearing = bearing - heading;
+          const diff = diferenciaAngular(anguloAcumuladoBearing, rotacionBearing);
+          anguloAcumuladoBearing += diff;
+          bNeedle.style.transform = `rotate(${anguloAcumuladoBearing}deg)`;
+        }
       }
+      
+      // === Texto del rumbo ===
       const txt = document.getElementById('txtRumbo');
       if (txt) txt.textContent = `${Math.round(heading)}° ${rumboACardinal(heading)}`;
+      
       actualizarBadgeBrujula(`${fuente} (${sensorSampleCount})`);
       actualizarCalculosNav();
     }
+
     function actualizarCalculosNav() {
       if (!userCoords || parcelaActualIndex < 0 || !parcelas[parcelaActualIndex]) return;
       const p = parcelas[parcelaActualIndex];
@@ -1611,9 +1571,6 @@
     function actualizarBadgeGps(t) { const e = document.getElementById('gpsStatusBadge'); if (e) e.textContent = t; }
     function actualizarBadgeBrujula(t) { const e = document.getElementById('compassStatusBadge'); if (e) e.textContent = t; }
 
-    /* =========================================================================
-       KML
-       ========================================================================= */
     function setupKMLListeners() {
       document.getElementById('inputKmlPuntos').addEventListener('change', (e) => {
         const f = e.target.files[0]; if (!f) return;
@@ -1689,9 +1646,6 @@
       if (notificar) mostrarNotificacion(`Campo cambiado a: "${field}"`);
     }
 
-    /* =========================================================================
-       EDICIÓN
-       ========================================================================= */
     function cargarParcelaEnEdicion(idx) {
       if (idx < 0 || idx >= parcelas.length) return;
       parcelaActualIndex = idx;
@@ -1742,9 +1696,7 @@
         else { p.fechaCompletada = null; mostrarNotificacion("↩️ Marcada como pendiente"); }
         guardarEnLocalStorage(); cargarParcelaEnEdicion(parcelaActualIndex); renderTablaResumen();
         
-        // NUEVO: Recalcular estadísticas de ruta si está activa
         if (rutaOptimaActiva) {
-          // Si la ruta estaba calculada, recalcularla para quitar la parcela completada
           setTimeout(() => {
             const pendientes = parcelas.filter(pp => !pp.completada);
             if (pendientes.length === 0) {
@@ -1758,9 +1710,6 @@
       }
     }
 
-    /* =========================================================================
-       TABLA
-       ========================================================================= */
     function renderTablaResumen() {
       const tbody = document.getElementById('tablaResumen'), contador = document.getElementById('resumenContador');
       if (!tbody) return;
@@ -1794,9 +1743,6 @@
       }).join('');
     }
 
-    /* =========================================================================
-       LOCALSTORAGE
-       ========================================================================= */
     function guardarEnLocalStorage() {
       try {
         localStorage.setItem('sigpac_parcelas_data', JSON.stringify(parcelas));
@@ -1824,7 +1770,6 @@
         const sl = localStorage.getItem('sigpac_tam_letra');
         if (sl) { document.getElementById('cfgTamLetra').value = sl; document.body.style.fontSize = sl; }
         
-        // NUEVO: Cargar configuración de ruta
         cargarConfigRuta();
         
         if (parcelas.length > 0) { renderTablaResumen(); cargarParcelaEnEdicion(0); mostrarNotificacion("Datos previos cargados."); }
@@ -1841,7 +1786,6 @@
       document.getElementById('secCamposKml').classList.add('hidden');
       renderTablaResumen(); cerrarModalConfirm(); mostrarNotificacion("Memoria limpiada.");
       
-      // Borrar origen y ruta si existen
       if (marcadorOrigen && mapaCompleto) {
         mapaCompleto.removeLayer(marcadorOrigen);
         marcadorOrigen = null;
@@ -1851,9 +1795,6 @@
       if (rutaOptimaActiva) borrarRutaOptima();
     }
 
-    /* =========================================================================
-       BÚSQUEDA PRINCIPAL (REGEX)
-       ========================================================================= */
     const USOS_SIGPAC_DB = [
       { codigo: "TA", descripcion: "Tierras Arables" }, { codigo: "TH", descripcion: "Huerta" },
       { codigo: "CS", descripcion: "Cítricos" }, { codigo: "FY", descripcion: "Frutales" },
@@ -2940,7 +2881,7 @@
   { "codigo": "237", "descripcion": "Visto en campo 2026" },
   { "codigo": "238", "descripcion": "Monitorizaci  n 2026: Pendiente confirmar por renovaci  n Ortofoto" },
   { "codigo": "239", "descripcion": "Actividad agraria comprobada en 2026" }
-];  
+]; 
 
     function agregarAObservaciones(sel, tipo) {
       if (!sel.value) return;
@@ -2991,9 +2932,6 @@
       renderList(INCIDENCIAS_SIGPAC_DB,'listIncidenciasRegex','countIncidencias',regex);
     }
 
-    /* =========================================================================
-       CONFIG Y UI
-       ========================================================================= */
     function toggleConfig() { document.getElementById('panelConfig').classList.toggle('hidden'); }
     function cambiarTema(tema, guardar = true) {
       document.body.setAttribute('data-theme', tema);
@@ -3034,9 +2972,6 @@
       setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 4000);
     }
 
-    /* =========================================================================
-       EXPORTAR
-       ========================================================================= */
     function exportarCSV() {
       if (!parcelas.length) return mostrarNotificacion("No hay datos.");
       let csv = "ID;Nombre;Latitud;Longitud;Estado;FechaCompletado;Observaciones\n";
@@ -3054,9 +2989,6 @@
     }
     function descargarArchivo(c, n, t) { const b = new Blob(["\ufeff"+c], {type:t}); const l = document.createElement("a"); l.href = URL.createObjectURL(b); l.download = n; l.click(); }
 
-    /* =========================================================================
-       INICIO
-       ========================================================================= */
     window.onload = function() {
       poblardesplegables();
       initMap();
@@ -3067,7 +2999,6 @@
     };
   </script>
 
-  <!-- MÓDULO SIGPAC (Encapsulado) -->
   <script>
     (function () {
       const BASE_URL = 'https://sigpac-hubcloud.es/servicioconsultassigpac/query';
