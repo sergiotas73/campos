@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Visitar Parcelas</title>
+  <title>Gestión de Parcelas y SIGPAC v26 - Tactical Pro</title>
 
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -81,6 +81,7 @@
     .btn { background-color: var(--btn-primary); color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95em; font-weight: 600; text-decoration: none; transition: all 0.2s; }
     .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
     .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
     .btn-export { background-color: var(--btn-success); }
     .btn-export-json { background-color: var(--btn-purple); }
     .btn-danger { background-color: var(--btn-danger); }
@@ -92,6 +93,9 @@
     .btn-mapview { background-color: var(--btn-map); }
     .btn-cache { background-color: #0891b2; }
     .btn-integrate { background-color: var(--btn-success); color: white; font-weight: 700; }
+    .btn-origen { background-color: #f59e0b; color: #000; font-weight: 700; }
+    .btn-origen.activo { background-color: #ef4444; color: white; animation: pulseOrigen 1.2s infinite; }
+    @keyframes pulseOrigen { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 50% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } }
     .kml-box-dual { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
     .kml-upload-card { background: var(--bg-tertiary); border: 2px dashed var(--border-color); padding: 16px; border-radius: 10px; transition: all 0.2s; }
     .kml-upload-card:hover { border-color: var(--accent-primary); }
@@ -108,7 +112,8 @@
     .needle-south { width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 55px solid #cbd5e1; margin-left: -5px; }
     .status-badge { font-size: 0.8em; padding: 6px 12px; border-radius: 20px; background: var(--badge-bg); color: var(--badge-text); border: 1px solid var(--border-color); margin-top: 6px; display: inline-block; width: 100%; word-break: break-word; font-weight: 600; }
     #mapaField, #mapaCompletoField, #mapPreview { height: 450px; width: 100%; border-radius: 10px; border: 2px solid var(--border-color); z-index: 1; background: var(--bg-primary); }
-    #mapaCompletoField { height: 600px; }
+    #mapaCompletoField { height: 600px; cursor: default; }
+    #mapaCompletoField.modo-origen { cursor: crosshair !important; }
     .user-location-marker { width: 24px; height: 24px; background-color: var(--accent-primary); border: 3px solid #ffffff; border-radius: 50%; box-shadow: 0 0 12px rgba(0,0,0,0.6); position: relative; }
     .user-location-marker::after { content: ''; position: absolute; top: -6px; left: -6px; width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--accent-primary); animation: pulseGps 1.6s infinite; opacity: 0; }
     @keyframes pulseGps { 0% { transform: scale(0.8); opacity: 0.9; } 100% { transform: scale(2.2); opacity: 0; } }
@@ -204,6 +209,64 @@
     .leaflet-popup-tip { background: var(--card-bg) !important; }
     .map-label { background: var(--card-bg); border: 1px solid var(--border-color); color: var(--text-primary); font-weight: 600; padding: 2px 6px; border-radius: 4px; }
 
+    /* NUEVO: Panel de estadísticas de ruta */
+    .ruta-stats-panel {
+      background: var(--bg-tertiary);
+      border: 2px solid var(--accent-primary);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 12px;
+      font-size: 0.95em;
+    }
+    .ruta-stats-panel.hidden { display: none; }
+    .ruta-stats-title {
+      color: var(--accent-primary);
+      font-weight: 800;
+      font-size: 1em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ruta-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+    .ruta-stat-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .ruta-stat-label {
+      font-size: 0.75em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .ruta-stat-value {
+      font-size: 1.1em;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .ruta-stat-value .completado { color: var(--btn-success); }
+    .ruta-stat-value .pendiente { color: var(--btn-danger); }
+    .ruta-progress-bar {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-primary);
+      border-radius: 3px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    .ruta-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--btn-success) 0%, var(--accent-primary) 100%);
+      transition: width 0.5s ease;
+    }
+
     @media(max-width: 850px) {
       .grid-2, .kml-box-dual, .field-gis-container, .sigpac-mod-code-row { grid-template-columns: 1fr; flex-direction: column; }
       .nav-btn { font-size: 0.75em; padding: 12px 8px; }
@@ -219,7 +282,7 @@
 <body data-theme="tactical">
 
   <div class="header-bar">
-    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v25</div>
+    <div class="header-title">&#x1F33E; SIGPAC TACTICAL v26</div>
     <div class="header-actions">
       <button class="btn-header primary" onclick="vibrate(); activarSensoresGpsYBrujula()">&#x1F4E1; GPS</button>
       <button class="btn-header" onclick="vibrate(); toggleConfig()">&#x2699;&#xFE0F; Config</button>
@@ -254,6 +317,10 @@
     </div>
     <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x1F524; Tamaño de Letra</h4>
     <select id="cfgTamLetra" onchange="vibrate(); aplicarAjustesConfig()"><option value="0.85em">Compacto</option><option value="1em" selected>Normal</option><option value="1.15em">Grande</option><option value="1.3em">Extra Grande</option></select>
+    <h4 style="color: var(--text-primary); margin: 16px 0 12px 0;">&#x23F1;&#xFE0F; Parámetros de Ruta Óptima</h4>
+    <div class="config-row"><label>Tiempo visita por parcela (min):</label><input type="number" id="cfgTiempoVisita" value="15" min="5" max="60" step="5" onchange="vibrate(); guardarConfigRuta()"></div>
+    <div class="config-row"><label>Horas por jornada laboral:</label><input type="number" id="cfgHorasJornada" value="7" min="1" max="12" step="0.5" onchange="vibrate(); guardarConfigRuta()"></div>
+    <div class="config-row"><label>Velocidad media estimada (km/h):</label><input type="number" id="cfgVelocidadMedia" value="50" min="10" max="120" step="5" onchange="vibrate(); guardarConfigRuta()"></div>
   </div>
 
   <div id="proximityAlertBar" class="proximity-alert-bar">
@@ -341,13 +408,56 @@
     </div>
   </div>
 
+  <!-- SECCIÓN MAPA COMPLETO CON RUTA ÓPTIMA MEJORADA -->
   <div id="sec-mapa" class="card hidden">
     <h2>&#x1F5FA;&#xFE0F; Mapa Completo de Parcelas</h2>
     <p style="font-size:0.85em; color:var(--text-secondary);">Vista general con todos los puntos y contornos. 🔴 Pendiente | 🟢 Completada</p>
     <div id="mapaCompletoField"></div>
     <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap;">
       <button class="btn btn-gps" onclick="vibrate(); ajustarMapaCompleto()">&#x1F50D; Ajustar vista</button>
+      <button id="btnMarcarOrigen" class="btn btn-origen" onclick="vibrate(); activarModoMarcarOrigen()">&#x1F4CD; Marcar Origen</button>
+      <button id="btnBorrarOrigen" class="btn btn-danger hidden" onclick="vibrate(); borrarOrigenRuta()">&#x274C; Borrar Origen</button>
+      <button id="btnRutaOptima" class="btn btn-integrate" onclick="vibrate(); calcularRutaOptima()">&#x1F6E3;&#xFE0F; Ruta Óptima</button>
+      <button id="btnBorrarRuta" class="btn btn-danger hidden" onclick="vibrate(); borrarRutaOptima()">&#x274C; Borrar Ruta</button>
       <button class="btn btn-completar" onclick="vibrate(); cambiarVista('sec-edicion')">&#x21A9;&#xFE0F; Volver a GPS</button>
+    </div>
+    <div id="rutaOptimaInfo" class="hidden" style="margin-top:10px; padding:10px; background:var(--bg-tertiary); border-radius:8px; border:1px solid var(--border-color); font-size:0.9em;">
+      <strong style="color:var(--accent-primary);">&#x1F6E3;&#xFE0F; Ruta Óptima Calculada</strong>
+      <div id="rutaOptimaDetalles" style="margin-top:6px; color:var(--text-secondary);"></div>
+    </div>
+    <!-- NUEVO: Panel de estadísticas de ruta -->
+    <div id="rutaStatsPanel" class="ruta-stats-panel hidden">
+      <div class="ruta-stats-title">&#x1F4CA; Estadísticas de Itinerario</div>
+      <div class="ruta-stats-grid">
+        <div class="ruta-stat-item">
+          <div class="ruta-stat-label">Kilómetros</div>
+          <div class="ruta-stat-value">
+            <span class="completado" id="statKmCompletados">0</span> / <span id="statKmTotales">0</span> km
+          </div>
+          <div class="ruta-progress-bar"><div class="ruta-progress-fill" id="progressKm" style="width:0%"></div></div>
+        </div>
+        <div class="ruta-stat-item">
+          <div class="ruta-stat-label">Tiempo de Conducción</div>
+          <div class="ruta-stat-value">
+            <span class="completado" id="statTiempoEmpleado">0h</span> / <span id="statTiempoTotal">0h</span>
+          </div>
+          <div class="ruta-progress-bar"><div class="ruta-progress-fill" id="progressTiempo" style="width:0%"></div></div>
+        </div>
+        <div class="ruta-stat-item">
+          <div class="ruta-stat-label">Jornadas (7h/día)</div>
+          <div class="ruta-stat-value">
+            <span class="completado" id="statJornadasEmpleadas">0</span> / <span id="statJornadasTotales">0</span> días
+          </div>
+          <div class="ruta-progress-bar"><div class="ruta-progress-fill" id="progressJornadas" style="width:0%"></div></div>
+        </div>
+        <div class="ruta-stat-item">
+          <div class="ruta-stat-label">Parcelas</div>
+          <div class="ruta-stat-value">
+            <span class="completado" id="statParcelasCompletadas">0</span> / <span id="statParcelasTotales">0</span>
+          </div>
+          <div class="ruta-progress-bar"><div class="ruta-progress-fill" id="progressParcelas" style="width:0%"></div></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -508,24 +618,26 @@
     let patronVibracion = 50;
     const CACHE_NAME = 'sigpac-tiles-v1';
 
+    /* NUEVAS VARIABLES PARA RUTA ÓPTIMA */
+    let rutaOptimaActiva = false;
+    let rutaOptimaLayer = null;
+    let rutaOptimaMarcadores = null;
+    let rutaOptimaOrden = []; // Orden de visita calculado
+    let origenRuta = null; // {lat, lng} del punto de origen
+    let marcadorOrigen = null;
+    let modoMarcarOrigen = false;
+    let handlerClicMapa = null;
+    let TIEMPO_VISITA_POR_PARCELA = 15; // minutos
+    let HORAS_JORNADA = 7;
+    let VELOCIDAD_MEDIA_KMH = 50;
+
     /* =========================================================================
        FUNCIÓN GLOBAL: Formatear referencia SIGPAC
        ========================================================================= */
-function padReferenceGlobal(parts) {
-  if (!Array.isArray(parts) || parts.length !== 7) {
-    console.error('padReferenceGlobal: parts inválido', parts);
-    return 'Referencia inválida';
-  }
-  const widths = [2, 3, 1, 1, 3, 5, 1];
-  return parts.map((part, idx) => {
-    const num = parseInt(part, 10);
-    if (isNaN(num)) {
-      console.error('padReferenceGlobal: parte no es número', part);
-      return '0';
+    function padReferenceGlobal(parts) {
+      const widths = [2, 3, 1, 1, 3, 5, 1];
+      return parts.map((part, idx) => String(part).padStart(widths[idx], '0')).join('-');
     }
-    return String(num).padStart(widths[idx], '0');
-  }).join('-');
-}
 
     /* =========================================================================
        FUNCIÓN GLOBAL: Integrar colección SIGPAC en la app principal
@@ -549,18 +661,16 @@ function padReferenceGlobal(parts) {
 
         if (!feature || !feature.geometry) return;
 
-const props = feature.properties || {};
-
-// Reconstruir la referencia EXACTA como la introdujo el usuario (sin padding)
-let nombre;
-if (item.parts && Array.isArray(item.parts)) {
-  nombre = item.parts.join('-');
-} else if (item.id) {
-  nombre = item.id;
-} else {
-  nombre = `Parcela SIGPAC ${startIndex + idx + 1}`;
-}
+        const props = feature.properties || {};
         
+        let nombre;
+        if (item.parts && Array.isArray(item.parts)) {
+          nombre = item.parts.join('-');
+        } else if (item.id) {
+          nombre = item.id;
+        } else {
+          nombre = `Parcela SIGPAC ${startIndex + idx + 1}`;
+        }
         
         let lat = 0, lng = 0;
         const geom = feature.geometry;
@@ -603,12 +713,20 @@ if (item.parts && Array.isArray(item.parts)) {
         nuevosPuntos++;
       });
 
- guardarEnLocalStorage();
-// NO llamar a poblarSelectCampoIdentificador() aquí, porque sobrescribiría los nombres
-renderTablaResumen();
+      guardarEnLocalStorage();
+      renderTablaResumen();
+      
+      mostrarNotificacion(`✅ Integrados: ${nuevosPuntos} parcelas, ${nuevosContornos} contornos`);
+      cambiarVista('sec-resumen');
 
-mostrarNotificacion(`✅ Integrados: ${nuevosPuntos} parcelas, ${nuevosContornos} contornos`);
-cambiarVista('sec-resumen');
+      // Recalcular ruta óptima si estaba activa
+      if (rutaOptimaActiva) {
+        setTimeout(() => {
+          mostrarNotificacion('🔄 Recalculando ruta óptima con nuevas parcelas...');
+          cambiarVista('sec-mapa');
+          setTimeout(() => calcularRutaOptima(), 800);
+        }, 1000);
+      }
     };
 
     /* =========================================================================
@@ -806,6 +924,518 @@ cambiarVista('sec-resumen');
         polygonsCompletos.forEach(p => bounds.extend(p.getBounds()));
         if (bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [40, 40] });
       }
+    }
+
+    /* =========================================================================
+       NUEVO: MARCAR ORIGEN DE RUTA
+       ========================================================================= */
+    function activarModoMarcarOrigen() {
+      if (!mapaCompleto) {
+        initMapaCompleto();
+        dibujarMapaCompleto();
+        setTimeout(() => activarModoMarcarOrigen(), 500);
+        return;
+      }
+
+      modoMarcarOrigen = !modoMarcarOrigen;
+      const btn = document.getElementById('btnMarcarOrigen');
+      const mapDiv = document.getElementById('mapaCompletoField');
+
+      if (modoMarcarOrigen) {
+        btn.classList.add('activo');
+        btn.innerHTML = '&#x274C; Cancelar Marcado';
+        mapDiv.classList.add('modo-origen');
+        mostrarNotificacion('📍 Haz clic en el mapa para marcar el punto de origen');
+
+        handlerClicMapa = function(e) {
+          colocarOrigen(e.latlng.lat, e.latlng.lng);
+        };
+        mapaCompleto.on('click', handlerClicMapa);
+      } else {
+        btn.classList.remove('activo');
+        btn.innerHTML = '&#x1F4CD; Marcar Origen';
+        mapDiv.classList.remove('modo-origen');
+        if (handlerClicMapa) {
+          mapaCompleto.off('click', handlerClicMapa);
+          handlerClicMapa = null;
+        }
+      }
+    }
+
+    function colocarOrigen(lat, lng) {
+      origenRuta = { lat: lat, lng: lng };
+      
+      if (marcadorOrigen && mapaCompleto) {
+        mapaCompleto.removeLayer(marcadorOrigen);
+      }
+
+      const origenIcon = L.divIcon({
+        className: 'origen-icon',
+        html: `<div style="background:#22c55e; color:#fff; width:32px; height:32px; border-radius:50% 50% 50% 0; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; border:3px solid #fff; box-shadow:0 3px 10px rgba(0,0,0,0.5); transform:rotate(-45deg);"><span style="transform:rotate(45deg);">🏠</span></div>`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+      });
+
+      marcadorOrigen = L.marker([lat, lng], { icon: origenIcon, draggable: true })
+        .addTo(mapaCompleto)
+        .bindPopup(`<b>🏠 Punto de Origen</b><br>${lat.toFixed(5)}, ${lng.toFixed(5)}<br><small>Arrastra para ajustar</small>`);
+
+      marcadorOrigen.on('dragend', function(e) {
+        const pos = e.target.getLatLng();
+        origenRuta = { lat: pos.lat, lng: pos.lng };
+        guardarOrigenEnLocalStorage();
+        mostrarNotificacion('📍 Origen actualizado');
+      });
+
+      // Desactivar modo marcado
+      modoMarcarOrigen = false;
+      const btn = document.getElementById('btnMarcarOrigen');
+      btn.classList.remove('activo');
+      btn.innerHTML = '&#x1F4CD; Marcar Origen';
+      document.getElementById('mapaCompletoField').classList.remove('modo-origen');
+      if (handlerClicMapa) {
+        mapaCompleto.off('click', handlerClicMapa);
+        handlerClicMapa = null;
+      }
+
+      document.getElementById('btnBorrarOrigen').classList.remove('hidden');
+      guardarOrigenEnLocalStorage();
+      mostrarNotificacion('✅ Origen marcado. Ya puedes calcular la ruta óptima.');
+    }
+
+    function borrarOrigenRuta() {
+      if (marcadorOrigen && mapaCompleto) {
+        mapaCompleto.removeLayer(marcadorOrigen);
+        marcadorOrigen = null;
+      }
+      origenRuta = null;
+      localStorage.removeItem('sigpac_origen_ruta');
+      document.getElementById('btnBorrarOrigen').classList.add('hidden');
+      
+      // Si hay ruta activa, borrarla también
+      if (rutaOptimaActiva) {
+        borrarRutaOptima();
+      }
+      
+      mostrarNotificacion('🗑️ Origen borrado');
+    }
+
+    function guardarOrigenEnLocalStorage() {
+      if (origenRuta) {
+        localStorage.setItem('sigpac_origen_ruta', JSON.stringify(origenRuta));
+      }
+    }
+
+    function cargarOrigenDeLocalStorage() {
+      const saved = localStorage.getItem('sigpac_origen_ruta');
+      if (saved) {
+        try {
+          origenRuta = JSON.parse(saved);
+          if (mapaCompleto && origenRuta) {
+            const origenIcon = L.divIcon({
+              className: 'origen-icon',
+              html: `<div style="background:#22c55e; color:#fff; width:32px; height:32px; border-radius:50% 50% 50% 0; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; border:3px solid #fff; box-shadow:0 3px 10px rgba(0,0,0,0.5); transform:rotate(-45deg);"><span style="transform:rotate(45deg);">🏠</span></div>`,
+              iconSize: [32, 32],
+              iconAnchor: [16, 32]
+            });
+            marcadorOrigen = L.marker([origenRuta.lat, origenRuta.lng], { icon: origenIcon, draggable: true })
+              .addTo(mapaCompleto)
+              .bindPopup(`<b>🏠 Punto de Origen</b><br>${origenRuta.lat.toFixed(5)}, ${origenRuta.lng.toFixed(5)}<br><small>Arrastra para ajustar</small>`);
+            marcadorOrigen.on('dragend', function(e) {
+              const pos = e.target.getLatLng();
+              origenRuta = { lat: pos.lat, lng: pos.lng };
+              guardarOrigenEnLocalStorage();
+            });
+            document.getElementById('btnBorrarOrigen').classList.remove('hidden');
+          }
+        } catch (e) { console.warn('Error cargando origen:', e); }
+      }
+    }
+
+    /* =========================================================================
+       NUEVO: CONFIGURACIÓN DE RUTA
+       ========================================================================= */
+    function guardarConfigRuta() {
+      TIEMPO_VISITA_POR_PARCELA = parseInt(document.getElementById('cfgTiempoVisita').value) || 15;
+      HORAS_JORNADA = parseFloat(document.getElementById('cfgHorasJornada').value) || 7;
+      VELOCIDAD_MEDIA_KMH = parseInt(document.getElementById('cfgVelocidadMedia').value) || 50;
+      
+      localStorage.setItem('sigpac_tiempo_visita', TIEMPO_VISITA_POR_PARCELA);
+      localStorage.setItem('sigpac_horas_jornada', HORAS_JORNADA);
+      localStorage.setItem('sigpac_velocidad_media', VELOCIDAD_MEDIA_KMH);
+      
+      mostrarNotificacion('⚙️ Parámetros de ruta actualizados');
+      
+      // Recalcular estadísticas si hay ruta activa
+      if (rutaOptimaActiva) {
+        actualizarEstadisticasRuta();
+      }
+    }
+
+    function cargarConfigRuta() {
+      const tv = localStorage.getItem('sigpac_tiempo_visita');
+      const hj = localStorage.getItem('sigpac_horas_jornada');
+      const vm = localStorage.getItem('sigpac_velocidad_media');
+      
+      if (tv) { TIEMPO_VISITA_POR_PARCELA = parseInt(tv); document.getElementById('cfgTiempoVisita').value = tv; }
+      if (hj) { HORAS_JORNADA = parseFloat(hj); document.getElementById('cfgHorasJornada').value = hj; }
+      if (vm) { VELOCIDAD_MEDIA_KMH = parseInt(vm); document.getElementById('cfgVelocidadMedia').value = vm; }
+    }
+
+    /* =========================================================================
+       RUTA ÓPTIMA DE VISITA (TSP + OSRM)
+       ========================================================================= */
+    function calcularDistanciaHaversine(lat1, lon1, lat2, lon2) {
+      const R = 6371000;
+      const p1 = lat1 * Math.PI / 180, p2 = lat2 * Math.PI / 180;
+      const dp = (lat2 - lat1) * Math.PI / 180, dl = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dp/2) * Math.sin(dp/2) + Math.cos(p1) * Math.cos(p2) * Math.sin(dl/2) * Math.sin(dl/2);
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function algoritmoVecinoMasCercano(parcelasPendientes, inicioLat, inicioLon) {
+      if (parcelasPendientes.length === 0) return [];
+      if (parcelasPendientes.length === 1) return [parcelasPendientes[0]];
+
+      const visitados = new Set();
+      const orden = [];
+      let actualLat = inicioLat;
+      let actualLon = inicioLon;
+
+      while (orden.length < parcelasPendientes.length) {
+        let mejorDist = Infinity;
+        let mejorIdx = -1;
+
+        for (let i = 0; i < parcelasPendientes.length; i++) {
+          if (visitados.has(i)) continue;
+          const d = calcularDistanciaHaversine(actualLat, actualLon, parcelasPendientes[i].lat, parcelasPendientes[i].lng);
+          if (d < mejorDist) {
+            mejorDist = d;
+            mejorIdx = i;
+          }
+        }
+
+        visitados.add(mejorIdx);
+        orden.push(parcelasPendientes[mejorIdx]);
+        actualLat = parcelasPendientes[mejorIdx].lat;
+        actualLon = parcelasPendientes[mejorIdx].lng;
+      }
+
+      return orden;
+    }
+	    async function obtenerRutaOSRM(coords) {
+      if (coords.length < 2) return null;
+      // OSRM espera coordenadas en formato "lng,lat;lng,lat"
+      const coordStr = coords.map(c => c[0] + ',' + c[1]).join(';');
+      const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson&steps=false`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) return null;
+        const data = await response.json();
+        if (data.code !== 'Ok' || !data.routes || data.routes.length === 0) return null;
+        return {
+          geometry: data.routes[0].geometry,
+          distancia: data.routes[0].distance,
+          duracion: data.routes[0].duration
+        };
+      } catch (e) {
+        console.warn('OSRM no disponible, usando líneas rectas:', e);
+        return null;
+      }
+    }
+
+    async function calcularRutaOptima() {
+      if (!mapaCompleto) {
+        initMapaCompleto();
+        dibujarMapaCompleto();
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      // Verificar que hay origen marcado
+      if (!origenRuta) {
+        mostrarNotificacion('⚠️ Primero debes marcar un punto de origen en el mapa.');
+        activarModoMarcarOrigen();
+        return;
+      }
+
+      const pendientes = parcelas.filter(p => !p.completada);
+      if (pendientes.length < 1) {
+        mostrarNotificacion('⚠️ No hay parcelas pendientes para visitar.');
+        return;
+      }
+
+      mostrarNotificacion('🛣️ Calculando ruta óptima para ' + pendientes.length + ' parcelas...');
+      document.getElementById('btnRutaOptima').disabled = true;
+
+      try {
+        // Paso 1: Calcular orden óptimo con Nearest Neighbor desde el origen
+        const ordenOptimo = algoritmoVecinoMasCercano(pendientes, origenRuta.lat, origenRuta.lng);
+        rutaOptimaOrden = ordenOptimo;
+
+        // Paso 2: Construir coordenadas para OSRM (origen -> parcelas -> origen)
+        // OSRM usa formato [lng, lat]
+        const coordsOSRM = [[origenRuta.lng, origenRuta.lat]];
+        ordenOptimo.forEach(p => coordsOSRM.push([p.lng, p.lat]));
+        coordsOSRM.push([origenRuta.lng, origenRuta.lat]); // Vuelta al origen
+
+        // Paso 3: Obtener ruta real por carretera desde OSRM
+        let rutaReal = null;
+        let distanciaTotal = 0;
+        let duracionTotal = 0;
+
+        if (coordsOSRM.length >= 2) {
+          // Dividir en chunks de máximo 100 coordenadas (límite de OSRM)
+          // Cada chunk debe empezar donde terminó el anterior
+          const chunks = [];
+          const chunkSize = 95; // Dejamos margen por seguridad
+          
+          for (let i = 0; i < coordsOSRM.length; i += chunkSize - 1) {
+            const end = Math.min(i + chunkSize, coordsOSRM.length);
+            const chunk = coordsOSRM.slice(i, end);
+            chunks.push(chunk);
+            // Si no llegamos al final, el siguiente chunk empieza en el último punto del actual
+            if (end < coordsOSRM.length) {
+              i = end - 2; // -2 porque el for hace i++ y necesitamos que el siguiente empiece en end-1
+            } else {
+              break;
+            }
+          }
+
+          console.log('RUTA: Total puntos:', coordsOSRM.length, 'Chunks:', chunks.length);
+
+          const todasLasGeometrias = [];
+
+          for (let idx = 0; idx < chunks.length; idx++) {
+            const chunk = chunks[idx];
+            if (chunk.length < 2) continue;
+            
+            console.log('RUTA: Procesando chunk', idx + 1, '/', chunks.length, 'con', chunk.length, 'puntos');
+            
+            const resultado = await obtenerRutaOSRM(chunk);
+            if (resultado) {
+              todasLasGeometrias.push(resultado.geometry);
+              distanciaTotal += resultado.distancia;
+              duracionTotal += resultado.duracion;
+              console.log('RUTA: Chunk OK -', (resultado.distancia/1000).toFixed(2), 'km');
+            } else {
+              console.warn('RUTA: Chunk', idx + 1, 'falló. Usando líneas rectas para ese tramo.');
+              // Fallback para este chunk: líneas rectas
+              const fallbackCoords = chunk.map(c => [c[1], c[0]]); // convertir a [lat, lng]
+              todasLasGeometrias.push({ coordinates: fallbackCoords.map(c => [c[1], c[0]]) });
+              
+              // Calcular distancia aproximada
+              for (let i = 1; i < fallbackCoords.length; i++) {
+                distanciaTotal += calcularDistanciaHaversine(
+                  fallbackCoords[i-1][0], fallbackCoords[i-1][1],
+                  fallbackCoords[i][0], fallbackCoords[i][1]
+                );
+              }
+            }
+          }
+
+          if (todasLasGeometrias.length > 0) {
+            const allCoords = [];
+            todasLasGeometrias.forEach((g, idx) => {
+              g.coordinates.forEach((c, cIdx) => {
+                // Evitar duplicar el punto de unión entre chunks
+                if (idx > 0 && cIdx === 0 && allCoords.length > 0) return;
+                allCoords.push([c[1], c[0]]); // convertir a [lat, lng] para Leaflet
+              });
+            });
+            rutaReal = allCoords;
+            console.log('RUTA: Total coordenadas finales:', allCoords.length);
+          }
+        }
+
+        // Paso 4: Dibujar en el mapa
+        borrarRutaOptimaSilencioso();
+
+        rutaOptimaLayer = L.layerGroup().addTo(mapaCompleto);
+        rutaOptimaMarcadores = L.layerGroup().addTo(mapaCompleto);
+
+        let dibujadoCorrectamente = false;
+
+        if (rutaReal && rutaReal.length > 1) {
+          console.log('RUTA: Dibujando línea con', rutaReal.length, 'puntos');
+          try {
+            L.polyline(rutaReal, {
+              color: '#f59e0b',
+              weight: 4,
+              opacity: 0.85,
+              dashArray: null,
+              lineCap: 'round',
+              lineJoin: 'round'
+            }).addTo(rutaOptimaLayer);
+            dibujadoCorrectamente = true;
+            console.log('RUTA: Línea dibujada correctamente');
+          } catch (e) {
+            console.error('RUTA: Error dibujando línea:', e);
+          }
+        }
+
+        // Si no se dibujó correctamente, usar fallback de líneas rectas
+        if (!dibujadoCorrectamente) {
+          console.log('RUTA: Usando fallback de líneas rectas');
+          const coordsFallback = [[origenRuta.lat, origenRuta.lng]];
+          ordenOptimo.forEach(p => coordsFallback.push([p.lat, p.lng]));
+          coordsFallback.push([origenRuta.lat, origenRuta.lng]);
+
+          L.polyline(coordsFallback, {
+            color: '#f59e0b',
+            weight: 3,
+            opacity: 0.8,
+            dashArray: '10, 8'
+          }).addTo(rutaOptimaLayer);
+
+          distanciaTotal = 0;
+          for (let i = 1; i < coordsFallback.length; i++) {
+            distanciaTotal += calcularDistanciaHaversine(
+              coordsFallback[i-1][0], coordsFallback[i-1][1],
+              coordsFallback[i][0], coordsFallback[i][1]
+            );
+          }
+          duracionTotal = (distanciaTotal / 1000 / VELOCIDAD_MEDIA_KMH) * 3600;
+        }
+
+        // Marcadores de orden de visita
+        ordenOptimo.forEach((p, idx) => {
+          const numIcon = L.divIcon({
+            className: 'ruta-num-icon',
+            html: `<div style="background:#f59e0b; color:#000; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px; border:2px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.5);">${idx + 1}</div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12]
+          });
+          L.marker([p.lat, p.lng], { icon: numIcon })
+            .bindPopup(`<b>Parada ${idx + 1}</b><br>${p.nombre}`)
+            .addTo(rutaOptimaMarcadores);
+        });
+
+        // Ajustar vista
+        const bounds = rutaOptimaLayer.getBounds();
+        if (bounds.isValid()) mapaCompleto.fitBounds(bounds, { padding: [50, 50] });
+
+        // Mostrar info
+        const distKm = (distanciaTotal / 1000).toFixed(1);
+        const durMin = Math.round(duracionTotal / 60);
+        const durH = Math.floor(durMin / 60);
+        const durM = durMin % 60;
+        const durStr = durH > 0 ? `${durH}h ${durM}min` : `${durM} min`;
+
+        document.getElementById('rutaOptimaInfo').classList.remove('hidden');
+        document.getElementById('rutaOptimaDetalles').innerHTML =
+          `🏠 Inicio/Vuelta: Origen marcado → 📍 <strong>${ordenOptimo.length} parcelas</strong> pendientes<br>` +
+          `📏 Distancia total: <strong>${distKm} km</strong> (itinerario cerrado)<br>` +
+          (duracionTotal > 0 ? `⏱️ Tiempo conducción: <strong>${durStr}</strong><br>` : '') +
+          `🟢 Numeración amarilla = orden de visita`;
+
+        document.getElementById('btnBorrarRuta').classList.remove('hidden');
+        rutaOptimaActiva = true;
+
+        // Actualizar estadísticas
+        actualizarEstadisticasRuta();
+
+        mostrarNotificacion(`✅ Ruta calculada: ${ordenOptimo.length} paradas, ${distKm} km`);
+
+      } catch (e) {
+        console.error('Error calculando ruta:', e);
+        mostrarNotificacion('⚠️ Error al calcular la ruta: ' + e.message);
+      } finally {
+        document.getElementById('btnRutaOptima').disabled = false;
+      }
+    }
+
+    /* =========================================================================
+       NUEVO: ESTADÍSTICAS DE RUTA
+       ========================================================================= */
+    function actualizarEstadisticasRuta() {
+      if (!rutaOptimaActiva || rutaOptimaOrden.length === 0) {
+        document.getElementById('rutaStatsPanel').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('rutaStatsPanel').classList.remove('hidden');
+
+      // Calcular km totales y tiempo total
+      let kmTotales = 0;
+      const coordsRuta = [[origenRuta.lat, origenRuta.lng]];
+      rutaOptimaOrden.forEach(p => coordsRuta.push([p.lat, p.lng]));
+      coordsRuta.push([origenRuta.lat, origenRuta.lng]);
+
+      for (let i = 1; i < coordsRuta.length; i++) {
+        kmTotales += calcularDistanciaHaversine(
+          coordsRuta[i-1][0], coordsRuta[i-1][1],
+          coordsRuta[i][0], coordsRuta[i][1]
+        );
+      }
+      kmTotales = kmTotales / 1000; // a km
+
+      const tiempoConduccionTotalMin = (kmTotales / VELOCIDAD_MEDIA_KMH) * 60;
+      const tiempoVisitaTotalMin = rutaOptimaOrden.length * TIEMPO_VISITA_POR_PARCELA;
+      const tiempoTotalMin = tiempoConduccionTotalMin + tiempoVisitaTotalMin;
+      const minutosPorJornada = HORAS_JORNADA * 60;
+      const jornadasTotales = Math.ceil(tiempoTotalMin / minutosPorJornada);
+
+      // Calcular km y tiempo completados (parcelas ya marcadas como completadas)
+      const completadas = parcelas.filter(p => p.completada);
+      const numCompletadas = completadas.length;
+      const numTotales = parcelas.length;
+
+      // Estimación: proporción de parcelas completadas × totales
+      const proporcionCompletada = numTotales > 0 ? numCompletadas / numTotales : 0;
+      const kmCompletados = kmTotales * proporcionCompletada;
+      const tiempoEmpleadoMin = tiempoTotalMin * proporcionCompletada;
+      const jornadasEmpleadas = Math.ceil(tiempoEmpleadoMin / minutosPorJornada);
+
+      // Actualizar UI
+      document.getElementById('statKmCompletados').textContent = kmCompletados.toFixed(1);
+      document.getElementById('statKmTotales').textContent = kmTotales.toFixed(1);
+      
+      const horasEmpleadas = Math.floor(tiempoEmpleadoMin / 60);
+      const minEmpleados = Math.round(tiempoEmpleadoMin % 60);
+      const horasTotales = Math.floor(tiempoTotalMin / 60);
+      const minTotales = Math.round(tiempoTotalMin % 60);
+      
+      document.getElementById('statTiempoEmpleado').textContent = `${horasEmpleadas}h ${minEmpleados}m`;
+      document.getElementById('statTiempoTotal').textContent = `${horasTotales}h ${minTotales}m`;
+      
+      document.getElementById('statJornadasEmpleadas').textContent = jornadasEmpleadas;
+      document.getElementById('statJornadasTotales').textContent = jornadasTotales;
+      
+      document.getElementById('statParcelasCompletadas').textContent = numCompletadas;
+      document.getElementById('statParcelasTotales').textContent = numTotales;
+
+      // Actualizar barras de progreso
+      const pctKm = kmTotales > 0 ? (kmCompletados / kmTotales) * 100 : 0;
+      const pctTiempo = tiempoTotalMin > 0 ? (tiempoEmpleadoMin / tiempoTotalMin) * 100 : 0;
+      const pctJornadas = jornadasTotales > 0 ? (jornadasEmpleadas / jornadasTotales) * 100 : 0;
+      const pctParcelas = numTotales > 0 ? (numCompletadas / numTotales) * 100 : 0;
+
+      document.getElementById('progressKm').style.width = pctKm + '%';
+      document.getElementById('progressTiempo').style.width = pctTiempo + '%';
+      document.getElementById('progressJornadas').style.width = pctJornadas + '%';
+      document.getElementById('progressParcelas').style.width = pctParcelas + '%';
+    }
+
+    function borrarRutaOptimaSilencioso() {
+      if (rutaOptimaLayer && mapaCompleto) {
+        mapaCompleto.removeLayer(rutaOptimaLayer);
+        rutaOptimaLayer = null;
+      }
+      if (rutaOptimaMarcadores && mapaCompleto) {
+        mapaCompleto.removeLayer(rutaOptimaMarcadores);
+        rutaOptimaMarcadores = null;
+      }
+      rutaOptimaOrden = [];
+    }
+
+    function borrarRutaOptima() {
+      borrarRutaOptimaSilencioso();
+      rutaOptimaActiva = false;
+      document.getElementById('rutaOptimaInfo').classList.add('hidden');
+      document.getElementById('rutaStatsPanel').classList.add('hidden');
+      document.getElementById('btnBorrarRuta').classList.add('hidden');
+      mostrarNotificacion('🗑️ Ruta óptima borrada.');
     }
 
     /* =========================================================================
@@ -1111,6 +1741,20 @@ cambiarVista('sec-resumen');
         if (p.completada) { p.fechaCompletada = new Date().toISOString(); mostrarNotificacion(`✔ Completada el ${formatearFecha(p.fechaCompletada)}`); }
         else { p.fechaCompletada = null; mostrarNotificacion("↩️ Marcada como pendiente"); }
         guardarEnLocalStorage(); cargarParcelaEnEdicion(parcelaActualIndex); renderTablaResumen();
+        
+        // NUEVO: Recalcular estadísticas de ruta si está activa
+        if (rutaOptimaActiva) {
+          // Si la ruta estaba calculada, recalcularla para quitar la parcela completada
+          setTimeout(() => {
+            const pendientes = parcelas.filter(pp => !pp.completada);
+            if (pendientes.length === 0) {
+              borrarRutaOptima();
+              mostrarNotificacion('🎉 ¡Todas las parcelas están completadas!');
+            } else {
+              calcularRutaOptima();
+            }
+          }, 500);
+        }
       }
     }
 
@@ -1179,6 +1823,10 @@ cambiarVista('sec-resumen');
         if (st) cambiarTema(st, false);
         const sl = localStorage.getItem('sigpac_tam_letra');
         if (sl) { document.getElementById('cfgTamLetra').value = sl; document.body.style.fontSize = sl; }
+        
+        // NUEVO: Cargar configuración de ruta
+        cargarConfigRuta();
+        
         if (parcelas.length > 0) { renderTablaResumen(); cargarParcelaEnEdicion(0); mostrarNotificacion("Datos previos cargados."); }
         actualizarStatsCache();
       } catch(e) { console.warn("Error LS:", e); }
@@ -1186,12 +1834,21 @@ cambiarVista('sec-resumen');
     function mostrarConfirmacionLimpieza() { document.getElementById('modalConfirm').classList.remove('hidden'); }
     function cerrarModalConfirm() { document.getElementById('modalConfirm').classList.add('hidden'); }
     function limpiarLocalStorage() {
-      ['sigpac_parcelas_data','sigpac_contornos_data','sigpac_fields_list','sigpac_selected_field'].forEach(k => localStorage.removeItem(k));
+      ['sigpac_parcelas_data','sigpac_contornos_data','sigpac_fields_list','sigpac_selected_field','sigpac_origen_ruta'].forEach(k => localStorage.removeItem(k));
       parcelas = []; contornosGeom = []; kmlFieldsList = new Set();
       document.getElementById('totalPuntos').textContent = '0';
       document.getElementById('totalContornos').textContent = '0';
       document.getElementById('secCamposKml').classList.add('hidden');
       renderTablaResumen(); cerrarModalConfirm(); mostrarNotificacion("Memoria limpiada.");
+      
+      // Borrar origen y ruta si existen
+      if (marcadorOrigen && mapaCompleto) {
+        mapaCompleto.removeLayer(marcadorOrigen);
+        marcadorOrigen = null;
+      }
+      origenRuta = null;
+      document.getElementById('btnBorrarOrigen').classList.add('hidden');
+      if (rutaOptimaActiva) borrarRutaOptima();
     }
 
     /* =========================================================================
@@ -1209,7 +1866,7 @@ cambiarVista('sec-resumen');
       { codigo: "ZU", descripcion: "Zona Urbana" }, { codigo: "IM", descripcion: "Improductivo" },
       { codigo: "CA", descripcion: "Caminos" }, { codigo: "ZC", descripcion: "Zona de Concentración Parcelaria" }
     ];
-     const PRODUCTOS_DB = [
+      const PRODUCTOS_DB = [
   { codigo:0, descripcion:"PRODUCTO DESCONOCIDO" },
   { codigo:1, descripcion:"TRIGO BLANDO" },
   { codigo:2, descripcion:"ESPELTA" },
@@ -2356,7 +3013,14 @@ cambiarVista('sec-resumen');
       const ts = document.getElementById(secId); if (ts) ts.classList.remove('hidden');
       const tb = document.getElementById('navBtn-'+secId); if (tb) tb.classList.add('active');
       if (secId === 'sec-edicion' && leafletMap) setTimeout(() => leafletMap.invalidateSize(), 200);
-      if (secId === 'sec-mapa') { initMapaCompleto(); setTimeout(() => { mapaCompleto.invalidateSize(); dibujarMapaCompleto(); }, 200); }
+      if (secId === 'sec-mapa') { 
+        initMapaCompleto(); 
+        setTimeout(() => { 
+          mapaCompleto.invalidateSize(); 
+          dibujarMapaCompleto(); 
+          cargarOrigenDeLocalStorage();
+        }, 200); 
+      }
     }
     function poblardesplegables() {
       const llenar = (id, items, label) => { const s = document.getElementById(id); if (!s) return; s.innerHTML = `<option value="">-- ${label} --</option>` + items.map(i => `<option value="${i.codigo}: ${i.descripcion}">${i.codigo} - ${i.descripcion}</option>`).join(''); };
